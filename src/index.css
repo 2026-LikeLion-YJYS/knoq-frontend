@@ -1,20 +1,24 @@
+/* [수정] 기본 초기화 */
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+/* [수정] PC에서 모바일 화면 바깥 영역 */
+body {
+  background: #000;
+}
+
+/* [수정] 실제 앱 화면 영역 */
+#root {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0 auto;
+}
+
+/* [수정] 전체 요소 크기 계산 방식 통일 */
 * {
   box-sizing: border-box;
-}
-
-html,
-body {
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  min-width: 320px;
-}
-
-button,
-input,
-textarea,
-select {
-  font: inherit;
 }
