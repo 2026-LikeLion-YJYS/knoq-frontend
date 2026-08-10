@@ -1,0 +1,40 @@
+/* [추가] 공통 헤더 */
+.main-header {
+  width: 100%;
+  height: 72px;
+  padding: 0 31px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: transparent;
+}
+
+/* [추가] KNOQ 로고 */
+.main-header__logo {
+  height: 22px;
+  display: block;
+}
+
+/* [추가] 우측 알림 / 설정 영역 */
+.main-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* [추가] 버튼 기본 스타일 제거 */
+.main-header button {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+/* [추가] 알림 / 설정 아이콘 */
+.main-header__icon {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
