@@ -8,6 +8,7 @@ import Onboarding1 from "./pages/onboarding/Onboarding1";
 import StaffIntro from "./pages/staff/StaffIntro";
 import StaffLogin from "./pages/staff/StaffLogin";
 import StaffRequests from "./pages/staff/StaffRequests";
+import StaffRequestDetail from "./pages/staff/StaffRequestDetail";
 
 function App() {
   // [수정] 화면 이동 상태
@@ -52,8 +53,25 @@ function App() {
           // [추가] 선택한 요청 ID 저장
           setSelectedRequestId(requestId);
 
-          // [추가] StaffRequestDetail 구현 전 임시 확인
-          alert(`${requestId} 상담 상세 화면으로 이동합니다.`);
+          // [수정] 직원 상담 요청 상세 화면으로 이동
+          setCurrentPage("staffRequestDetail");
+        }}
+      />
+    );
+  }
+
+  // [추가] 직원 상담 요청 상세 화면
+  if (currentPage === "staffRequestDetail") {
+    return (
+      <StaffRequestDetail
+        requestId={selectedRequestId}
+        onSettings={() => {
+          // [추가] StaffExitModal 구현 전 임시 동작
+          alert("POS 설정을 엽니다.");
+        }}
+        onEndConsultation={(requestId) => {
+          // [추가] StaffConsultationEnd 구현 전 임시 동작
+          alert(`${requestId} 상담을 종료합니다.`);
         }}
       />
     );
