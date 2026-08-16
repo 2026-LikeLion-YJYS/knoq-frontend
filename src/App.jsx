@@ -1,16 +1,19 @@
-import { useState } from "react";
-// [추가] 도움 요청 화면 확인용
 import Help from "./pages/help/Help";
+import Onboarding1 from "./pages/onboarding/Onboarding1";
 
 function App() {
-  // [추가] 현재 선택된 메뉴 확인용
-  const [activeTab, setActiveTab] = useState("analysis");
+  const CURRENT_PAGE = "help"; // "onboarding" 또는 "help"로 변경하여 페이지 전환
 
-  return (
-    
-      <Help />
-      
-  );
+  if (CURRENT_PAGE === "onboarding") {
+    return (
+      <Onboarding1
+        onSelectPrivate={() => alert("프라이빗 선택")}
+        onSelectAccount={() => alert("계정 선택")}
+      />
+    );
+  }
+
+  return <Help />;
 }
 
 export default App;
