@@ -1,5 +1,6 @@
-// [추가] 도움 화면 상태 관리를 위한 useState
+// [수정] 도움 화면 상태 관리와 화면 이동 사용
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 // [추가] 기존 공통 컴포넌트 사용
 import MainHeader from "../../components/MainHeader/MainHeader";
@@ -7,6 +8,9 @@ import BottomNav from "../../components/BottomNav/BottomNav";
 
 // [추가] 저장목록 모달 사용
 import SavedProductModal from "./SavedProductModal";
+
+// [추가] 상담 요청 완료 화면 사용
+import HelpComplete from "./HelpComplete";
 
 import "./Help.css";
 
@@ -47,6 +51,9 @@ const checkStoreOpen = () => {
  * [수정] 어드바이저 도움 요청 화면
  */
 function Help() {
+  // [추가] 다른 화면으로 이동
+  const navigate = useNavigate();
+
   // [추가] 선택한 도움 유형 관리
   const [selectedHelpType, setSelectedHelpType] = useState("");
 
@@ -58,6 +65,9 @@ function Help() {
 
   // [추가] 라이프스타일 및 니즈 공유 여부 관리
   const [shareMyInfo, setShareMyInfo] = useState(false);
+
+  // [추가] 상담 요청 완료 화면 표시 여부 관리
+  const [isRequestComplete, setIsRequestComplete] = useState(false);
 
   // [추가] 현재 매장 운영시간 여부 확인
   const isStoreOpen = checkStoreOpen();
@@ -75,24 +85,59 @@ function Help() {
     setSelectedProducts(products);
     setIsProductModalOpen(false);
   };
+
   /**
-   * [추가] 도움 요청하기 클릭 시
-   * 사용자가 선택한 값을 하나의 데이터로 묶습니다.
+   * [수정] 도움 요청하기 클릭 시 요청 데이터를 구성하고
+   * API 연동 전에는 바로 완료 화면으로 이동합니다.
    */
   const handleRequestHelp = () => {
     if (!canRequestHelp) return;
 
+    // [수정] 추후 POST 상담 요청 API에서 사용할 데이터 구조
     const requestData = {
       helpType: selectedHelpType,
-      products: selectedProducts,
-      shareMyInfo,
+      productIds: selectedProducts.map((product) => product.id),
+      includeNeedsAnalysis: shareMyInfo,
     };
 
     console.log("도움 요청 데이터:", requestData);
 
-    // 추후 API 연동 시 여기서 전달
-    // requestAdvisorHelp(requestData);
+    // [추가] API 연동 전 임시로 완료 화면 표시
+    setIsRequestComplete(true);
+
+    /*
+     * [추후 API 연동]
+     * const response = await requestAdvisorHelp(requestData);
+     *
+     * if (response 성공) {
+     *   setIsRequestComplete(true);
+     * }
+     */
   };
+
+  /**
+   * [추가] 상담 완료 화면에서 홈으로 이동할 때
+   * 기존 상담 신청 내용을 초기화하고 도움 화면으로 돌아갑니다.
+   */
+  const handleGoHome = () => {
+    setSelectedHelpType("");
+    setSelectedProducts([]);
+    setShareMyInfo(false);
+    setIsProductModalOpen(false);
+    setIsRequestComplete(false);
+  };
+
+  // [추가] 상담 요청 완료 후 완료 화면 표시
+  if (isRequestComplete) {
+    return (
+      <HelpComplete
+        // [수정] 상담 신청 상태 초기화 후 도움 홈 화면으로 이동
+        onGoHome={handleGoHome}
+        // [추가] 알림 화면으로 이동
+        onViewNotifications={() => navigate("/alarm")}
+      />
+    );
+  }
 
   return (
     <div className="help-page">
@@ -158,7 +203,9 @@ function Help() {
                 key={`empty-product-${index}`}
                 className="help-add-card"
                 type="button"
-                aria-label={`상담 제품 ${selectedProducts.length + index + 1} 추가`}
+                aria-label={`상담 제품 ${
+                  selectedProducts.length + index + 1
+                } 추가`}
                 onClick={() => setIsProductModalOpen(true)}
               >
                 +
@@ -223,7 +270,9 @@ function Help() {
 
         {/* [수정] 매장 운영시간과 도움 유형에 따른 요청 버튼 */}
         <button
-          className={`help-request-button ${canRequestHelp ? "is-active" : ""}`}
+          className={`help-request-button ${
+            canRequestHelp ? "is-active" : ""
+          }`}
           type="button"
           disabled={!canRequestHelp}
           onClick={handleRequestHelp}
