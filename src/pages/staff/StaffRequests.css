@@ -1,0 +1,261 @@
+/* 직원 상담 요청 목록 화면 전체 영역 */
+.staff-requests {
+  width: 100%;
+  max-width: 744px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: 48px 32px 32px;
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  color: #ffffff;
+  background:
+    radial-gradient(
+      149.83% 46.17% at 80.28% -15.61%,
+      rgba(218, 87, 0, 0.5) 0%,
+      rgba(36, 34, 30, 0.5) 100%
+    ),
+    #24221e;
+
+  font-family: Pretendard, sans-serif;
+  box-sizing: border-box;
+}
+
+/* 상단 KNOQ 로고와 설정 영역 */
+.staff-requests__header {
+  width: 100%;
+  height: 54px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* KNOQ 로고 */
+.staff-requests__logo {
+  display: block;
+  width: 90px;
+  height: auto;
+  object-fit: contain;
+}
+
+/* 설정 버튼 */
+.staff-requests__setting-button {
+  width: 54px;
+  height: 54px;
+  padding: 7px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: transparent;
+  border: 0;
+
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 설정 아이콘 */
+.staff-requests__setting-icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* 요청 목록 제목 */
+.staff-requests__title {
+  margin: 64px 0 48px;
+
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: -0.03em;
+}
+
+/* 요청 카드 목록 */
+.staff-requests__list {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 개별 상담 요청 카드 */
+.staff-request-card {
+  width: 100%;
+  min-height: 153px;
+  padding: 26px 27px 26px 32px;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 145px;
+  align-items: center;
+  gap: 28px;
+  border-radius: 16px;
+  background: rgba(82, 82, 82, 0.4);
+  box-sizing: border-box;
+}
+
+/* 요청 정보 영역 */
+.staff-request-card__information {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* 도움 유형 */
+.staff-request-card__heading {
+  margin-bottom: 14px;
+}
+
+.staff-request-card__type {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 150%; /* 36px */
+  letter-spacing: -0.48px;
+}
+
+/* 요청 상세 정보 한 줄 */
+.staff-request-card__row {
+  min-height: 32px;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 요청 정보 라벨 */
+.staff-request-card__label {
+  width: 88px;
+  flex-shrink: 0;
+
+  color: #bbb;
+  font-family: Pretendard, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.32px;
+}
+
+/* SVG 점선 */
+.staff-request-card__line {
+  display: block;
+  width: 104px;
+  height: auto;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+/* 고객 닉네임 */
+.staff-request-card__nickname {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 150%; /* 24px */
+  letter-spacing: -0.32px;
+  white-space: nowrap;
+}
+
+/* 닉네임 뒤 '님' */
+.staff-request-card__nickname-suffix {
+  color: #bbb;
+  text-align: center;
+  font-family: Pretendard;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%; /* 21px */
+  letter-spacing: -0.28px;
+}
+
+/* 라이프스타일 태그 목록 */
+.staff-request-card__tags {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* 라이프스타일 태그 */
+.staff-request-card__tag {
+  padding: 6px 13px;
+
+  color: #ffffff;
+  background: #62615f;
+  border-radius: 999px;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* 상담 시작 버튼 */
+.staff-request-card__start-button {
+  width: 146px;
+  height: 100px;
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #ffffff;
+  background: #FC7810;
+  border: 0;
+  border-radius: 10px;
+
+  font-family: Pretendard, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 150%; /* 24px */
+letter-spacing: -0.32px;
+
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    transform 0.1s ease;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 상담 시작 버튼 클릭 효과 */
+.staff-request-card__start-button:active {
+  background: #e86200;
+  transform: scale(0.97);
+}
+
+/* 접수된 요청이 없을 때 */
+.staff-requests__empty {
+  width: 100%;
+  padding: 64px 20px;
+
+  color: #a8a8a8;
+  background: rgba(63, 62, 60, 0.55);
+  border-radius: 16px;
+
+  font-size: 18px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* 키보드 접근 시 포커스 표시 */
+.staff-requests__setting-button:focus-visible,
+.staff-request-card__start-button:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.9);
+  outline-offset: 4px;
+}

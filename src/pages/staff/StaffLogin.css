@@ -266,28 +266,3 @@
   outline: 3px solid rgba(255, 255, 255, 0.9);
   outline-offset: 4px;
 }
-
-/* 작은 높이의 모바일 화면 대응 */
-@media (max-height: 800px) {
-  .staff-login {
-    padding-top: 24px;
-    padding-bottom: 20px;
-  }
-
-  .staff-login__content {
-    padding-top: 50px;
-  }
-
-  .staff-login__pin {
-    margin-top: 42px;
-  }
-
-  .staff-login__keypad {
-    margin-top: 48px;
-    row-gap: 14px;
-  }
-
-  .staff-login__error {
-    top: 82px;
-  }
-}

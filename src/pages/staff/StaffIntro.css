@@ -133,18 +133,3 @@
   outline: 3px solid rgba(255, 255, 255, 0.9);
   outline-offset: 4px;
 }
-
-/* 작은 모바일 화면 대응 */
-@media (max-height: 700px) {
-  .staff-intro__header {
-    padding-top: 54px;
-  }
-
-  .staff-intro__logo-area {
-    top: 54%;
-  }
-
-  .staff-intro__bottom {
-    padding-bottom: 24px;
-  }
-}
