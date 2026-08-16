@@ -1,0 +1,459 @@
+/* [수정] 도움 화면 전체 요소 크기 계산 통일 */
+.help-page,
+.help-page * {
+  box-sizing: border-box;
+}
+
+/* [수정] 393px 고정 없이 전체 화면을 사용하는 도움 페이지 */
+.help-page {
+  position: relative;
+
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+
+  overflow-x: hidden;
+
+  color: #ffffff;
+  font-family: Pretendard, sans-serif;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.31) -33.49%,
+      rgba(255, 142, 67, 0.31) 99.99%
+    ),
+    #24221e;
+}
+
+/* [수정] 모바일 393px에서 실제 본문 너비가 345px이 되도록 설정 */
+.help-content {
+  width: 100%;
+  padding: 8px 24px 110px;
+}
+
+/* =========================
+   상단 안내 문구
+========================= */
+
+/* [수정] 상단 안내 영역 */
+.help-intro {
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+/* [수정] 원하는 순간, 어드바이저와 연결하세요 */
+.help-intro h1 {
+  align-self: stretch;
+
+  margin: 0 0 4px;
+
+  color: #ffffff;
+  font-family: Pretendard, sans-serif;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 150%;
+  letter-spacing: -0.5px;
+}
+
+/* [수정] 자유롭게 탐색한 후 도움 안내 문구 */
+.help-intro p {
+  align-self: stretch;
+
+  margin: 0;
+
+  color: #bbbbbb;
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.3px;
+}
+
+/* =========================
+   도움 화면 공통 영역
+========================= */
+
+/* [수정] 각 도움 기능 영역 */
+.help-section {
+  width: 100%;
+  margin-bottom: 26px;
+}
+
+/* [수정] 도움 유형 선택, 제품 추가 등 영역 제목 */
+.help-section h2 {
+  margin: 0 0 14px;
+
+  color: rgba(255, 255, 255, 0.9);
+  font-family: Pretendard, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.32px;
+}
+
+/* =========================
+   도움 유형 선택
+========================= */
+
+/* [수정] 도움 유형 2열 배치 */
+.help-type-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 10px;
+
+  width: 100%;
+}
+
+/* [수정] 도움 유형 버튼 */
+.help-type-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-width: 0;
+  height: 50px;
+  padding: 14px 0;
+
+  color: rgba(255, 255, 255, 0.7);
+  font-family: Pretendard, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.28px;
+  white-space: nowrap;
+
+  background: rgba(46, 46, 46, 0.60);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+
+  cursor: default;
+}
+
+/* [수정] 현재 선택된 도움 유형 */
+.help-type-button[aria-pressed="true"] {
+  color: #ffffff;
+
+  background: rgba(46, 46, 46, 0.2);
+  border: 1px solid #ff8e43;
+
+  box-shadow: 0 2px 12px rgba(255, 142, 67, 0.2);
+}
+
+/* =========================
+   제품 추가
+========================= */
+
+/* [수정] 상담 제품 3칸 배치 */
+.help-product-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
+}
+
+/* [수정] 선택된 제품 카드 */
+.help-product-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-width: 0;
+  height: 102px;
+  overflow: hidden;
+
+  background: rgba(46, 46, 46, 0.45);
+  border: 1px solid #ff8e43;
+  border-radius: 16px;
+
+  box-shadow: 0 2px 12px rgba(255, 142, 67, 0.2);
+}
+
+/* [수정] 선택된 제품 이미지 */
+.help-product-card img {
+  display: block;
+
+  width: 88%;
+  height: 88%;
+
+  object-fit: contain;
+}
+
+/* [수정] 비어 있는 제품 추가 칸 */
+.help-add-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-width: 0;
+  height: 102px;
+  padding: 0;
+
+  color: #bbbbbb;
+  font-family: Pretendard, sans-serif;
+  font-size: 44px;
+  font-style: normal;
+  font-weight: 300;
+  line-height: 1;
+
+  background: rgba(46, 46, 46, 0.45);
+  border: 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+
+  cursor: default;
+}
+
+/* =========================
+   공유할 나의 정보
+========================= */
+
+/* [수정] 공유 정보 제목과 체크박스 배치 */
+.help-share-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  width: 100%;
+}
+
+/* [수정] 제목 아래 간격 유지 */
+.help-share-title h2 {
+  margin-bottom: 14px;
+}
+
+/* [수정] 기본 체크박스 디자인 제거 */
+.help-checkbox {
+  position: relative;
+
+  flex-shrink: 0;
+
+  width: 23px;
+  height: 21px;
+  margin: 0 0 14px;
+  padding: 0;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  background: #ff8e43;
+  border: 0;
+  border-radius: 3px;
+
+  cursor: default;
+}
+
+/* [수정] 체크박스의 흰색 체크 표시 */
+.help-checkbox:checked::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  color: #ffffff;
+  font-family: "SF Pro", Pretendard, sans-serif;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 590;
+  line-height: 150%;
+  letter-spacing: -0.3px;
+
+  content: "✓";
+
+  transform: translate(-50%, -52%);
+}
+
+/* [수정] 라이프스타일과 니즈를 묶는 상자 */
+.help-info-card {
+  width: 100%;
+  height: 142px;
+  padding: 10px 13px;
+  border-radius: 16px;
+  background: radial-gradient(59.76% 166% at 51.59% 129%, rgba(245, 158, 11, 0.20) 0%, rgba(248, 124, 42, 0.30) 100%);
+}
+
+/* [수정] 라이프스타일 제목과 태그 배치 */
+.help-lifestyle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  height: 34px;
+}
+
+/* [수정] 라이프스타일과 니즈 제목 */
+.help-lifestyle h3,
+.help-needs h3 {
+  margin: 0;
+  margin-left: 5px;
+  color: rgba(255, 255, 255, 0.9);
+  font-family: Pretendard, sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.28px;
+}
+
+/* [수정] 라이프스타일 태그 목록 */
+.help-tag-list {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* [수정] 모던, 미니멀 태그 */
+.help-tag-list span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 76px;
+  height: 34px;
+  padding: 0;
+
+  color: #fff;
+  font-family: Pretendard, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.24px;
+
+  background: rgba(73, 56, 43, 0.5);
+  border-radius: 100px;
+}
+
+/* [수정] 나의 니즈 영역 */
+.help-needs {
+  width: 100%;
+  margin-top: 4px;
+}
+
+/* [수정] 나의 니즈를 묶는 상자 */
+.help-needs-list {
+  display: grid;
+  grid-template-columns: 1.15fr 0.9fr 1.3fr 1.2fr;
+  gap: 12px;
+
+  width: 100%;
+  height: 58px;
+  margin-top: 4px;
+  padding: 7px 8px;
+
+  background: rgba(73, 56, 43, 0.5);
+  border-radius: 10px;
+}
+
+/* [수정] 니즈 개별 항목 */
+.help-needs-list div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 0;
+}
+
+/* [수정] 카테고리, 소재, 사이즈, 컬러 */
+.help-needs-list span {
+  display: block;
+  margin-bottom: 6px;
+
+  color: #bbb;
+  font-family: Pretendard, sans-serif;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+}
+
+/* [수정] 니즈 분석값 */
+.help-needs-list p {
+  display: block;
+  margin: 0;
+  max-width: 100%;
+
+  color: rgba(255, 255, 255, 0.90);
+  font-family: Pretendard, sans-serif;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.22px;
+  white-space: nowrap;
+}
+
+/* =========================
+   도움 요청 버튼
+========================= */
+
+/* [수정] 도움 요청하기 버튼 */
+.help-request-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: calc(100% - 44px);
+  height: 50px;
+  margin: 20px auto 0;
+  padding: 13px 0;
+
+  color: #ffffff;
+  font-family: Pretendard, sans-serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.32px;
+  white-space: nowrap;
+
+  background: radial-gradient(
+    59.76% 166% at 51.59% 129%,
+    #f59e0b 0%,
+    #fc7810 100%
+  );
+
+  border: 0;
+  border-radius: 50px;
+
+  cursor: default;
+}
+
+/* =========================
+   작은 모바일 화면 대응
+========================= */
+
+/* [추가] 360px 이하에서도 내용이 잘리지 않도록 조정 */
+@media (max-width: 360px) {
+  .help-content {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .help-type-button {
+    font-size: 13px;
+  }
+
+  .help-tag-list {
+    gap: 5px;
+  }
+
+  .help-tag-list span {
+    width: 66px;
+  }
+
+  .help-needs-list strong {
+    font-size: 8px;
+  }
+}
