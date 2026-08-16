@@ -1,14 +1,116 @@
+// [추가] 화면 상태 관리를 위한 useState
+import { useState } from "react";
+
 import Help from "./pages/help/Help";
 import Onboarding1 from "./pages/onboarding/Onboarding1";
 
-function App() {
-  const CURRENT_PAGE = "help"; // "onboarding" 또는 "help"로 변경하여 페이지 전환
+// [추가] 직원 화면
+import StaffIntro from "./pages/staff/StaffIntro";
+import StaffLogin from "./pages/staff/StaffLogin";
+import StaffRequests from "./pages/staff/StaffRequests";
+import StaffRequestDetail from "./pages/staff/StaffRequestDetail";
+import StaffConsultationEnd from "./pages/staff/StaffConsultationEnd";
 
-  if (CURRENT_PAGE === "onboarding") {
+function App() {
+  // [수정] 화면 이동 상태
+  const [currentPage, setCurrentPage] = useState("staffIntro");
+
+  // [추가] 선택한 상담 요청 ID
+  const [selectedRequestId, setSelectedRequestId] = useState(null);
+
+  // [추가] API 연동 전 요청별 상담 상태
+  const [requestStatuses, setRequestStatuses] = useState({});
+
+  if (currentPage === "onboarding") {
     return (
       <Onboarding1
         onSelectPrivate={() => alert("프라이빗 선택")}
         onSelectAccount={() => alert("계정 선택")}
+      />
+    );
+  }
+
+  // [추가] 직원 로그인 진입 화면
+  if (currentPage === "staffIntro") {
+    return <StaffIntro onLogin={() => setCurrentPage("staffLogin")} />;
+  }
+
+  // [추가] 직원 PIN 로그인 화면
+  if (currentPage === "staffLogin") {
+    return (
+      <StaffLogin
+        onBack={() => setCurrentPage("staffIntro")}
+        onLogin={() => setCurrentPage("staffRequests")}
+      />
+    );
+  }
+
+  // [추가] 직원 상담 요청 목록 화면
+  if (currentPage === "staffRequests") {
+    return (
+      <StaffRequests
+        requestStatuses={requestStatuses}
+        onSelectRequest={(requestId) => {
+          // [추가] 선택한 요청 ID 저장
+          setSelectedRequestId(requestId);
+
+          // [추가] 상담 시작 상태로 변경
+          setRequestStatuses((previousStatuses) => ({
+            ...previousStatuses,
+            [requestId]: "ACCEPTED",
+          }));
+
+          // [수정] 직원 상담 요청 상세 화면으로 이동
+          setCurrentPage("staffRequestDetail");
+        }}
+        onExitPos={() => {
+          // [추가] POS 종료 시 요청 관련 임시 상태 제거
+          setSelectedRequestId(null);
+          setRequestStatuses({});
+
+          // [추가] 직원 로그인 진입 화면으로 이동
+          setCurrentPage("staffIntro");
+        }}
+      />
+    );
+  }
+
+  // [추가] 직원 상담 요청 상세 화면
+  if (currentPage === "staffRequestDetail") {
+    return (
+      <StaffRequestDetail
+        requestId={selectedRequestId}
+        onSettings={() => {
+          alert("상담을 종료한 후 POS를 종료해주세요.");
+        }}
+        onEndConsultation={() => {
+          // [수정] 상담 종료 확인 화면으로 이동
+          setCurrentPage("staffConsultationEnd");
+        }}
+      />
+    );
+  }
+
+  // [추가] 직원 상담 종료 확인 화면
+  if (currentPage === "staffConsultationEnd") {
+    return (
+      <StaffConsultationEnd
+        requestId={selectedRequestId}
+        onContinue={() => {
+          // [추가] 현재 상담 상세 화면으로 돌아가기
+          setCurrentPage("staffRequestDetail");
+        }}
+        onConfirmEnd={(requestId) => {
+          // [추가] 상담 완료 상태로 변경
+          setRequestStatuses((previousStatuses) => ({
+            ...previousStatuses,
+            [requestId]: "COMPLETED",
+          }));
+
+          // [추가] 상담 완료 후 요청 목록으로 이동
+          setSelectedRequestId(null);
+          setCurrentPage("staffRequests");
+        }}
       />
     );
   }
