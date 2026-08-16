@@ -50,10 +50,6 @@ function App() {
     return (
       <StaffRequests
         requestStatuses={requestStatuses}
-        onSettings={() => {
-          // [추가] StaffExitModal 구현 전 임시 동작
-          alert("POS 설정을 엽니다.");
-        }}
         onSelectRequest={(requestId) => {
           // [추가] 선택한 요청 ID 저장
           setSelectedRequestId(requestId);
@@ -67,6 +63,14 @@ function App() {
           // [수정] 직원 상담 요청 상세 화면으로 이동
           setCurrentPage("staffRequestDetail");
         }}
+        onExitPos={() => {
+          // [추가] POS 종료 시 요청 관련 임시 상태 제거
+          setSelectedRequestId(null);
+          setRequestStatuses({});
+
+          // [추가] 직원 로그인 진입 화면으로 이동
+          setCurrentPage("staffIntro");
+        }}
       />
     );
   }
@@ -77,8 +81,7 @@ function App() {
       <StaffRequestDetail
         requestId={selectedRequestId}
         onSettings={() => {
-          // [추가] StaffExitModal 구현 전 임시 동작
-          alert("POS 설정을 엽니다.");
+          alert("상담을 종료한 후 POS를 종료해주세요.");
         }}
         onEndConsultation={() => {
           // [수정] 상담 종료 확인 화면으로 이동
@@ -94,17 +97,18 @@ function App() {
       <StaffConsultationEnd
         requestId={selectedRequestId}
         onContinue={() => {
-          // 상담 종료를 취소하고 기존 상담 화면으로 돌아간다.
+          // [추가] 현재 상담 상세 화면으로 돌아가기
           setCurrentPage("staffRequestDetail");
         }}
         onConfirmEnd={(requestId) => {
-          // API 연동 전 상담 완료 상태로 변경
+          // [추가] 상담 완료 상태로 변경
           setRequestStatuses((previousStatuses) => ({
             ...previousStatuses,
             [requestId]: "COMPLETED",
           }));
 
-          // 상담 완료 후 요청 목록으로 이동
+          // [추가] 상담 완료 후 요청 목록으로 이동
+          setSelectedRequestId(null);
           setCurrentPage("staffRequests");
         }}
       />

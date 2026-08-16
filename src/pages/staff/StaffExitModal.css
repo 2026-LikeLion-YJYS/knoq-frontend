@@ -1,0 +1,123 @@
+/* POS 종료 모달 배경 */
+.staff-exit-modal__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+
+  width: 100%;
+  max-width: 744px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.64);
+
+  box-sizing: border-box;
+}
+
+/* POS 종료 모달 */
+.staff-exit-modal {
+  width: min(590px, 100%);
+  padding:
+    clamp(38px, 4.5vh, 50px)
+    clamp(24px, 4vw, 32px)
+    clamp(20px, 2.5vh, 28px);
+
+  color: #24221e;
+  background: #ffffff;
+  border-radius: 12px;
+
+  text-align: center;
+
+  box-sizing: border-box;
+}
+
+/* 모달 제목 */
+.staff-exit-modal__title {
+  margin: 0;
+
+  color: #24221e;
+
+  font-size: clamp(23px, 3.8vw, 28px);
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: -0.56px;
+}
+
+/* 모달 설명 */
+.staff-exit-modal__description {
+  margin: clamp(14px, 1.8vh, 20px) 0 0;
+
+  color: #999999;
+
+  font-size: clamp(15px, 2.4vw, 18px);
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.36px;
+}
+
+/* 모달 하단 버튼 영역 */
+.staff-exit-modal__buttons {
+  width: 100%;
+  margin-top: clamp(34px, 4.2vh, 48px);
+
+  display: flex;
+  gap: clamp(14px, 2.7vw, 22px);
+}
+
+/* 모달 공통 버튼 */
+.staff-exit-modal__button {
+  flex: 1;
+  min-width: 0;
+  min-height: clamp(58px, 6.8vh, 70px);
+  padding: 10px 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 0;
+  border-radius: 999px;
+
+  font-size: clamp(15px, 2.5vw, 19px);
+  font-weight: 500;
+  line-height: 150%;
+  letter-spacing: -0.38px;
+  white-space: nowrap;
+
+  cursor: pointer;
+  transition: transform 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 계속 상담하기 버튼 */
+.staff-exit-modal__button--continue {
+  color: #525252;
+  background: #dddddd;
+}
+
+/* POS 종료하기 버튼 */
+.staff-exit-modal__button--exit {
+  color: #ffffff;
+  background: radial-gradient(
+    59.76% 166% at 51.59% 129%,
+    #f59e0b 0%,
+    #fc7810 100%
+  );
+}
+
+/* 버튼 클릭 효과 */
+.staff-exit-modal__button:active {
+  transform: scale(0.97);
+}
+
+/* 키보드 접근 시 포커스 표시 */
+.staff-exit-modal__button:focus-visible {
+  outline: 3px solid #fc7810;
+  outline-offset: 4px;
+}

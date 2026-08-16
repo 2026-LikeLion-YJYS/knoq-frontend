@@ -1,3 +1,9 @@
+// [추가] POS 종료 모달 상태 관리
+import { useState } from "react";
+
+// [추가] POS 종료 확인 모달
+import StaffExitModal from "./StaffExitModal";
+
 // [추가] 직원 상담 요청 목록 화면 스타일
 import "./StaffRequests.css";
 
@@ -59,20 +65,40 @@ const LIFESTYLE_TAG_LABELS = {
  * 직원 상담 요청 목록 화면
  * 접수된 상담 요청을 최신순으로 표시한다.
  */
-function StaffRequests({
-  onSelectRequest,
-  onSettings,
-  requestStatuses = {},
-}) {
+function StaffRequests({ onSelectRequest, onExitPos, requestStatuses = {} }) {
+  // [추가] POS 종료 확인 모달 상태
+  const [isExitModalOpen, setIsExitModalOpen] = useState(false);
+
   // [수정] 임시 상태를 반영하고 요청 접수 시간을 기준으로 최신순 정렬
   const sortedRequests = TEMP_REQUESTS.map((request) => ({
     ...request,
     status: requestStatuses[request.requestId] ?? request.status,
   })).sort(
     (firstRequest, secondRequest) =>
-      new Date(secondRequest.requestedAt) -
-      new Date(firstRequest.requestedAt),
+      new Date(secondRequest.requestedAt) - new Date(firstRequest.requestedAt),
   );
+
+  /**
+   * 설정 아이콘을 누르면 POS 종료 확인 모달을 연다.
+   */
+  const handleOpenExitModal = () => {
+    setIsExitModalOpen(true);
+  };
+
+  /**
+   * 계속 상담하기를 누르면 모달만 닫는다.
+   */
+  const handleContinueConsultation = () => {
+    setIsExitModalOpen(false);
+  };
+
+  /**
+   * POS 종료를 확정하고 부모 컴포넌트로 전달한다.
+   */
+  const handleExitPos = () => {
+    setIsExitModalOpen(false);
+    onExitPos?.();
+  };
 
   /**
    * 상담 시작 버튼을 누르면 선택한 requestId를 부모로 전달한다.
@@ -85,16 +111,12 @@ function StaffRequests({
     <main className="staff-requests">
       {/* [추가] 직원 요청 목록 상단 헤더 */}
       <header className="staff-requests__header">
-        <img
-          className="staff-requests__logo"
-          src={logoKnoq}
-          alt="KNOQ"
-        />
+        <img className="staff-requests__logo" src={logoKnoq} alt="KNOQ" />
 
         <button
           className="staff-requests__setting-button"
           type="button"
-          onClick={onSettings}
+          onClick={handleOpenExitModal}
           aria-label="직원 설정 열기"
         >
           <img
@@ -107,35 +129,24 @@ function StaffRequests({
       </header>
 
       {/* [추가] 요청 목록 제목 */}
-      <h1 className="staff-requests__title">
-        현재 접수된 요청 내역
-      </h1>
+      <h1 className="staff-requests__title">현재 접수된 요청 내역</h1>
 
       {/* [추가] 접수된 요청 카드 목록 */}
-      <section
-        className="staff-requests__list"
-        aria-label="접수된 상담 요청"
-      >
+      <section className="staff-requests__list" aria-label="접수된 상담 요청">
         {sortedRequests.length > 0 ? (
           sortedRequests.map((request) => (
-            <article
-              className="staff-request-card"
-              key={request.requestId}
-            >
+            <article className="staff-request-card" key={request.requestId}>
               <div className="staff-request-card__information">
                 {/* [추가] 도움 유형 */}
                 <div className="staff-request-card__heading">
                   <h2 className="staff-request-card__type">
-                    {HELP_TYPE_LABELS[request.helpType] ??
-                      request.helpType}
+                    {HELP_TYPE_LABELS[request.helpType] ?? request.helpType}
                   </h2>
                 </div>
 
                 {/* [추가] 고객 닉네임 */}
                 <div className="staff-request-card__row">
-                  <span className="staff-request-card__label">
-                    고객
-                  </span>
+                  <span className="staff-request-card__label">고객</span>
 
                   <img
                     className="staff-request-card__line"
@@ -168,10 +179,7 @@ function StaffRequests({
 
                   <div className="staff-request-card__tags">
                     {request.lifestyleTags.map((tag) => (
-                      <span
-                        className="staff-request-card__tag"
-                        key={tag}
-                      >
+                      <span className="staff-request-card__tag" key={tag}>
                         {LIFESTYLE_TAG_LABELS[tag] ?? tag}
                       </span>
                     ))}
@@ -184,13 +192,9 @@ function StaffRequests({
                 className="staff-request-card__start-button"
                 type="button"
                 disabled={request.status === "COMPLETED"}
-                onClick={() =>
-                  handleStartConsultation(request.requestId)
-                }
+                onClick={() => handleStartConsultation(request.requestId)}
               >
-                {request.status === "COMPLETED"
-                  ? "상담 완료"
-                  : "상담 시작하기"}
+                {request.status === "COMPLETED" ? "상담 완료" : "상담 시작하기"}
               </button>
             </article>
           ))
@@ -201,6 +205,13 @@ function StaffRequests({
           </div>
         )}
       </section>
+
+      {/* [추가] POS 종료 확인 모달 */}
+      <StaffExitModal
+        isOpen={isExitModalOpen}
+        onContinue={handleContinueConsultation}
+        onExit={handleExitPos}
+      />
     </main>
   );
 }
