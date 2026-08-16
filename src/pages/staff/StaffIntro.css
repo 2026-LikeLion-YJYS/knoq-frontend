@@ -1,0 +1,132 @@
+.staff-intro::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  background: rgba(255, 215, 140, 0.08);
+  mix-blend-mode: screen;
+}
+
+/* 직원 로그인 진입 화면 전체 영역 */
+.staff-intro {
+  filter: contrast(1.04) saturate(1.06);
+  position: relative;
+
+  width: 100%;
+  max-width: 744px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0 auto;
+  overflow: hidden;
+
+  color: #ffffff;
+
+  /* 배경 이미지 원본 그대로 */
+  background-color: #24221e;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* 상단 매장 안내 영역 */
+.staff-intro__header {
+  position: relative;
+  z-index: 1;
+
+  padding-top: clamp(72px, 10.5vh, 119px);
+  text-align: center;
+}
+
+/* MCM 헤리티지 문구 */
+.staff-intro__heritage {
+  margin: 0;
+  color: #ffffff;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.02em;
+}
+
+/* 매장명 */
+.staff-intro__store {
+  margin: clamp(22px, 2.6vh, 30px) 0 0;
+
+  color: #ffffff;
+  font-size: 40px;
+  font-weight: 500;
+  line-height: 150%; /* 60px */
+  letter-spacing: -0.8px;
+}
+
+.staff-intro__store span {
+  white-space: nowrap;
+}
+
+/* 중앙 로고 배치 영역 */
+.staff-intro__logo-area {
+  position: absolute;
+  top: 52%;
+  left: 50%;
+  z-index: 1;
+
+  transform: translate(-50%, -50%);
+}
+
+/* 중앙 MCM 로고 */
+.staff-intro__logo {
+  display: block;
+  width: 257px;
+  height: 257px;
+  aspect-ratio: 1/1;
+}
+
+/* 하단 로그인 버튼 영역 */
+.staff-intro__bottom {
+  position: relative;
+  z-index: 1;
+
+  width: 100%;
+  margin-top: auto;
+
+  padding: 0 clamp(28px, 17vw, 126px) max(70px, env(safe-area-inset-bottom));
+}
+
+/* 어드바이저 로그인 버튼 */
+.staff-intro__login-button {
+  width: 100%;
+  min-height: clamp(64px, 8.5vh, 96px);
+  padding: 16px 24px;
+
+  color: #ffffff;
+  background: radial-gradient(
+    59.76% 166% at 51.59% 129%,
+    #f59e0b 0%,
+    #fc7810 100%
+  );
+
+  border: 0;
+  border-radius: 50px;
+
+  font-size: 30px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%; /* 49.5px */
+  letter-spacing: -0.66px;
+
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.staff-intro__login-button:active {
+  transform: scale(0.98);
+}
+
+.staff-intro__login-button:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.9);
+  outline-offset: 4px;
+}

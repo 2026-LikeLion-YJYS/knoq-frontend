@@ -1,0 +1,263 @@
+/* 직원 PIN 로그인 화면 전체 영역 */
+.staff-login {
+  position: relative;
+
+  width: 100%;
+  max-width: 744px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: max(48px, env(safe-area-inset-top)) clamp(28px, 6.5vw, 48px)
+    max(32px, env(safe-area-inset-bottom));
+  overflow: hidden;
+
+  color: #ffffff;
+
+  background: radial-gradient(
+    circle 1000px at 119.42% -30.45%,
+    #ff8e43 0%,
+    #24221e 100%
+  );
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* 상단 로그인 헤더 */
+.staff-login__header {
+  width: 100%;
+  min-height: 52px;
+
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+
+/* 뒤로가기 버튼 */
+.staff-login__back-button {
+  width: 52px;
+  height: 52px;
+  padding: 0;
+
+  background: transparent;
+  border: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 뒤로가기 화살표 */
+.staff-login__back-icon {
+  width: 19px;
+  height: 19px;
+  margin-left: 8px;
+
+  border-bottom: 4px solid #ffffff;
+  border-left: 4px solid #ffffff;
+  border-radius: 2px;
+
+  transform: rotate(45deg);
+}
+
+/* 로그인 제목 */
+.staff-login__title {
+  margin: 0;
+
+  font-size: clamp(24px, 4.3vw, 32px);
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: -0.02em;
+}
+
+/* 제목 중앙 정렬용 빈 영역 */
+.staff-login__header-space {
+  width: 52px;
+  height: 52px;
+  justify-self: end;
+}
+
+/* PIN 오류 메시지 */
+.staff-login__error {
+  position: absolute;
+  top: clamp(116px, 12.5vh, 142px);
+  left: 50%;
+  z-index: 2;
+
+  margin: 0;
+
+  display: inline-flex;
+  padding: 10px 24px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+
+  color: #ff8e43;
+  background: #fff;
+  border-radius: 100px;
+
+  font-size: 26px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%; /* 39px */
+  letter-spacing: -0.52px;
+
+  white-space: nowrap;
+
+  transform: translateX(-50%);
+}
+
+/* 로그인 주요 콘텐츠 */
+.staff-login__content {
+  width: 100%;
+  padding-top: clamp(70px, 8vh, 95px);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* MCM POS 제목 */
+.staff-login__pos-title {
+  color: #fff;
+  font-size: 36px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 150%; /* 54px */
+  letter-spacing: 5.04px;
+}
+
+/* PIN 원 표시 영역 */
+.staff-login__pin {
+  margin-top: clamp(65px, 8.5vh, 96px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(24px, 5vw, 38px);
+}
+
+/* PIN 입력 전 원 */
+.staff-login__pin-circle {
+  width: clamp(30px, 6.45vw, 48px);
+  height: clamp(30px, 6.45vw, 48px);
+
+  background: transparent;
+  border: 3px solid #ff813c;
+  border-radius: 50%;
+
+  transition:
+    background-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+/* PIN 입력 완료 원 */
+.staff-login__pin-circle--filled {
+  background: #ff813c;
+  transform: scale(1.03);
+}
+
+/* 숫자 키패드 */
+.staff-login__keypad {
+  --key-size: clamp(72px, 13.5vw, 100px);
+
+  width: min(440px, 100%);
+  margin-top: clamp(70px, 8.5vh, 96px);
+
+  display: grid;
+  grid-template-columns: repeat(3, var(--key-size));
+  justify-content: space-between;
+  align-items: center;
+  row-gap: clamp(18px, 2.3vh, 26px);
+}
+
+/* 숫자 키패드 버튼 */
+.staff-login__key-button {
+  width: var(--key-size);
+  height: var(--key-size);
+  padding: 0;
+
+  color: #ffffff;
+  background: #30302f;
+  border: 0;
+  border-radius: 50%;
+
+  font-size: clamp(20px, 3.8vw, 28px);
+  font-weight: 500;
+  line-height: 1;
+
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    transform 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 숫자 버튼 클릭 효과 */
+.staff-login__key-button:active {
+  background: #3b3b3a;
+  transform: scale(0.94);
+}
+
+/* 키패드 하단 왼쪽 영역 */
+.staff-login__key-placeholder {
+  width: var(--key-size);
+  height: var(--key-size);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 피그마의 하단 왼쪽 주황색 선 */
+.staff-login__key-line {
+  width: 60%;
+  height: 7px;
+
+  background: #ff813c;
+  border-radius: 999px;
+}
+
+/* PIN 삭제 버튼 */
+.staff-login__delete-button {
+  width: var(--key-size);
+  height: var(--key-size);
+  padding: 0;
+
+  background: transparent;
+  border: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Figma에서 export한 삭제 SVG */
+.staff-login__delete-icon {
+  width: 88%;
+  height: auto;
+
+  display: block;
+
+  transition: transform 0.1s ease;
+  pointer-events: none;
+}
+
+/* 삭제 버튼 클릭 효과 */
+.staff-login__delete-button:active .staff-login__delete-icon {
+  transform: scale(0.92);
+}
+
+/* 키보드 접근 시 포커스 표시 */
+.staff-login__back-button:focus-visible,
+.staff-login__key-button:focus-visible,
+.staff-login__delete-button:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.9);
+  outline-offset: 4px;
+}
