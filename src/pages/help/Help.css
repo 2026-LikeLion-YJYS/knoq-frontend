@@ -173,6 +173,7 @@
   height: 88%;
 
   object-fit: contain;
+  cursor: pointer;
 }
 
 /* [수정] 비어 있는 제품 추가 칸 */
@@ -218,7 +219,7 @@
   margin-bottom: 14px;
 }
 
-/* [수정] 기본 체크박스 디자인 제거 */
+/* 선택 전 정보공유 체크박스 */
 .help-checkbox {
   position: relative;
 
@@ -232,29 +233,38 @@
   appearance: none;
   -webkit-appearance: none;
 
-  background: #ff8e43;
+  background: #919191;
   border: 0;
   border-radius: 3px;
 
-  cursor: default;
+  cursor: pointer;
 }
 
-/* [수정] 체크박스의 흰색 체크 표시 */
-.help-checkbox:checked::after {
+/* 기본 상태: 검정 체크 */
+.help-checkbox::after {
   position: absolute;
   top: 50%;
   left: 50%;
 
-  color: #ffffff;
+  color: #000000;
   font-family: "SF Pro", Pretendard, sans-serif;
   font-size: 15px;
   font-weight: 590;
   line-height: 150%;
-  letter-spacing: -0.3px;
 
   content: "✓";
 
   transform: translate(-50%, -52%);
+}
+
+/* 선택 상태: 주황색 박스 */
+.help-checkbox:checked {
+  background: #ff8e43;
+}
+
+/* 선택 상태: 흰색 체크 */
+.help-checkbox:checked::after {
+  color: #ffffff;
 }
 
 /* [수정] 라이프스타일과 니즈를 묶는 상자 */

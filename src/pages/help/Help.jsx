@@ -53,11 +53,46 @@ function Help() {
   // [추가] 저장목록 모달 표시 여부 관리
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
 
+  // [추가] 상담에 추가한 제품 관리
+  const [selectedProducts, setSelectedProducts] = useState([]);
+
+  // [추가] 라이프스타일 및 니즈 공유 여부 관리
+  const [shareMyInfo, setShareMyInfo] = useState(false);
+
   // [추가] 현재 매장 운영시간 여부 확인
   const isStoreOpen = checkStoreOpen();
 
   // [추가] 운영시간 내이며 도움 유형을 선택했을 때 요청 가능
   const canRequestHelp = isStoreOpen && selectedHelpType !== "";
+
+  // [추가] 선택 제품 수만큼 제외한 빈 제품 칸 개수
+  const emptyProductSlotCount = 3 - selectedProducts.length;
+
+  /**
+   * [추가] 모달에서 선택한 제품을 상담 제품으로 반영합니다.
+   */
+  const handleAddProducts = (products) => {
+    setSelectedProducts(products);
+    setIsProductModalOpen(false);
+  };
+  /**
+   * [추가] 도움 요청하기 클릭 시
+   * 사용자가 선택한 값을 하나의 데이터로 묶습니다.
+   */
+  const handleRequestHelp = () => {
+    if (!canRequestHelp) return;
+
+    const requestData = {
+      helpType: selectedHelpType,
+      products: selectedProducts,
+      shareMyInfo,
+    };
+
+    console.log("도움 요청 데이터:", requestData);
+
+    // 추후 API 연동 시 여기서 전달
+    // requestAdvisorHelp(requestData);
+  };
 
   return (
     <div className="help-page">
@@ -70,9 +105,7 @@ function Help() {
         <section className="help-intro">
           <h1>원하는 순간, 어드바이저와 연결하세요.</h1>
 
-          <p>
-            자유롭게 탐색한 후 도움이 필요할 때 직접 요청할 수 있어요.
-          </p>
+          <p>자유롭게 탐색한 후 도움이 필요할 때 직접 요청할 수 있어요.</p>
         </section>
 
         {/* [수정] 도움 유형 선택 영역 */}
@@ -101,18 +134,31 @@ function Help() {
           </div>
         </section>
 
-        {/* [수정] 제품이 추가되지 않은 기본 제품 영역 */}
+        {/* [수정] 선택한 상담 제품 표시 영역 */}
         <section className="help-section">
           <h2>제품 추가하기(선택)</h2>
 
           <div className="help-product-list">
-            {/* [수정] 모든 추가 칸을 누르면 저장목록 모달 표시 */}
-            {[0, 1, 2].map((slot) => (
+            {/* [추가] 모달에서 추가한 상담 제품 표시 */}
+            {selectedProducts.map((product) => (
               <button
-                key={slot}
+                className="help-product-card"
+                key={product.id}
+                type="button"
+                aria-label={`${product.name} 선택 수정`}
+                onClick={() => setIsProductModalOpen(true)}
+              >
+                <img src={product.image} alt={product.name} />
+              </button>
+            ))}
+
+            {/* [수정] 남은 제품 칸을 추가 버튼으로 표시 */}
+            {Array.from({ length: emptyProductSlotCount }).map((_, index) => (
+              <button
+                key={`empty-product-${index}`}
                 className="help-add-card"
                 type="button"
-                aria-label={`상담 제품 ${slot + 1} 추가`}
+                aria-label={`상담 제품 ${selectedProducts.length + index + 1} 추가`}
                 onClick={() => setIsProductModalOpen(true)}
               >
                 +
@@ -121,17 +167,18 @@ function Help() {
           </div>
         </section>
 
-        {/* [추가] 어드바이저에게 공유할 정보 */}
+        {/* [수정] 어드바이저에게 공유할 정보 */}
         <section className="help-section">
           <div className="help-share-title">
             <h2>어드바이저에게 공유할 나의 정보(선택)</h2>
 
-            {/* [추가] 정보공유 기능은 다음 단계에서 구현 */}
+            {/* [수정] 라이프스타일과 니즈를 하나의 체크박스로 관리 */}
             <input
               className="help-checkbox"
               type="checkbox"
-              readOnly
+              checked={shareMyInfo}
               aria-label="라이프스타일과 나의 니즈 공유"
+              onChange={(event) => setShareMyInfo(event.target.checked)}
             />
           </div>
 
@@ -176,11 +223,10 @@ function Help() {
 
         {/* [수정] 매장 운영시간과 도움 유형에 따른 요청 버튼 */}
         <button
-          className={`help-request-button ${
-            canRequestHelp ? "is-active" : ""
-          }`}
+          className={`help-request-button ${canRequestHelp ? "is-active" : ""}`}
           type="button"
           disabled={!canRequestHelp}
+          onClick={handleRequestHelp}
         >
           {isStoreOpen ? "도움 요청하기" : "매장 오픈전입니다"}
         </button>
@@ -189,10 +235,12 @@ function Help() {
       {/* [추가] 공통 하단 내비게이션 */}
       <BottomNav activeTab="help" />
 
-      {/* [추가] 저장목록 모달 조건부 표시 */}
+      {/* [수정] 저장목록 모달에 기존 선택 제품과 추가 함수를 전달 */}
       {isProductModalOpen && (
         <SavedProductModal
+          selectedProducts={selectedProducts}
           onClose={() => setIsProductModalOpen(false)}
+          onAddProducts={handleAddProducts}
         />
       )}
     </div>
