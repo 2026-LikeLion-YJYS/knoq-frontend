@@ -19,8 +19,6 @@
     #24221e 100%
   );
 
-  font-family: Pretendard, sans-serif;
-
   display: flex;
   flex-direction: column;
 }
@@ -101,7 +99,6 @@
   background: #fff;
   border-radius: 100px;
 
-  font-family: Pretendard, sans-serif;
   font-size: 26px;
   font-style: normal;
   font-weight: 400;
@@ -126,7 +123,6 @@
 /* MCM POS 제목 */
 .staff-login__pos-title {
   color: #fff;
-  font-family: Pretendard;
   font-size: 36px;
   font-style: normal;
   font-weight: 500;
@@ -189,7 +185,6 @@
   border: 0;
   border-radius: 50%;
 
-  font-family: Pretendard, sans-serif;
   font-size: clamp(20px, 3.8vw, 28px);
   font-weight: 500;
   line-height: 1;

@@ -1,0 +1,142 @@
+/* 직원 상담 종료 확인 화면 전체 영역 */
+.staff-consultation-end {
+  position: relative;
+
+  width: 100%;
+  max-width: 744px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
+  margin: 0 auto;
+  padding: clamp(28px, 4.2vh, 48px) clamp(32px, 6vw, 48px)
+    clamp(38px, 5vh, 56px);
+  overflow: hidden;
+
+  color: #ffffff;
+
+  background:
+    linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0) 15%,
+      rgba(253, 146, 56, 0.9) 100%,
+      rgba(245, 158, 11, 0.72) 120%
+    ),
+    #24221e;
+
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 상담 종료 안내 콘텐츠 */
+.staff-consultation-end__content {
+  width: 100%;
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  transform: translateY(clamp(10px, 2vh, 24px));
+}
+
+/* 상담 말풍선 SVG 아이콘 */
+.staff-consultation-end__icon {
+  display: block;
+
+  width: 212px;
+  height: 199px;
+
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+/* 상담 종료 안내 제목 */
+.staff-consultation-end__title {
+  margin: clamp(40px, 5.5vh, 62px) 0 0;
+
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 150%;
+  letter-spacing: -0.72px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* 상담 하단 버튼 영역 */
+.staff-consultation-end__buttons {
+  width: 100%;
+  display: flex;
+  gap: clamp(16px, 2.5vw, 24px);
+  flex-shrink: 0;
+}
+
+/* 상담 하단 공통 버튼 */
+.staff-consultation-end__button {
+  flex: 1;
+  min-width: 0;
+  min-height: clamp(72px, 8.8vh, 100px);
+  padding: 12px 20px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 0;
+  border-radius: 999px;
+
+  font-size: clamp(22px, 3.4vw, 28px);
+  font-weight: 500;
+  line-height: 150%;
+  letter-spacing: -0.56px;
+  white-space: nowrap;
+
+  cursor: pointer;
+  transition: transform 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 상담 계속하기 버튼 */
+.staff-consultation-end__button--continue {
+  color: #525252;
+  border-radius: 50px;
+  background: #bbb;
+  font-size: 28px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: -0.56px;
+}
+
+/* 상담 종료 확정 버튼 */
+.staff-consultation-end__button--end {
+  color: #ffffff;
+  border-radius: 50px;
+  background: radial-gradient(
+    59.76% 166% at 51.59% 129%,
+    #f59e0b 0%,
+    #fc7810 100%
+  );
+  font-size: 28px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: -0.56px;
+}
+
+/* 버튼 클릭 효과 */
+.staff-consultation-end__button:active {
+  transform: scale(0.98);
+}
+
+/* 키보드 접근 시 포커스 표시 */
+.staff-consultation-end__button:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.9);
+  outline-offset: 4px;
+}

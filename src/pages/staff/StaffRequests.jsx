@@ -59,11 +59,19 @@ const LIFESTYLE_TAG_LABELS = {
  * 직원 상담 요청 목록 화면
  * 접수된 상담 요청을 최신순으로 표시한다.
  */
-function StaffRequests({ onSelectRequest, onSettings }) {
-  // [추가] 요청 접수 시간을 기준으로 최신 요청부터 정렬
-  const sortedRequests = [...TEMP_REQUESTS].sort(
+function StaffRequests({
+  onSelectRequest,
+  onSettings,
+  requestStatuses = {},
+}) {
+  // [수정] 임시 상태를 반영하고 요청 접수 시간을 기준으로 최신순 정렬
+  const sortedRequests = TEMP_REQUESTS.map((request) => ({
+    ...request,
+    status: requestStatuses[request.requestId] ?? request.status,
+  })).sort(
     (firstRequest, secondRequest) =>
-      new Date(secondRequest.requestedAt) - new Date(firstRequest.requestedAt),
+      new Date(secondRequest.requestedAt) -
+      new Date(firstRequest.requestedAt),
   );
 
   /**
@@ -77,7 +85,11 @@ function StaffRequests({ onSelectRequest, onSettings }) {
     <main className="staff-requests">
       {/* [추가] 직원 요청 목록 상단 헤더 */}
       <header className="staff-requests__header">
-        <img className="staff-requests__logo" src={logoKnoq} alt="KNOQ" />
+        <img
+          className="staff-requests__logo"
+          src={logoKnoq}
+          alt="KNOQ"
+        />
 
         <button
           className="staff-requests__setting-button"
@@ -95,24 +107,35 @@ function StaffRequests({ onSelectRequest, onSettings }) {
       </header>
 
       {/* [추가] 요청 목록 제목 */}
-      <h1 className="staff-requests__title">현재 접수된 요청 내역</h1>
+      <h1 className="staff-requests__title">
+        현재 접수된 요청 내역
+      </h1>
 
       {/* [추가] 접수된 요청 카드 목록 */}
-      <section className="staff-requests__list" aria-label="접수된 상담 요청">
+      <section
+        className="staff-requests__list"
+        aria-label="접수된 상담 요청"
+      >
         {sortedRequests.length > 0 ? (
           sortedRequests.map((request) => (
-            <article className="staff-request-card" key={request.requestId}>
+            <article
+              className="staff-request-card"
+              key={request.requestId}
+            >
               <div className="staff-request-card__information">
                 {/* [추가] 도움 유형 */}
                 <div className="staff-request-card__heading">
                   <h2 className="staff-request-card__type">
-                    {HELP_TYPE_LABELS[request.helpType] ?? request.helpType}
+                    {HELP_TYPE_LABELS[request.helpType] ??
+                      request.helpType}
                   </h2>
                 </div>
 
                 {/* [추가] 고객 닉네임 */}
                 <div className="staff-request-card__row">
-                  <span className="staff-request-card__label">고객</span>
+                  <span className="staff-request-card__label">
+                    고객
+                  </span>
 
                   <img
                     className="staff-request-card__line"
@@ -145,7 +168,10 @@ function StaffRequests({ onSelectRequest, onSettings }) {
 
                   <div className="staff-request-card__tags">
                     {request.lifestyleTags.map((tag) => (
-                      <span className="staff-request-card__tag" key={tag}>
+                      <span
+                        className="staff-request-card__tag"
+                        key={tag}
+                      >
                         {LIFESTYLE_TAG_LABELS[tag] ?? tag}
                       </span>
                     ))}
@@ -153,13 +179,18 @@ function StaffRequests({ onSelectRequest, onSettings }) {
                 </div>
               </div>
 
-              {/* [추가] 요청 상세 화면 이동 버튼 */}
+              {/* [수정] 요청 상태에 따른 상담 버튼 */}
               <button
                 className="staff-request-card__start-button"
                 type="button"
-                onClick={() => handleStartConsultation(request.requestId)}
+                disabled={request.status === "COMPLETED"}
+                onClick={() =>
+                  handleStartConsultation(request.requestId)
+                }
               >
-                상담 시작하기
+                {request.status === "COMPLETED"
+                  ? "상담 완료"
+                  : "상담 시작하기"}
               </button>
             </article>
           ))

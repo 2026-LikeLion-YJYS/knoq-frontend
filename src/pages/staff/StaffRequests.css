@@ -18,7 +18,6 @@
     ),
     #24221e;
 
-  font-family: Pretendard, sans-serif;
   box-sizing: border-box;
 }
 
@@ -139,7 +138,6 @@
   flex-shrink: 0;
 
   color: #bbb;
-  font-family: Pretendard, sans-serif;
   font-size: 16px;
   font-weight: 400;
   line-height: 150%;
@@ -172,7 +170,6 @@
 .staff-request-card__nickname-suffix {
   color: #bbb;
   text-align: center;
-  font-family: Pretendard;
   font-size: 14px;
   font-style: normal;
   font-weight: 400;
@@ -215,15 +212,14 @@
   justify-content: center;
 
   color: #ffffff;
-  background: #FC7810;
+  background: #fc7810;
   border: 0;
   border-radius: 10px;
 
-  font-family: Pretendard, sans-serif;
   font-size: 16px;
   font-weight: 400;
   line-height: 150%; /* 24px */
-letter-spacing: -0.32px;
+  letter-spacing: -0.32px;
 
   cursor: pointer;
   transition:
@@ -258,4 +254,19 @@ letter-spacing: -0.32px;
 .staff-request-card__start-button:focus-visible {
   outline: 3px solid rgba(255, 255, 255, 0.9);
   outline-offset: 4px;
+}
+
+/* [추가] 상담이 완료된 요청 버튼 */
+.staff-request-card__start-button:disabled {
+  color: #595959;
+  background: #bbb;
+  font-size: 16px;
+  cursor: default;
+  transform: none;
+}
+
+/* [추가] 완료 버튼은 클릭 효과를 적용하지 않음 */
+.staff-request-card__start-button:disabled:active {
+  background: #bdbdbd;
+  transform: none;
 }
