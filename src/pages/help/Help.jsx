@@ -1,13 +1,59 @@
+// [추가] 도움 유형 선택 상태 관리를 위한 useState
+import { useState } from "react";
+
 // [추가] 기존 공통 컴포넌트 사용
 import MainHeader from "../../components/MainHeader/MainHeader";
 import BottomNav from "../../components/BottomNav/BottomNav";
 import "./Help.css";
 
 /**
- * [추가] 어드바이저 도움 요청 정적 화면
- * 피그마 도움_5 화면의 선택 완료 상태를 표시합니다.
+ * [추가] API 명세에 맞춘 도움 유형 목록
+ * 화면에는 label을 표시하고 서버 전송 시 value를 사용합니다.
+ */
+const HELP_TYPES = [
+  {
+    label: "제품 추천",
+    value: "PRODUCT_RECOMMENDATION",
+  },
+  {
+    label: "제품 비교",
+    value: "PRODUCT_COMPARISON",
+  },
+  {
+    label: "스타일링 추천",
+    value: "STYLING_RECOMMENDATION",
+  },
+  {
+    label: "제품 정보",
+    value: "PRODUCT_INFO",
+  },
+];
+
+/**
+ * [추가] 현재 시간이 매장 운영시간인지 확인합니다.
+ * 매장 운영시간: 11:00 이상, 22:00 미만
+ */
+const checkStoreOpen = () => {
+  const now = new Date();
+  const hour = now.getHours();
+
+  return hour >= 11 && hour < 22;
+};
+
+/**
+ * [수정] 어드바이저 도움 요청 화면
+ * 도움 유형 선택과 매장 운영시간에 따라 요청 버튼 상태를 변경합니다.
  */
 function Help() {
+  // [추가] 선택한 도움 유형 관리
+  const [selectedHelpType, setSelectedHelpType] = useState("");
+
+  // [추가] 현재 매장 운영시간 여부 확인
+  const isStoreOpen = checkStoreOpen();
+
+  // [추가] 운영시간 내이며 도움 유형을 선택했을 때 요청 가능
+  const canRequestHelp = isStoreOpen && selectedHelpType !== "";
+
   return (
     <div className="help-page">
       {/* [추가] 공통 상단 헤더 */}
@@ -24,43 +70,30 @@ function Help() {
           </p>
         </section>
 
-        {/* [추가] 도움 유형 선택 영역 */}
+        {/* [수정] 도움 유형 선택 영역 */}
         <section className="help-section">
           <h2>도움 유형 선택(필수)</h2>
 
           <div className="help-type-list">
-            {/* [추가] 선택된 도움 유형 */}
-            <button
-              className="help-type-button"
-              type="button"
-              aria-pressed="true"
-            >
-              제품 추천
-            </button>
+            {/* [수정] 도움 유형 목록을 배열로 출력 */}
+            {HELP_TYPES.map((type) => {
+              const isSelected = selectedHelpType === type.value;
 
-            <button
-              className="help-type-button"
-              type="button"
-              aria-pressed="false"
-            >
-              제품 비교
-            </button>
-
-            <button
-              className="help-type-button"
-              type="button"
-              aria-pressed="false"
-            >
-              스타일링 추천
-            </button>
-
-            <button
-              className="help-type-button"
-              type="button"
-              aria-pressed="false"
-            >
-              제품 정보
-            </button>
+              return (
+                <button
+                  key={type.value}
+                  className="help-type-button"
+                  type="button"
+                  aria-pressed={isSelected}
+                  // [수정] 선택한 유형을 다시 누르면 선택 취소
+                  onClick={() =>
+                  setSelectedHelpType(isSelected ? "" : type.value)
+                  }
+                >
+                  {type.label}
+                </button>
+              );
+            })}
           </div>
         </section>
 
@@ -150,9 +183,15 @@ function Help() {
           </div>
         </section>
 
-        {/* [추가] 도움 유형 선택으로 활성화된 요청 버튼 */}
-        <button className="help-request-button" type="button">
-          도움 요청하기
+        {/* [수정] 운영시간과 도움 유형 선택 여부에 따른 요청 버튼 */}
+        <button
+          className={`help-request-button ${
+            canRequestHelp ? "is-active" : ""
+          }`}
+          type="button"
+          disabled={!canRequestHelp}
+        >
+          {isStoreOpen ? "도움 요청하기" : "매장 오픈전입니다"}
         </button>
       </main>
 

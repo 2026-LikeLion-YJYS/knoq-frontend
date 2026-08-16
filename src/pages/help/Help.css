@@ -44,14 +44,10 @@
 
 /* [수정] 원하는 순간, 어드바이저와 연결하세요 */
 .help-intro h1 {
-  align-self: stretch;
-
   margin: 0 0 4px;
 
   color: #ffffff;
-  font-family: Pretendard, sans-serif;
   font-size: 20px;
-  font-style: normal;
   font-weight: 500;
   line-height: 150%;
   letter-spacing: -0.5px;
@@ -59,14 +55,10 @@
 
 /* [수정] 자유롭게 탐색한 후 도움 안내 문구 */
 .help-intro p {
-  align-self: stretch;
-
   margin: 0;
 
   color: #bbbbbb;
-  font-family: Pretendard, sans-serif;
   font-size: 12px;
-  font-style: normal;
   font-weight: 400;
   line-height: 150%;
   letter-spacing: -0.3px;
@@ -87,9 +79,7 @@
   margin: 0 0 14px;
 
   color: rgba(255, 255, 255, 0.9);
-  font-family: Pretendard, sans-serif;
   font-size: 16px;
-  font-style: normal;
   font-weight: 400;
   line-height: 150%;
   letter-spacing: -0.32px;
@@ -108,7 +98,7 @@
   width: 100%;
 }
 
-/* [수정] 도움 유형 버튼 */
+/* [수정] 도움 유형 기본 버튼 */
 .help-type-button {
   display: flex;
   align-items: center;
@@ -122,17 +112,16 @@
   color: rgba(255, 255, 255, 0.7);
   font-family: Pretendard, sans-serif;
   font-size: 14px;
-  font-style: normal;
   font-weight: 400;
   line-height: 150%;
   letter-spacing: -0.28px;
   white-space: nowrap;
 
-  background: rgba(46, 46, 46, 0.60);
+  background: rgba(46, 46, 46, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
 
-  cursor: default;
+  cursor: pointer;
 }
 
 /* [수정] 현재 선택된 도움 유형 */
@@ -140,7 +129,7 @@
   color: #ffffff;
 
   background: rgba(46, 46, 46, 0.2);
-  border: 1px solid #ff8e43;
+  border-color: #ff8e43;
 
   box-shadow: 0 2px 12px rgba(255, 142, 67, 0.2);
 }
@@ -154,6 +143,7 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
+
   width: 100%;
 }
 
@@ -199,12 +189,10 @@
   color: #bbbbbb;
   font-family: Pretendard, sans-serif;
   font-size: 44px;
-  font-style: normal;
   font-weight: 300;
   line-height: 1;
 
   background: rgba(46, 46, 46, 0.45);
-  border: 0;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
 
@@ -260,7 +248,6 @@
   color: #ffffff;
   font-family: "SF Pro", Pretendard, sans-serif;
   font-size: 15px;
-  font-style: normal;
   font-weight: 590;
   line-height: 150%;
   letter-spacing: -0.3px;
@@ -275,8 +262,13 @@
   width: 100%;
   height: 142px;
   padding: 10px 13px;
+
+  background: radial-gradient(
+    59.76% 166% at 51.59% 129%,
+    rgba(245, 158, 11, 0.2) 0%,
+    rgba(248, 124, 42, 0.3) 100%
+  );
   border-radius: 16px;
-  background: radial-gradient(59.76% 166% at 51.59% 129%, rgba(245, 158, 11, 0.20) 0%, rgba(248, 124, 42, 0.30) 100%);
 }
 
 /* [수정] 라이프스타일 제목과 태그 배치 */
@@ -285,6 +277,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+
   width: 100%;
   height: 34px;
 }
@@ -292,12 +285,10 @@
 /* [수정] 라이프스타일과 니즈 제목 */
 .help-lifestyle h3,
 .help-needs h3 {
-  margin: 0;
-  margin-left: 5px;
+  margin: 0 0 0 5px;
+
   color: rgba(255, 255, 255, 0.9);
-  font-family: Pretendard, sans-serif;
   font-size: 14px;
-  font-style: normal;
   font-weight: 400;
   line-height: 150%;
   letter-spacing: -0.28px;
@@ -320,10 +311,8 @@
   height: 34px;
   padding: 0;
 
-  color: #fff;
-  font-family: Pretendard, sans-serif;
+  color: #ffffff;
   font-size: 12px;
-  font-style: normal;
   font-weight: 400;
   line-height: 150%;
   letter-spacing: -0.24px;
@@ -368,10 +357,8 @@
   display: block;
   margin-bottom: 6px;
 
-  color: #bbb;
-  font-family: Pretendard, sans-serif;
+  color: #bbbbbb;
   font-size: 10px;
-  font-style: normal;
   font-weight: 400;
   line-height: 150%;
   letter-spacing: -0.2px;
@@ -381,13 +368,12 @@
 /* [수정] 니즈 분석값 */
 .help-needs-list p {
   display: block;
-  margin: 0;
-  max-width: 100%;
 
-  color: rgba(255, 255, 255, 0.90);
-  font-family: Pretendard, sans-serif;
+  max-width: 100%;
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.9);
   font-size: 11px;
-  font-style: normal;
   font-weight: 400;
   line-height: 150%;
   letter-spacing: -0.22px;
@@ -398,7 +384,7 @@
    도움 요청 버튼
 ========================= */
 
-/* [수정] 도움 요청하기 버튼 */
+/* [수정] 비활성 상태의 도움 요청 버튼 */
 .help-request-button {
   display: flex;
   align-items: center;
@@ -409,14 +395,24 @@
   margin: 20px auto 0;
   padding: 13px 0;
 
-  color: #ffffff;
+  color: #6f6f6f;
   font-family: Pretendard, sans-serif;
   font-size: 16px;
-  font-style: normal;
   font-weight: 400;
   line-height: 150%;
   letter-spacing: -0.32px;
   white-space: nowrap;
+
+  background: #c5c5c5;
+  border: 0;
+  border-radius: 50px;
+
+  cursor: default;
+}
+
+/* [추가] 운영시간 내에 도움 유형을 선택한 활성 버튼 */
+.help-request-button.is-active {
+  color: #ffffff;
 
   background: radial-gradient(
     59.76% 166% at 51.59% 129%,
@@ -424,10 +420,12 @@
     #fc7810 100%
   );
 
-  border: 0;
-  border-radius: 50px;
+  cursor: pointer;
+}
 
-  cursor: default;
+/* [추가] 비활성 버튼의 투명도 자동 적용 방지 */
+.help-request-button:disabled {
+  opacity: 1;
 }
 
 /* =========================
@@ -453,7 +451,7 @@
     width: 66px;
   }
 
-  .help-needs-list strong {
-    font-size: 8px;
+  .help-needs-list p {
+    font-size: 9px;
   }
 }
