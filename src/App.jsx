@@ -3,6 +3,9 @@ import { useState } from "react";
 
 import Help from "./pages/help/Help";
 import Onboarding1 from "./pages/onboarding/Onboarding1";
+import Onboarding2 from "./pages/onboarding/Onboarding2";
+import OnboardingSetup from "./pages/onboarding/OnboardingSetup";
+import OnboardingComplete from "./pages/onboarding/OnboardingComplete";
 
 // [추가] 직원 화면
 import StaffIntro from "./pages/staff/StaffIntro";
@@ -12,8 +15,8 @@ import StaffRequestDetail from "./pages/staff/StaffRequestDetail";
 import StaffConsultationEnd from "./pages/staff/StaffConsultationEnd";
 
 function App() {
-  // [수정] 화면 이동 상태
-  const [currentPage, setCurrentPage] = useState("staffIntro");
+  // [수정] 화면 이동 상태 - 지금은 온보딩 설정 화면 테스트용으로 임시 설정
+  const [currentPage, setCurrentPage] = useState("onboardingSetup");
 
   // [추가] 선택한 상담 요청 ID
   const [selectedRequestId, setSelectedRequestId] = useState(null);
@@ -21,6 +24,7 @@ function App() {
   // [추가] API 연동 전 요청별 상담 상태
   const [requestStatuses, setRequestStatuses] = useState({});
 
+  // [테스트용] 온보딩1 - 매장진입/저장범위선택
   if (currentPage === "onboarding") {
     return (
       <Onboarding1
@@ -28,6 +32,36 @@ function App() {
         onSelectAccount={() => alert("계정 선택")}
       />
     );
+  }
+
+  // [테스트용] 온보딩2 - 약관 동의 확인
+  if (currentPage === "onboardingConsent") {
+    return (
+      <Onboarding2
+        onBack={() => alert("뒤로가기")}
+        onSubmit={(consents) => console.log("제출된 동의값:", consents)}
+      />
+    );
+  }
+
+  // [테스트용] 닉네임+라이프스타일 선택
+  if (currentPage === "onboardingSetup") {
+    return (
+      <OnboardingSetup
+        onBack={() => alert("뒤로가기")}
+        onSubmit={(data) => {
+          console.log("닉네임/라이프스타일:", data);
+          alert(
+            `닉네임: ${data.nickname}, 태그: ${data.lifestyleTags.join(", ")}`
+          );
+        }}
+      />
+    );
+  }
+
+  // [테스트용] 쇼핑 셋업 완료
+  if (currentPage === "onboardingComplete") {
+    return <OnboardingComplete onStart={() => alert("쇼핑 시작하기")} />;
   }
 
   // [추가] 직원 로그인 진입 화면
@@ -51,24 +85,16 @@ function App() {
       <StaffRequests
         requestStatuses={requestStatuses}
         onSelectRequest={(requestId) => {
-          // [추가] 선택한 요청 ID 저장
           setSelectedRequestId(requestId);
-
-          // [추가] 상담 시작 상태로 변경
           setRequestStatuses((previousStatuses) => ({
             ...previousStatuses,
             [requestId]: "ACCEPTED",
           }));
-
-          // [수정] 직원 상담 요청 상세 화면으로 이동
           setCurrentPage("staffRequestDetail");
         }}
         onExitPos={() => {
-          // [추가] POS 종료 시 요청 관련 임시 상태 제거
           setSelectedRequestId(null);
           setRequestStatuses({});
-
-          // [추가] 직원 로그인 진입 화면으로 이동
           setCurrentPage("staffIntro");
         }}
       />
@@ -84,7 +110,6 @@ function App() {
           alert("상담을 종료한 후 POS를 종료해주세요.");
         }}
         onEndConsultation={() => {
-          // [수정] 상담 종료 확인 화면으로 이동
           setCurrentPage("staffConsultationEnd");
         }}
       />
@@ -97,17 +122,13 @@ function App() {
       <StaffConsultationEnd
         requestId={selectedRequestId}
         onContinue={() => {
-          // [추가] 현재 상담 상세 화면으로 돌아가기
           setCurrentPage("staffRequestDetail");
         }}
         onConfirmEnd={(requestId) => {
-          // [추가] 상담 완료 상태로 변경
           setRequestStatuses((previousStatuses) => ({
             ...previousStatuses,
             [requestId]: "COMPLETED",
           }));
-
-          // [추가] 상담 완료 후 요청 목록으로 이동
           setSelectedRequestId(null);
           setCurrentPage("staffRequests");
         }}
