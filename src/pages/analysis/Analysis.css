@@ -175,7 +175,7 @@
   margin: 8px 0 0;
   padding: 0;
 
-  color: #FF8E43;
+  color: #ff8e43;
   font-size: 14px;
   font-weight: 500;
   line-height: 150%;
@@ -339,6 +339,9 @@
   padding: 270px 48px 0;
 
   background: rgba(36, 34, 30, 0.18);
+
+  /* [추가] 오버레이가 하단 네비게이션 클릭을 막지 않도록 설정 */
+  pointer-events: none;
 }
 
 /* [추가] 최초 니즈 분석 시작 버튼 */
@@ -368,6 +371,7 @@
   cursor: pointer;
   transition: transform 0.12s ease;
   -webkit-tap-highlight-color: transparent;
+  pointer-events: auto;
 }
 
 /* [추가] 저장 제품이 2개 미만일 때 분석 버튼 비활성화 */
@@ -491,4 +495,8 @@
   letter-spacing: -0.28px;
   text-align: center;
   word-break: keep-all;
+}
+
+.analysis-page .bottom-nav {
+  z-index: 3;
 }
