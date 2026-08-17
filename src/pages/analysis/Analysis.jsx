@@ -105,8 +105,8 @@ function Analysis({
   };
 
   /**
-   * [수정] 니즈 분석 업데이트 버튼 동작
-   * 저장 제품이 2개 이상인 경우에만 업데이트를 실행합니다.
+   * [수정] 니즈 분석 업데이트
+   * 기존 결과에 값을 추가하지 않고 현재 저장 제품을 기준으로 재분석합니다.
    */
   const handleUpdateAnalysis = () => {
     if (!canUpdateAnalysis) {

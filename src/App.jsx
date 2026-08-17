@@ -178,11 +178,14 @@ function App() {
         }
       />
 
-      {/* [추가] 최초 니즈 분석 로딩 화면 */}
+      {/* [추가] 분석3 - 최초 니즈 분석 로딩 화면 */}
       <Route
         path="/analysis/loading"
         element={
-          <AnalysisLoading onComplete={() => navigate("/analysis/review")} />
+          <AnalysisLoading
+            mode="initial"
+            onComplete={() => navigate("/analysis/review", { replace: true })}
+          />
         }
       />
 
@@ -193,25 +196,30 @@ function App() {
           <Analysis
             initialStep="review"
             initialSavedCount={2}
-            onUpdateAnalysis={() => {
-              // [추가] 업데이트 로딩 화면은 이후 커밋에서 연결
-              alert("니즈 분석 업데이트");
-            }}
+            onUpdateAnalysis={() => navigate("/analysis/update-loading")}
           />
         }
       />
 
-      {/* [추가] 분석5 - 저장 제품 2개 이상, 업데이트 가능 */}
+      {/* [수정] 분석5 - 저장 제품 2개 이상, 업데이트 가능 */}
       <Route
         path="/analysis/result"
         element={
           <Analysis
             initialStep="result"
             initialSavedCount={2}
-            onUpdateAnalysis={() => {
-              // [추가] 업데이트 로딩 화면은 이후 커밋에서 연결
-              alert("니즈 분석 업데이트");
-            }}
+            onUpdateAnalysis={() => navigate("/analysis/update-loading")}
+          />
+        }
+      />
+
+      {/* [추가] 분석6 - 니즈 분석 업데이트 로딩 화면 */}
+      <Route
+        path="/analysis/update-loading"
+        element={
+          <AnalysisLoading
+            mode="update"
+            onComplete={() => navigate("/analysis/review", { replace: true })}
           />
         }
       />
