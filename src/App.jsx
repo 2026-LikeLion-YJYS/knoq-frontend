@@ -18,6 +18,7 @@ import StaffConsultationEnd from "./pages/staff/StaffConsultationEnd";
 
 import Analysis from "./pages/analysis/Analysis";
 import AnalysisLoading from "./pages/analysis/AnalysisLoading";
+import AnalysisEditComplete from "./pages/analysis/AnalysisEditComplete";
 
 function App() {
   // 페이지 전환은 react-router-dom으로 이관
@@ -28,6 +29,10 @@ function App() {
 
   // [추가] API 연동 전 요청별 상담 상태
   const [requestStatuses, setRequestStatuses] = useState({});
+
+  // [추가] 사용자가 수정 완료한 니즈 분석 결과
+  // 분석8에서 저장한 값을 분석13을 거쳐 분석5까지 유지합니다.
+  const [confirmedAnalysis, setConfirmedAnalysis] = useState(null);
 
   return (
     <Routes>
@@ -154,7 +159,7 @@ function App() {
         }
       />
 
-      {/* [수정] 분석1 - 저장 제품 2개 미만 */}
+      {/* [추가] 분석1 - 저장 제품 2개 미만 */}
       <Route
         path="/analysis"
         element={
@@ -178,56 +183,91 @@ function App() {
         }
       />
 
-      {/* [추가] 분석3 - 최초 니즈 분석 로딩 화면 */}
+      {/* [추가] 분석3 - 최초 니즈 분석 로딩 */}
       <Route
         path="/analysis/loading"
         element={
           <AnalysisLoading
             mode="initial"
-            onComplete={() => navigate("/analysis/review", { replace: true })}
+            onComplete={() =>
+              navigate("/analysis/review", {
+                replace: true,
+              })
+            }
           />
         }
       />
 
-      {/* [수정] 분석4 - 분석 결과 승인·수정 검토 화면 */}
+      {/* [수정] 분석4·8 - 승인 또는 수정 화면 */}
       <Route
         path="/analysis/review"
         element={
           <Analysis
             initialStep="review"
             initialSavedCount={2}
+            initialAnalysis={confirmedAnalysis ?? undefined}
             onUpdateAnalysis={() => navigate("/analysis/update-loading")}
+            onCompleteEdit={(editedAnalysis) => {
+              // [추가] 수정 결과를 분석13과 분석5에서 사용할 수 있도록 저장
+              setConfirmedAnalysis(editedAnalysis);
+              navigate("/analysis/edit-complete");
+            }}
           />
         }
       />
 
-      {/* [수정] 분석5 - 저장 제품 2개 이상, 업데이트 가능 */}
+      {/* [수정] 분석5 - 수정 결과를 포함한 확정 화면 */}
       <Route
         path="/analysis/result"
         element={
           <Analysis
             initialStep="result"
             initialSavedCount={2}
+            initialAnalysis={confirmedAnalysis ?? undefined}
             onUpdateAnalysis={() => navigate("/analysis/update-loading")}
           />
         }
       />
 
-      {/* [추가] 분석6 - 니즈 분석 업데이트 로딩 화면 */}
+      {/* [추가] 분석6 - 니즈 분석 업데이트 로딩 */}
       <Route
         path="/analysis/update-loading"
         element={
           <AnalysisLoading
             mode="update"
-            onComplete={() => navigate("/analysis/review", { replace: true })}
+            onComplete={() =>
+              navigate("/analysis/review", {
+                replace: true,
+              })
+            }
           />
         }
       />
 
-      {/* [추가] 분석7 - 저장 제품 2개 미만, 업데이트 불가능 */}
+      {/* [수정] 분석7 - 저장 제품 2개 미만 */}
       <Route
         path="/analysis/result-disabled"
-        element={<Analysis initialStep="result" initialSavedCount={1} />}
+        element={
+          <Analysis
+            initialStep="result"
+            initialSavedCount={1}
+            initialAnalysis={confirmedAnalysis ?? undefined}
+          />
+        }
+      />
+
+      {/* [추가] 분석13 - 니즈 분석 수정 완료 */}
+      <Route
+        path="/analysis/edit-complete"
+        element={
+          <AnalysisEditComplete
+            onContinue={() =>
+              navigate("/analysis/result", {
+                replace: true,
+              })
+            }
+          />
+        }
       />
 
       <Route path="*" element={<Help />} />
