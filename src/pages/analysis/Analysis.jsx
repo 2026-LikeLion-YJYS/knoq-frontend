@@ -45,18 +45,26 @@ const analysisItems = [
 
 /**
  * [수정] 니즈 분석 화면
- * 분석 결과가 없으면 저장 제품 개수에 따라 분석1 또는 분석2 상태를 표시합니다.
+ * analysisStep 상태에 따라 진입·검토·확정·수정 화면을 구분합니다.
  */
-function Analysis({ onStartAnalysis, onUpdateAnalysis }) {
+function Analysis({
+  initialStep = "entry",
+  onStartAnalysis,
+  onUpdateAnalysis,
+}) {
+  // [추가] 분석 화면 진행 상태
+  // entry: 분석1·2 / review: 분석4 / result: 분석5 / edit: 분석8
+  const [analysisStep, setAnalysisStep] = useState(initialStep);
+
   // [추가] API 연동 전 저장 제품 개수
   // 분석1 확인 시 1, 분석2 확인 시 2 이상으로 변경합니다.
   const [savedCount] = useState(2);
 
-  // [수정] 분석 결과 존재 여부만 사용
-  const [hasAnalysis] = useState(false);
+  // [수정] entry 상태에서만 분석1·2 진입 화면을 표시합니다.
+  const showAnalysisEntry = analysisStep === "entry";
 
-  // [추가] 분석 결과가 없을 때 분석1·2 진입 화면을 표시합니다.
-  const showAnalysisEntry = hasAnalysis === false;
+  // [추가] 분석4에서만 승인·수정 버튼을 표시합니다.
+  const showReviewActions = analysisStep === "review";
 
   // [추가] 저장 제품이 2개 이상이면 니즈 분석을 시작할 수 있습니다.
   const canAnalyze = savedCount >= 2;
@@ -74,8 +82,23 @@ function Analysis({ onStartAnalysis, onUpdateAnalysis }) {
   };
 
   /**
+   * [추가] 분석 결과 승인
+   * 분석4에서 분석5 확정 결과 상태로 변경합니다.
+   */
+  const handleApproveAnalysis = () => {
+    setAnalysisStep("result");
+  };
+
+  /**
+   * [추가] 분석 결과 수정
+   * 다음 커밋에서 edit 상태에 분석8 UI를 연결합니다.
+   */
+  const handleEditAnalysis = () => {
+    setAnalysisStep("edit");
+  };
+
+  /**
    * [추가] 니즈 분석 업데이트 버튼 동작
-   * 현재는 부모 컴포넌트의 화면 이동 함수만 실행하며,
    * 추후 API 연동 시 재분석 요청 성공 후 로딩 화면으로 이동합니다.
    */
   const handleUpdateAnalysis = () => {
@@ -83,15 +106,39 @@ function Analysis({ onStartAnalysis, onUpdateAnalysis }) {
   };
 
   return (
-    <div className="analysis-page">
+    // [수정] 현재 분석 단계 확인을 위한 data 속성 추가
+    <div className="analysis-page" data-analysis-step={analysisStep}>
       {/* [추가] 분석 화면 공통 헤더 */}
       <MainHeader />
 
       {/* [수정] 분석 결과와 최초 진입 상태를 함께 관리하는 콘텐츠 */}
       <main className="analysis-content">
-        {/* [추가] 분석 화면 제목과 설명 */}
+        {/* [수정] 분석 화면 제목과 검토 버튼 영역 */}
         <section className="analysis-intro">
-          <h1 className="analysis-title">KNOQ가 발견한 나의 니즈</h1>
+          <div className="analysis-title-row">
+            <h1 className="analysis-title">KNOQ가 발견한 나의 니즈</h1>
+
+            {/* [추가] 분석4에서만 표시되는 승인·수정 버튼 */}
+            {showReviewActions && (
+              <div className="analysis-review-actions">
+                <button
+                  className="analysis-review-button"
+                  type="button"
+                  onClick={handleApproveAnalysis}
+                >
+                  승인
+                </button>
+
+                <button
+                  className="analysis-review-button"
+                  type="button"
+                  onClick={handleEditAnalysis}
+                >
+                  수정
+                </button>
+              </div>
+            )}
+          </div>
 
           <p className="analysis-description">
             스캔한 제품을 바탕으로 나의 제품 선호를 분석했어요.

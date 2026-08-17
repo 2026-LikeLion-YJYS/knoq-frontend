@@ -336,3 +336,55 @@
   text-align: center;
   word-break: keep-all;
 }
+
+/* [추가] 분석 제목과 승인·수정 버튼 가로 배치 */
+.analysis-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  width: 100%;
+}
+
+/* [추가] 분석4 승인·수정 버튼 영역 */
+.analysis-review-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* [추가] 분석 결과 승인·수정 공통 버튼 */
+.analysis-review-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 21px;
+  padding: 3px 10px;
+
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 150%;
+  letter-spacing: -0.2px;
+
+  border: 0;
+  border-radius: 20px;
+  background: #fc7810;
+
+  cursor: pointer;
+  transition: transform 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* [추가] 승인·수정 버튼 클릭 효과 */
+.analysis-review-button:active {
+  transform: scale(0.96);
+}
+
+/* [추가] 키보드 접근 시 포커스 표시 */
+.analysis-review-button:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}

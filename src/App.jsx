@@ -160,10 +160,6 @@ function App() {
         element={
           <Analysis
             onStartAnalysis={() => navigate("/analysis/loading")}
-            onUpdateAnalysis={() => {
-              // [추가] 업데이트 로딩 화면은 이후 커밋에서 연결
-              alert("니즈 분석 업데이트");
-            }}
           />
         }
       />
@@ -173,6 +169,20 @@ function App() {
         path="/analysis/loading"
         element={
           <AnalysisLoading onComplete={() => navigate("/analysis/review")} />
+        }
+      />
+
+      {/* [추가] 분석 결과 승인·수정 검토 화면 */}
+      <Route
+        path="/analysis/review"
+        element={
+          <Analysis
+            initialStep="review"
+            onUpdateAnalysis={() => {
+              // [추가] 업데이트 로딩 화면은 이후 커밋에서 연결
+              alert("니즈 분석 업데이트");
+            }}
+          />
         }
       />
 
