@@ -45,7 +45,11 @@
 
 .onboarding-setup__section {
   padding: 0 24px;
-  margin-top: 36px;
+  margin-top: 34px;
+}
+
+.onboarding-setup__section--lifestyle {
+  margin-top: 49px;
 }
 
 .onboarding-setup__label {
@@ -54,10 +58,11 @@
   color: #fff;
   line-height: 1.5;
   letter-spacing: -0.4px;
-  margin-bottom: 16px;
+  margin-bottom: 30px;
 }
 
 .onboarding-setup__label--lifestyle {
+  line-height: 1.4;
   margin-bottom: 4px;
 }
 
@@ -65,10 +70,9 @@
   font-size: 14px;
   color: #8d8d8d;
   letter-spacing: -0.28px;
-  margin-bottom: 20px;
+  margin-bottom: 34px;
 }
 
-/* 닉네임 인풋 */
 .onboarding-setup__input {
   width: 100%;
   height: 60px;
@@ -93,17 +97,19 @@
   box-shadow: 0 0 12px 0 rgba(255, 123, 55, 0.4);
 }
 
-/* 라이프스타일 태그 */
 .onboarding-setup__tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 11px 8px;
 }
 
 .onboarding-setup__tag {
   flex: 1 1 calc(33.333% - 6px);
   min-width: 96px;
   height: 41px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: #2e2e2e;
   border: 1.5px solid transparent;
   border-radius: 25px;
@@ -119,7 +125,6 @@
   box-shadow: 0 0 4px rgba(255, 123, 55, 0.3);
 }
 
-/* 하단 CTA 버튼 */
 .onboarding-setup__cta {
   position: fixed;
   left: 50%;
@@ -139,7 +144,7 @@
 
 .onboarding-setup__cta--active {
   background: radial-gradient(
-    ellipse 150% 150% at 50% 0%,
+    ellipse 150% 150% at 50% 100%,
     #f59e0b 0%,
     #fc7810 100%
   );

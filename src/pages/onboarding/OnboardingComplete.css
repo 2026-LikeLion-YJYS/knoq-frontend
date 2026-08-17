@@ -2,6 +2,7 @@
 .onboarding-complete {
   position: relative;
   min-height: 100dvh;
+  height: 100dvh;
   overflow-y: auto;
   background: radial-gradient(
       ellipse 480px 480px at 100% 0%,
@@ -15,15 +16,24 @@
     #24221e;
   max-width: 393px;
   margin: 0 auto;
-  padding-bottom: 116px;
 }
 
 .onboarding-complete__header {
+  position: relative;
   height: 46px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-top: 62px;
+}
+
+.onboarding-complete__back {
+  position: absolute;
+  left: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
 }
 
 .onboarding-complete__title {
@@ -37,10 +47,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
-  gap: 24px;
-  margin-top: 62px;
-  padding: 0 24px;
+  width: 253px;
+  margin: 131px auto 0;
+  gap: 36px;
 }
 
 .onboarding-complete__check {
@@ -48,10 +57,19 @@
   height: 110px;
 }
 
+.onboarding-complete__text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  text-align: center;
+}
+
 .onboarding-complete__headline {
   font-size: 26px;
   font-weight: 600;
   color: #fff;
+  line-height: 1.5;
   letter-spacing: -0.52px;
 }
 
@@ -66,7 +84,7 @@
   display: flex;
   justify-content: center;
   gap: 14px;
-  margin-top: 65px;
+  margin-top: 85px;
 }
 
 .onboarding-complete__product-card {
@@ -92,11 +110,7 @@
   height: 50px;
   border: none;
   border-radius: 50px;
-  background: radial-gradient(
-    ellipse 150% 150% at 50% 0%,
-    #f59e0b 0%,
-    #fc7810 100%
-  );
+  background: radial-gradient(ellipse 150% 150% at 50% 100%, #f59e0b 0%, #fc7810 100%);
   color: #fff;
   font-size: 16px;
   font-weight: 500;

@@ -1,5 +1,5 @@
-// 온보딩 - 닉네임 입력 + 라이프스타일 선택 (FR-101, FR-102)
-// 카카오 경로(온보딩_4/5), 비회원 경로(온보딩_2/3) 공통 사용
+// 온보딩 - 닉네임 입력 + 라이프스타일 선택
+// 카카오 경로(온보딩_4/5), 비회원 경로(온보딩_2/3) 공통 사용 됨
 
 import { useState } from "react";
 import "./OnboardingSetup.css";
@@ -27,7 +27,7 @@ function OnboardingSetup({ onBack, onSubmit }) {
       if (prev.includes(value)) {
         return prev.filter((tag) => tag !== value);
       }
-      if (prev.length >= MAX_TAGS) return prev; // 3개 초과 선택 방지
+      if (prev.length >= MAX_TAGS) return prev;
       return [...prev, value];
     });
   };
