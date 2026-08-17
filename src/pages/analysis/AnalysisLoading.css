@@ -1,0 +1,104 @@
+/* [추가] 로딩 화면 전체 요소 크기 계산 통일 */
+.analysis-loading-page,
+.analysis-loading-page * {
+  box-sizing: border-box;
+}
+
+/* [추가] 피그마 배경을 적용한 전체 로딩 화면 */
+.analysis-loading-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 0 28px;
+
+  color: #ffffff;
+
+  background:
+    radial-gradient(
+      149.83% 46.17% at 80.28% -15.61%,
+      rgba(218, 87, 0, 0.5) 0%,
+      rgba(36, 34, 30, 0.5) 100%
+    ),
+    #24221e;
+}
+
+/* [추가] 로딩 그래픽과 문구 세로 배치 */
+.analysis-loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  transform: translateY(-14px);
+}
+
+/* [추가] 회전하는 원형 니즈 분석 로딩 그래픽 */
+.analysis-loading-spinner {
+  position: relative;
+
+  width: 222px;
+  height: 222px;
+
+  border-radius: 50%;
+  background: conic-gradient(
+    from 20deg,
+    #e85900 0deg,
+    #ff9138 100deg,
+    #ffbd91 190deg,
+    #fff2eb 270deg,
+    #ffffff 315deg,
+    #e85900 360deg
+  );
+
+  animation: analysis-loading-rotate 1.2s linear infinite;
+}
+
+/* [추가] 로딩 그래픽 내부의 빈 원 */
+.analysis-loading-spinner::after {
+  position: absolute;
+  inset: 16px;
+
+  border-radius: 50%;
+  background: #24221e;
+
+  content: "";
+}
+
+/* [추가] 니즈 분석 중 제목 */
+.analysis-loading-title {
+  margin: 56px 0 0;
+
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: -0.56px;
+  text-align: center;
+}
+
+/* [추가] 로딩 안내 문구 */
+.analysis-loading-description {
+  margin: 14px 0 0;
+
+  color: #bbbbbb;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.28px;
+  text-align: center;
+}
+
+/* [추가] 원형 로딩 그래픽 회전 효과 */
+@keyframes analysis-loading-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

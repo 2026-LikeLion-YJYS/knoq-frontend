@@ -52,8 +52,8 @@ function Analysis({ onStartAnalysis, onUpdateAnalysis }) {
   // 분석1 확인 시 1, 분석2 확인 시 2 이상으로 변경합니다.
   const [savedCount] = useState(2);
 
-  // [추가] API 연동 전 기존 니즈 분석 결과 존재 여부
-  const [hasAnalysis, setHasAnalysis] = useState(false);
+  // [수정] 분석 결과 존재 여부만 사용
+  const [hasAnalysis] = useState(false);
 
   // [추가] 분석 결과가 없을 때 분석1·2 진입 화면을 표시합니다.
   const showAnalysisEntry = hasAnalysis === false;
@@ -62,21 +62,15 @@ function Analysis({ onStartAnalysis, onUpdateAnalysis }) {
   const canAnalyze = savedCount >= 2;
 
   /**
-   * [추가] 최초 니즈 분석 시작
-   * 다음 커밋에서 니즈 분석 로딩 화면으로 이동하도록 연결합니다.
+   * [수정] 최초 니즈 분석 시작
+   * 저장 제품이 2개 이상이면 분석3 로딩 화면으로 이동합니다.
    */
   const handleStartAnalysis = () => {
     if (!canAnalyze) {
       return;
     }
 
-    if (onStartAnalysis) {
-      onStartAnalysis();
-      return;
-    }
-
-    // [추가] 현재 커밋에서는 분석5 결과 화면 전환 확인용으로 사용합니다.
-    setHasAnalysis(true);
+    onStartAnalysis?.();
   };
 
   /**

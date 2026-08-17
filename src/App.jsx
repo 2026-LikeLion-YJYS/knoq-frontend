@@ -17,6 +17,7 @@ import StaffRequestDetail from "./pages/staff/StaffRequestDetail";
 import StaffConsultationEnd from "./pages/staff/StaffConsultationEnd";
 
 import Analysis from "./pages/analysis/Analysis";
+import AnalysisLoading from "./pages/analysis/AnalysisLoading";
 
 function App() {
   // 페이지 전환은 react-router-dom으로 이관
@@ -153,16 +154,25 @@ function App() {
         }
       />
 
-      {/* [추가] 니즈 분석 결과 기본 화면 */}
+      {/* [수정] 니즈 분석 기본 화면 */}
       <Route
         path="/analysis"
         element={
           <Analysis
+            onStartAnalysis={() => navigate("/analysis/loading")}
             onUpdateAnalysis={() => {
-              // [추가] 다음 커밋에서 분석 업데이트 로딩 화면으로 연결
+              // [추가] 업데이트 로딩 화면은 이후 커밋에서 연결
               alert("니즈 분석 업데이트");
             }}
           />
+        }
+      />
+
+      {/* [추가] 최초 니즈 분석 로딩 화면 */}
+      <Route
+        path="/analysis/loading"
+        element={
+          <AnalysisLoading onComplete={() => navigate("/analysis/review")} />
         }
       />
 
