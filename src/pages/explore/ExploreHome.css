@@ -1,0 +1,268 @@
+.explore-home {
+  position: relative;
+  min-height: 100dvh;
+  overflow-y: auto;
+  scrollbar-width: none;
+  background: #24221e;
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  padding-bottom: 140px;
+  box-sizing: border-box;
+}
+
+.explore-home::-webkit-scrollbar {
+  display: none;
+}
+
+.explore-home__top-section {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0 0 20px 20px;
+  padding-bottom: 40px;
+}
+
+/* 그라데이션 + 로고 워터마크를 한 레이어로 합침 */
+.explore-home__glow {
+  position: absolute;
+  inset: 0;
+  background-image: url("../../assets/images/background-logo.png"),
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(255, 100, 19, 0.54) 15%,
+      rgba(245, 158, 11, 0.72) 75%
+    );
+  background-size: cover, cover;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+  z-index: 0;
+}
+
+.explore-home__header-wrap {
+  position: relative;
+  z-index: 3;
+  margin-top: 62px;
+}
+
+.explore-home__title {
+  position: relative;
+  z-index: 3;
+  font-size: 28px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: -0.56px;
+  line-height: 1.5;
+  padding: 0 24px;
+  margin-top: 24px;
+}
+
+/* 유리효과 제거, 네비바 스타일로 flat하게 */
+.explore-home__insight-card,
+.explore-home__hero-card {
+  position: relative;
+  z-index: 3;
+  width: calc(100% - 48px);
+  box-sizing: border-box;
+  background: rgba(46, 46, 46, 0.5);
+  border: 0.5px solid rgba(174, 174, 174, 0.3);
+  border-radius: 16px;
+}
+
+.explore-home__insight-card {
+  margin: 15px auto 0;
+  padding: 15px 16px;
+}
+
+.explore-home__insight-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: -0.32px;
+}
+
+.explore-home__insight-body {
+  margin-top: 18px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.5;
+  letter-spacing: -0.24px;
+}
+
+.explore-home__hero-card {
+  margin: 10px auto 0;
+  padding: 14px 16px 16px;
+}
+
+.explore-home__hero-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.explore-home__hero-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: -0.32px;
+}
+
+/* 크기 업, 폰트 얇게 */
+.explore-home__detail-badge {
+  background: #fc7810;
+  border: none;
+  border-radius: 20px;
+  padding: 5px 14px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: -0.2px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.explore-home__hero-image-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+  height: 160px;
+}
+
+.explore-home__hero-image {
+  max-width: 176px;
+  max-height: 130px;
+  object-fit: contain;
+}
+
+.explore-home__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.explore-home__arrow--left {
+  left: 4px;
+}
+
+.explore-home__arrow--right {
+  right: 4px;
+}
+
+.explore-home__saved {
+  position: relative;
+  z-index: 1;
+  padding: 0 32px;
+  margin-top: 39px;
+  box-sizing: border-box;
+}
+
+.explore-home__saved-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: -0.32px;
+  margin-bottom: 9px;
+}
+
+.explore-home__saved-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+
+.explore-home__saved-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 106 / 116;
+}
+
+.explore-home__saved-card-select {
+  width: 100%;
+  height: 100%;
+  background: rgba(104, 104, 104, 0.5);
+  border-radius: 16px;
+  border: 1.5px solid transparent;
+  padding: 0;
+  cursor: pointer;
+  position: relative;
+}
+
+.explore-home__saved-card--selected .explore-home__saved-card-select {
+  border-color: #ff7b37;
+}
+
+.explore-home__saved-card-delete {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  width: 10px;
+  height: 10px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.explore-home__saved-card-delete img {
+  width: 100%;
+  height: 100%;
+}
+
+.explore-home__recommend-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 31px;
+  height: 23px;
+  box-sizing: border-box;
+  background: #bbb;
+  color: #525252;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: -0.2px;
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.explore-home__scan-fab {
+  position: fixed;
+  bottom: 112px;
+  right: 24px;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse 150% 150% at 50% 100%,
+    #f59e0b 0%,
+    #fc7810 100%
+  );
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 2;
+}
+
+.explore-home__scan-fab img {
+  width: 20px;
+  height: 20px;
+}
+
+.explore-home__scan-fab span {
+  font-size: 10px;
+  color: #fff;
+  letter-spacing: -0.2px;
+}

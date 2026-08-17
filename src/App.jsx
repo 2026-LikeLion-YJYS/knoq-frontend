@@ -16,6 +16,8 @@ import StaffRequests from "./pages/staff/StaffRequests";
 import StaffRequestDetail from "./pages/staff/StaffRequestDetail";
 import StaffConsultationEnd from "./pages/staff/StaffConsultationEnd";
 
+import ExploreHome from "./pages/explore/ExploreHome";
+
 function App() {
   // 페이지 전환은 react-router-dom으로 이관
   const navigate = useNavigate();
@@ -77,6 +79,17 @@ function App() {
           />
         }
       />
+
+      {/* [추가] 탐색 기본 화면 */}
+      <Route
+        path="/explore"
+        element={
+          <ExploreHome
+            onOpenDetail={() => alert("상세보기 모달 - 다음 단계에서 연결 예정")}
+            onScan={() => alert("제품 스캔")}
+          />
+        }
+    />
 
       {/* [추가] 직원 로그인 진입 화면 */}
       <Route
