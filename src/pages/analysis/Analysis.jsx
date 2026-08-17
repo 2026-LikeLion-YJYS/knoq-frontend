@@ -1,3 +1,6 @@
+// [추가] 분석 화면 임시 상태 관리를 위한 useState
+import { useState } from "react";
+
 // [추가] 공통 헤더와 하단 네비게이션 사용
 import MainHeader from "../../components/MainHeader/MainHeader";
 import BottomNav from "../../components/BottomNav/BottomNav";
@@ -41,10 +44,41 @@ const analysisItems = [
 ];
 
 /**
- * [추가] 니즈 분석 결과 기본 화면
- * 저장한 제품을 바탕으로 분석된 선호 정보와 코멘트를 표시합니다.
+ * [수정] 니즈 분석 화면
+ * 분석 결과가 없으면 저장 제품 개수에 따라 분석1 또는 분석2 상태를 표시합니다.
  */
-function Analysis({ onUpdateAnalysis }) {
+function Analysis({ onStartAnalysis, onUpdateAnalysis }) {
+  // [추가] API 연동 전 저장 제품 개수
+  // 분석1 확인 시 1, 분석2 확인 시 2 이상으로 변경합니다.
+  const [savedCount] = useState(2);
+
+  // [추가] API 연동 전 기존 니즈 분석 결과 존재 여부
+  const [hasAnalysis, setHasAnalysis] = useState(false);
+
+  // [추가] 분석 결과가 없을 때 분석1·2 진입 화면을 표시합니다.
+  const showAnalysisEntry = hasAnalysis === false;
+
+  // [추가] 저장 제품이 2개 이상이면 니즈 분석을 시작할 수 있습니다.
+  const canAnalyze = savedCount >= 2;
+
+  /**
+   * [추가] 최초 니즈 분석 시작
+   * 다음 커밋에서 니즈 분석 로딩 화면으로 이동하도록 연결합니다.
+   */
+  const handleStartAnalysis = () => {
+    if (!canAnalyze) {
+      return;
+    }
+
+    if (onStartAnalysis) {
+      onStartAnalysis();
+      return;
+    }
+
+    // [추가] 현재 커밋에서는 분석5 결과 화면 전환 확인용으로 사용합니다.
+    setHasAnalysis(true);
+  };
+
   /**
    * [추가] 니즈 분석 업데이트 버튼 동작
    * 현재는 부모 컴포넌트의 화면 이동 함수만 실행하며,
@@ -59,7 +93,7 @@ function Analysis({ onUpdateAnalysis }) {
       {/* [추가] 분석 화면 공통 헤더 */}
       <MainHeader />
 
-      {/* [추가] 니즈 분석 결과 전체 콘텐츠 */}
+      {/* [수정] 분석 결과와 최초 진입 상태를 함께 관리하는 콘텐츠 */}
       <main className="analysis-content">
         {/* [추가] 분석 화면 제목과 설명 */}
         <section className="analysis-intro">
@@ -72,41 +106,69 @@ function Analysis({ onUpdateAnalysis }) {
           </p>
         </section>
 
-        {/* [추가] 카테고리·컬러·소재·사이즈 분석 결과 */}
-        <section
-          className="analysis-result-grid"
-          aria-label="니즈 분석 결과"
+        {/* [추가] 분석1·2에서 블러 처리할 분석5 결과 영역 */}
+        <div
+          className={`analysis-result-area ${
+            showAnalysisEntry ? "analysis-result-area--blurred" : ""
+          }`}
+          aria-hidden={showAnalysisEntry}
         >
-          {analysisItems.map((item) => (
-            <article className="analysis-result-card" key={item.label}>
-              <p className="analysis-result-label">{item.label}</p>
-              <p className="analysis-result-value">{item.value}</p>
-            </article>
-          ))}
-        </section>
+          {/* [추가] 카테고리·컬러·소재·사이즈 분석 결과 */}
+          <section className="analysis-result-grid" aria-label="니즈 분석 결과">
+            {analysisItems.map((item) => (
+              <article className="analysis-result-card" key={item.label}>
+                <p className="analysis-result-label">{item.label}</p>
+                <p className="analysis-result-value">{item.value}</p>
+              </article>
+            ))}
+          </section>
 
-        {/* [추가] 저장 제품에서 발견한 공통점 */}
-        <section className="analysis-discovery">
-          <h2 className="analysis-discovery-title">KNOQ'S 발견</h2>
+          {/* [추가] 저장 제품에서 발견한 공통점 */}
+          <section className="analysis-discovery">
+            <h2 className="analysis-discovery-title">KNOQ'S 발견</h2>
 
-          <p className="analysis-discovery-description">
-            스캔한 제품들의 공통점을 찾아, 내가 가장 중요하게 생각하는 기준을
-            알려드려요.
-          </p>
+            <p className="analysis-discovery-description">
+              스캔한 제품들의 공통점을 찾아, 내가 가장 중요하게 생각하는 기준을
+              알려드려요.
+            </p>
 
-          <div className="analysis-comment">
-            <p>{analysisData.comment}</p>
-          </div>
-        </section>
+            <div className="analysis-comment">
+              <p>{analysisData.comment}</p>
+            </div>
+          </section>
 
-        {/* [추가] 니즈 분석 업데이트 버튼 */}
-        <button
-          className="analysis-update-button"
-          type="button"
-          onClick={handleUpdateAnalysis}
-        >
-          니즈 분석 업데이트
-        </button>
+          {/* [추가] 니즈 분석 업데이트 버튼 */}
+          <button
+            className="analysis-update-button"
+            type="button"
+            onClick={handleUpdateAnalysis}
+          >
+            니즈 분석 업데이트
+          </button>
+        </div>
+
+        {/* [추가] 분석 결과가 없을 때 표시하는 분석1·2 오버레이 */}
+        {showAnalysisEntry && (
+          <section
+            className="analysis-entry-overlay"
+            aria-label="니즈 분석 시작"
+          >
+            <button
+              className="analysis-start-button"
+              type="button"
+              disabled={!canAnalyze}
+              onClick={handleStartAnalysis}
+            >
+              니즈 분석하기
+            </button>
+
+            <p className="analysis-entry-message">
+              {canAnalyze
+                ? "나의 니즈를 찾아서 탐색을 이어가보세요"
+                : "제품을 2개 이상 스캔해야 니즈분석이 가능해요."}
+            </p>
+          </section>
+        )}
       </main>
 
       {/* [추가] 분석 탭이 활성화된 공통 하단 네비게이션 */}
