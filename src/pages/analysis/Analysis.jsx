@@ -45,29 +45,36 @@ const analysisItems = [
 
 /**
  * [수정] 니즈 분석 화면
- * analysisStep 상태에 따라 진입·검토·확정·수정 화면을 구분합니다.
+ * analysisStep과 저장 제품 개수에 따라 분석1·2·4·5·7 화면을 구분합니다.
  */
 function Analysis({
   initialStep = "entry",
+  initialSavedCount = 1,
   onStartAnalysis,
   onUpdateAnalysis,
 }) {
   // [추가] 분석 화면 진행 상태
-  // entry: 분석1·2 / review: 분석4 / result: 분석5 / edit: 분석8
+  // entry: 분석1·2 / review: 분석4 / result: 분석5·7 / edit: 분석8
   const [analysisStep, setAnalysisStep] = useState(initialStep);
 
-  // [추가] API 연동 전 저장 제품 개수
-  // 분석1 확인 시 1, 분석2 확인 시 2 이상으로 변경합니다.
-  const [savedCount] = useState(2);
+  // [수정] 화면별 저장 제품 개수를 전달받아 초기화
+  // 분석1·7은 1, 분석2·4·5는 2 이상을 전달합니다.
+  const [savedCount] = useState(initialSavedCount);
 
   // [수정] entry 상태에서만 분석1·2 진입 화면을 표시합니다.
   const showAnalysisEntry = analysisStep === "entry";
 
-  // [추가] 분석4에서만 승인·수정 버튼을 표시합니다.
+  // [수정] 분석4인 review 상태에서만 승인·수정 버튼을 표시합니다.
   const showReviewActions = analysisStep === "review";
 
-  // [추가] 저장 제품이 2개 이상이면 니즈 분석을 시작할 수 있습니다.
+  // [추가] entry가 아니면 기존 니즈 분석 결과가 존재하는 상태입니다.
+  const hasAnalysis = analysisStep !== "entry";
+
+  // [추가] 저장 제품이 2개 이상이면 최초 니즈 분석을 시작할 수 있습니다.
   const canAnalyze = savedCount >= 2;
+
+  // [추가] 분석 결과가 있고 저장 제품이 2개 이상이면 업데이트할 수 있습니다.
+  const canUpdateAnalysis = hasAnalysis && savedCount >= 2;
 
   /**
    * [수정] 최초 니즈 분석 시작
@@ -98,10 +105,14 @@ function Analysis({
   };
 
   /**
-   * [추가] 니즈 분석 업데이트 버튼 동작
-   * 추후 API 연동 시 재분석 요청 성공 후 로딩 화면으로 이동합니다.
+   * [수정] 니즈 분석 업데이트 버튼 동작
+   * 저장 제품이 2개 이상인 경우에만 업데이트를 실행합니다.
    */
   const handleUpdateAnalysis = () => {
+    if (!canUpdateAnalysis) {
+      return;
+    }
+
     onUpdateAnalysis?.();
   };
 
@@ -118,7 +129,7 @@ function Analysis({
           <div className="analysis-title-row">
             <h1 className="analysis-title">KNOQ가 발견한 나의 니즈</h1>
 
-            {/* [추가] 분석4에서만 표시되는 승인·수정 버튼 */}
+            {/* [수정] 분석4에서만 승인·수정 버튼 표시 */}
             {showReviewActions && (
               <div className="analysis-review-actions">
                 <button
@@ -178,14 +189,22 @@ function Analysis({
             </div>
           </section>
 
-          {/* [추가] 니즈 분석 업데이트 버튼 */}
+          {/* [수정] 저장 제품 개수에 따라 활성화되는 업데이트 버튼 */}
           <button
             className="analysis-update-button"
             type="button"
+            disabled={!canUpdateAnalysis}
             onClick={handleUpdateAnalysis}
           >
             니즈 분석 업데이트
           </button>
+
+          {/* [추가] 분석7에서 업데이트 불가 안내 문구 표시 */}
+          {hasAnalysis && !canUpdateAnalysis && (
+            <p className="analysis-update-message">
+              제품을 2개 이상 스캔해야 니즈분석이 가능해요.
+            </p>
+          )}
         </div>
 
         {/* [추가] 분석 결과가 없을 때 표시하는 분석1·2 오버레이 */}

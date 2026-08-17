@@ -154,11 +154,25 @@ function App() {
         }
       />
 
-      {/* [수정] 니즈 분석 기본 화면 */}
+      {/* [수정] 분석1 - 저장 제품 2개 미만 */}
       <Route
         path="/analysis"
         element={
           <Analysis
+            initialStep="entry"
+            initialSavedCount={1}
+            onStartAnalysis={() => navigate("/analysis/loading")}
+          />
+        }
+      />
+
+      {/* [추가] 분석2 - 저장 제품 2개 이상 */}
+      <Route
+        path="/analysis/entry"
+        element={
+          <Analysis
+            initialStep="entry"
+            initialSavedCount={2}
             onStartAnalysis={() => navigate("/analysis/loading")}
           />
         }
@@ -172,18 +186,40 @@ function App() {
         }
       />
 
-      {/* [추가] 분석 결과 승인·수정 검토 화면 */}
+      {/* [수정] 분석4 - 분석 결과 승인·수정 검토 화면 */}
       <Route
         path="/analysis/review"
         element={
           <Analysis
             initialStep="review"
+            initialSavedCount={2}
             onUpdateAnalysis={() => {
               // [추가] 업데이트 로딩 화면은 이후 커밋에서 연결
               alert("니즈 분석 업데이트");
             }}
           />
         }
+      />
+
+      {/* [추가] 분석5 - 저장 제품 2개 이상, 업데이트 가능 */}
+      <Route
+        path="/analysis/result"
+        element={
+          <Analysis
+            initialStep="result"
+            initialSavedCount={2}
+            onUpdateAnalysis={() => {
+              // [추가] 업데이트 로딩 화면은 이후 커밋에서 연결
+              alert("니즈 분석 업데이트");
+            }}
+          />
+        }
+      />
+
+      {/* [추가] 분석7 - 저장 제품 2개 미만, 업데이트 불가능 */}
+      <Route
+        path="/analysis/result-disabled"
+        element={<Analysis initialStep="result" initialSavedCount={1} />}
       />
 
       <Route path="*" element={<Help />} />

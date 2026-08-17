@@ -388,3 +388,28 @@
   outline: 2px solid #ffffff;
   outline-offset: 2px;
 }
+
+/* [추가] 저장 제품이 2개 미만일 때 업데이트 버튼 비활성화 */
+.analysis-update-button:disabled {
+  color: #525252;
+  background: #bbbbbb;
+  cursor: default;
+}
+
+/* [추가] 비활성화된 업데이트 버튼은 클릭 효과 제외 */
+.analysis-update-button:disabled:active {
+  transform: none;
+}
+
+/* [추가] 니즈 분석 업데이트 불가 안내 문구 */
+.analysis-update-message {
+  margin: 14px 0 0;
+
+  color: #bbbbbb;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.28px;
+  text-align: center;
+  word-break: keep-all;
+}
