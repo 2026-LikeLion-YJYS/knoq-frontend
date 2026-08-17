@@ -21,23 +21,27 @@ const analysisData = {
 };
 
 /**
- * [추가] 니즈 분석 결과 카드 목록
- * 동일한 카드 UI를 반복해서 렌더링하기 위한 데이터입니다.
+ * [수정] 니즈 분석 결과 카드 목록
+ * 각 카드에 수정 모달을 구분하기 위한 field 값을 추가합니다.
  */
 const analysisItems = [
   {
+    field: "productCategory",
     label: "제품 카테고리",
     value: analysisData.productCategory,
   },
   {
+    field: "preferredColor",
     label: "선호 컬러",
     value: analysisData.preferredColor,
   },
   {
+    field: "preferredMaterial",
     label: "선호 소재",
     value: analysisData.preferredMaterial,
   },
   {
+    field: "preferredSize",
     label: "선호 사이즈",
     value: analysisData.preferredSize,
   },
@@ -45,27 +49,34 @@ const analysisItems = [
 
 /**
  * [수정] 니즈 분석 화면
- * analysisStep과 저장 제품 개수에 따라 분석1·2·4·5·7 화면을 구분합니다.
+ * analysisStep과 저장 제품 개수에 따라 분석1·2·4·5·7·8 화면을 구분합니다.
  */
 function Analysis({
   initialStep = "entry",
   initialSavedCount = 1,
   onStartAnalysis,
   onUpdateAnalysis,
+  onCompleteEdit,
 }) {
-  // [추가] 분석 화면 진행 상태
+  // [수정] 분석 화면 진행 상태
   // entry: 분석1·2 / review: 분석4 / result: 분석5·7 / edit: 분석8
   const [analysisStep, setAnalysisStep] = useState(initialStep);
 
   // [수정] 화면별 저장 제품 개수를 전달받아 초기화
-  // 분석1·7은 1, 분석2·4·5는 2 이상을 전달합니다.
+  // 분석1·7은 1, 분석2·4·5·8은 2 이상을 전달합니다.
   const [savedCount] = useState(initialSavedCount);
+
+  // [추가] 다음 커밋에서 열 수정 모달의 항목을 저장합니다.
+  const [editingField, setEditingField] = useState(null);
 
   // [수정] entry 상태에서만 분석1·2 진입 화면을 표시합니다.
   const showAnalysisEntry = analysisStep === "entry";
 
   // [수정] 분석4인 review 상태에서만 승인·수정 버튼을 표시합니다.
   const showReviewActions = analysisStep === "review";
+
+  // [추가] 분석8인 edit 상태에서 수정 관련 버튼을 표시합니다.
+  const showEditControls = analysisStep === "edit";
 
   // [추가] entry가 아니면 기존 니즈 분석 결과가 존재하는 상태입니다.
   const hasAnalysis = analysisStep !== "entry";
@@ -97,11 +108,27 @@ function Analysis({
   };
 
   /**
-   * [추가] 분석 결과 수정
-   * 다음 커밋에서 edit 상태에 분석8 UI를 연결합니다.
+   * [수정] 분석 결과 수정
+   * 분석4에서 분석8 수정 메인 화면으로 변경합니다.
    */
   const handleEditAnalysis = () => {
     setAnalysisStep("edit");
+  };
+
+  /**
+   * [추가] 수정할 니즈 항목 선택
+   * 다음 커밋에서 editingField에 따라 하나의 수정 모달 내용을 변경합니다.
+   */
+  const handleSelectEditField = (field) => {
+    setEditingField(field);
+  };
+
+  /**
+   * [추가] 전체 니즈 수정 완료
+   * 다음 커밋 이후 분석13 수정 완료 화면으로 이동하도록 연결합니다.
+   */
+  const handleCompleteEdit = () => {
+    onCompleteEdit?.();
   };
 
   /**
@@ -117,14 +144,18 @@ function Analysis({
   };
 
   return (
-    // [수정] 현재 분석 단계 확인을 위한 data 속성 추가
-    <div className="analysis-page" data-analysis-step={analysisStep}>
+    // [수정] 현재 분석 단계와 선택한 수정 항목을 확인할 수 있도록 data 속성 추가
+    <div
+      className="analysis-page"
+      data-analysis-step={analysisStep}
+      data-editing-field={editingField ?? ""}
+    >
       {/* [추가] 분석 화면 공통 헤더 */}
       <MainHeader />
 
       {/* [수정] 분석 결과와 최초 진입 상태를 함께 관리하는 콘텐츠 */}
       <main className="analysis-content">
-        {/* [수정] 분석 화면 제목과 검토 버튼 영역 */}
+        {/* [수정] 분석 화면 제목과 화면별 버튼 영역 */}
         <section className="analysis-intro">
           <div className="analysis-title-row">
             <h1 className="analysis-title">KNOQ가 발견한 나의 니즈</h1>
@@ -149,6 +180,17 @@ function Analysis({
                 </button>
               </div>
             )}
+
+            {/* [추가] 분석8에서만 수정 완료하기 버튼 표시 */}
+            {showEditControls && (
+              <button
+                className="analysis-edit-complete-button"
+                type="button"
+                onClick={handleCompleteEdit}
+              >
+                수정 완료하기
+              </button>
+            )}
           </div>
 
           <p className="analysis-description">
@@ -158,30 +200,48 @@ function Analysis({
           </p>
         </section>
 
-        {/* [추가] 분석1·2에서 블러 처리할 분석5 결과 영역 */}
+        {/* [수정] 분석1·2에서 블러 처리하고 분석8에서 수정 버튼을 표시할 영역 */}
         <div
           className={`analysis-result-area ${
             showAnalysisEntry ? "analysis-result-area--blurred" : ""
           }`}
           aria-hidden={showAnalysisEntry}
         >
-          {/* [추가] 카테고리·컬러·소재·사이즈 분석 결과 */}
+          {/* [수정] 카테고리·컬러·소재·사이즈 분석 결과 */}
           <section className="analysis-result-grid" aria-label="니즈 분석 결과">
             {analysisItems.map((item) => (
-              <article className="analysis-result-card" key={item.label}>
+              <article
+                className={`analysis-result-card ${
+                  showEditControls ? "analysis-result-card--editable" : ""
+                }`}
+                key={item.field}
+              >
                 <p className="analysis-result-label">{item.label}</p>
                 <p className="analysis-result-value">{item.value}</p>
+
+                {/* [추가] 분석8에서만 카드별 수정 버튼 표시 */}
+                {showEditControls && (
+                  <button
+                    className="analysis-card-edit-button"
+                    type="button"
+                    aria-label={`${item.label} 수정`}
+                    onClick={() => handleSelectEditField(item.field)}
+                  >
+                    수정
+                  </button>
+                )}
               </article>
             ))}
           </section>
 
-          {/* [추가] 저장 제품에서 발견한 공통점 */}
+          {/* [수정] 저장 제품에서 발견한 공통점 */}
           <section className="analysis-discovery">
             <h2 className="analysis-discovery-title">KNOQ'S 발견</h2>
 
             <p className="analysis-discovery-description">
-              스캔한 제품들의 공통점을 찾아, 내가 가장 중요하게 생각하는 기준을
-              알려드려요.
+              {showEditControls
+                ? "제품에서 가장 많이 나타난 공통 요소를 기준으로 우선순위를 분석했어요."
+                : "스캔한 제품들의 공통점을 찾아, 내가 가장 중요하게 생각하는 기준을 알려드려요."}
             </p>
 
             <div className="analysis-comment">
