@@ -1,7 +1,7 @@
 // [추가] 화면 상태 관리를 위한 useState
 import { useState } from "react";
 
-// react-router-dom 페이지 전환용
+// [추가] react-router-dom을 이용한 페이지 전환
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 
 import Help from "./pages/help/Help";
@@ -10,6 +10,8 @@ import Onboarding1 from "./pages/onboarding/Onboarding1";
 import Onboarding2 from "./pages/onboarding/Onboarding2";
 import OnboardingSetup from "./pages/onboarding/OnboardingSetup";
 import OnboardingComplete from "./pages/onboarding/OnboardingComplete";
+
+import ExploreHome from "./pages/explore/ExploreHome";
 
 import StaffIntro from "./pages/staff/StaffIntro";
 import StaffLogin from "./pages/staff/StaffLogin";
@@ -73,7 +75,7 @@ const createInitialAnalysisState = () => ({
 });
 
 function App() {
-  // 페이지 전환은 react-router-dom으로 이관
+  // [수정] react-router-dom을 이용해 화면을 전환합니다.
   const navigate = useNavigate();
 
   // [추가] 선택한 상담 요청 ID
@@ -92,7 +94,7 @@ function App() {
 
   /**
    * [추가] 최초 니즈 분석 시작
-   * 저장 제품이 2개 이상일 때 분석3으로 이동합니다.
+   * 저장 제품이 2개 이상일 때 분석 로딩 화면으로 이동합니다.
    */
   const handleStartAnalysis = () => {
     if (analysisState.savedCount < 2) {
@@ -107,7 +109,7 @@ function App() {
 
   /**
    * [추가] 최초 니즈 분석 로딩 완료
-   * 새 분석 결과를 저장하고 분석4로 이동합니다.
+   * 새 분석 결과를 저장하고 분석 검토 화면으로 이동합니다.
    */
   const handleInitialLoadingComplete = () => {
     const newAnalysisData = { ...INITIAL_ANALYSIS_DATA };
@@ -123,7 +125,7 @@ function App() {
 
   /**
    * [추가] 분석 결과 승인
-   * 분석4에서 분석5로 이동합니다.
+   * 분석 검토 화면에서 최종 결과 화면으로 이동합니다.
    */
   const handleApproveAnalysis = () => {
     setAnalysisState((previousState) => ({
@@ -135,7 +137,7 @@ function App() {
 
   /**
    * [추가] 분석 결과 수정 시작
-   * 현재 분석 결과를 복사한 뒤 분석8로 이동합니다.
+   * 현재 분석 결과를 복사한 뒤 분석 수정 화면으로 이동합니다.
    */
   const handleStartEditAnalysis = () => {
     setAnalysisState((previousState) => ({
@@ -147,7 +149,7 @@ function App() {
   };
 
   /**
-   * [추가] 니즈 항목 수정 모달 열기
+   * [추가] 니즈 항목 수정 모달을 엽니다.
    */
   const handleOpenEditModal = (modalType) => {
     setAnalysisState((previousState) => ({
@@ -157,7 +159,7 @@ function App() {
   };
 
   /**
-   * [추가] 니즈 항목 수정 모달 닫기
+   * [추가] 니즈 항목 수정 모달을 닫습니다.
    */
   const handleCloseEditModal = () => {
     setAnalysisState((previousState) => ({
@@ -167,7 +169,7 @@ function App() {
   };
 
   /**
-   * [추가] 수정 모달에서 선택한 값을 임시 수정 결과에 반영
+   * [추가] 수정 모달에서 선택한 값을 임시 수정 결과에 반영합니다.
    */
   const handleSaveEditValue = (value) => {
     setAnalysisState((previousState) => {
@@ -190,7 +192,7 @@ function App() {
 
   /**
    * [추가] 전체 니즈 수정 완료
-   * 수정 결과를 확정한 뒤 분석13으로 이동합니다.
+   * 수정 결과를 확정한 뒤 수정 완료 화면으로 이동합니다.
    */
   const handleCompleteAnalysisEdit = () => {
     setAnalysisState((previousState) => ({
@@ -203,7 +205,7 @@ function App() {
   };
 
   /**
-   * [추가] 수정 완료 화면에서 분석5로 이동
+   * [추가] 수정 완료 화면에서 분석 결과 화면으로 이동합니다.
    */
   const handleContinueAnalysis = () => {
     setAnalysisState((previousState) => ({
@@ -245,7 +247,7 @@ function App() {
   };
 
   /**
-   * [추가] 현재 분석 단계에 맞는 화면 표시
+   * [추가] 현재 분석 단계에 맞는 화면을 표시합니다.
    */
   const renderAnalysisScreen = () => {
     if (analysisState.analysisStep === ANALYSIS_STEP.LOADING) {
@@ -293,38 +295,43 @@ function App() {
 
   return (
     <Routes>
-      {/* [수정] 화면 이동 상태 - 지금은 온보딩 설정 화면 테스트용으로 임시 설정 */}
-      <Route path="/" element={<Navigate to="/onboarding/setup" replace />} />
+      {/* [수정] 앱 최초 진입 시 온보딩 첫 화면으로 이동 */}
+      <Route path="/" element={<Navigate to="/onboarding" replace />} />
 
-      {/* [테스트용] 온보딩1 - 매장진입/저장범위선택 */}
+      {/* [수정] 온보딩 저장 범위 선택 후 약관 동의 화면으로 이동 */}
       <Route
         path="/onboarding"
         element={
           <Onboarding1
-            onSelectPrivate={() => alert("프라이빗 선택")}
-            onSelectAccount={() => alert("계정 선택")}
+            onSelectPrivate={() => navigate("/onboarding/consent")}
+            onSelectAccount={() => navigate("/onboarding/consent")}
           />
         }
       />
 
-      {/* [테스트용] 온보딩2 - 약관 동의 확인 */}
+      {/* [수정] 약관 동의 완료 후 사용자 설정 화면으로 이동 */}
       <Route
         path="/onboarding/consent"
         element={
           <Onboarding2
             onBack={() => navigate(-1)}
-            onSubmit={(consents) => console.log("제출된 동의값:", consents)}
+            onSubmit={(consents) => {
+              // [테스트] API 연동 전 제출된 동의 값을 확인합니다.
+              console.log("제출된 동의값:", consents);
+              navigate("/onboarding/setup");
+            }}
           />
         }
       />
 
-      {/* [테스트용] 닉네임+라이프스타일 선택 */}
+      {/* [수정] 닉네임과 라이프스타일 설정 후 완료 화면으로 이동 */}
       <Route
         path="/onboarding/setup"
         element={
           <OnboardingSetup
             onBack={() => navigate(-1)}
             onSubmit={(data) => {
+              // [테스트] API 연동 전 설정한 사용자 정보를 확인합니다.
               console.log("닉네임/라이프스타일:", data);
               navigate("/onboarding/complete");
             }}
@@ -332,16 +339,35 @@ function App() {
         }
       />
 
-      {/* [테스트용] 쇼핑 셋업 완료 */}
+      {/* [수정] 온보딩 완료 후 탐색 화면으로 이동 */}
       <Route
         path="/onboarding/complete"
         element={
           <OnboardingComplete
             onBack={() => navigate(-1)}
-            onStart={() => alert("쇼핑 시작하기")}
+            onStart={() => navigate("/explore")}
           />
         }
       />
+
+      {/* [추가] 탐색 기본 화면 */}
+      <Route
+        path="/explore"
+        element={
+          <ExploreHome
+            onOpenDetail={() =>
+              alert("상세보기 모달 - 다음 단계에서 연결 예정")
+            }
+            onScan={() => alert("제품 스캔")}
+          />
+        }
+      />
+
+      {/* [추가] 분석 화면 */}
+      <Route path="/analysis/*" element={renderAnalysisScreen()} />
+
+      {/* [추가] 도움 화면 */}
+      <Route path="/help" element={<Help />} />
 
       {/* [추가] 직원 로그인 진입 화면 */}
       <Route
@@ -368,10 +394,12 @@ function App() {
             requestStatuses={requestStatuses}
             onSelectRequest={(requestId) => {
               setSelectedRequestId(requestId);
+
               setRequestStatuses((previousStatuses) => ({
                 ...previousStatuses,
                 [requestId]: "ACCEPTED",
               }));
+
               navigate("/staff/requests/detail");
             }}
             onExitPos={() => {
@@ -409,6 +437,7 @@ function App() {
                 ...previousStatuses,
                 [requestId]: "COMPLETED",
               }));
+
               setSelectedRequestId(null);
               navigate("/staff/requests");
             }}
@@ -416,10 +445,8 @@ function App() {
         }
       />
 
-      {/* [수정] 전체 분석 화면을 하나의 상태 흐름으로 관리 */}
-      <Route path="/analysis/*" element={renderAnalysisScreen()} />
-
-      <Route path="*" element={<Help />} />
+      {/* [추가] 존재하지 않는 주소로 접근하면 시작 화면으로 이동 */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
