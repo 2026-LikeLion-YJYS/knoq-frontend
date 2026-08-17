@@ -5,6 +5,9 @@ import { useState } from "react";
 import MainHeader from "../../components/MainHeader/MainHeader";
 import BottomNav from "../../components/BottomNav/BottomNav";
 
+// [추가] 니즈 항목 수정 모달 사용
+import AnalysisEditModal from "./AnalysisEditModal";
+
 import "./Analysis.css";
 
 /**
@@ -21,31 +24,15 @@ const analysisData = {
 };
 
 /**
- * [수정] 니즈 분석 결과 카드 목록
- * 각 카드에 수정 모달을 구분하기 위한 field 값을 추가합니다.
+ * [추가] 수정 모달 종류와 분석 데이터 필드 연결
+ * 선택한 모달 결과를 올바른 분석 항목에 반영합니다.
  */
-const analysisItems = [
-  {
-    field: "productCategory",
-    label: "제품 카테고리",
-    value: analysisData.productCategory,
-  },
-  {
-    field: "preferredColor",
-    label: "선호 컬러",
-    value: analysisData.preferredColor,
-  },
-  {
-    field: "preferredMaterial",
-    label: "선호 소재",
-    value: analysisData.preferredMaterial,
-  },
-  {
-    field: "preferredSize",
-    label: "선호 사이즈",
-    value: analysisData.preferredSize,
-  },
-];
+const analysisFieldMap = {
+  category: "productCategory",
+  color: "preferredColor",
+  material: "preferredMaterial",
+  size: "preferredSize",
+};
 
 /**
  * [수정] 니즈 분석 화면
@@ -58,7 +45,7 @@ function Analysis({
   onUpdateAnalysis,
   onCompleteEdit,
 }) {
-  // [수정] 분석 화면 진행 상태
+  // [추가] 분석 화면 진행 상태
   // entry: 분석1·2 / review: 분석4 / result: 분석5·7 / edit: 분석8
   const [analysisStep, setAnalysisStep] = useState(initialStep);
 
@@ -66,8 +53,37 @@ function Analysis({
   // 분석1·7은 1, 분석2·4·5·8은 2 이상을 전달합니다.
   const [savedCount] = useState(initialSavedCount);
 
-  // [추가] 다음 커밋에서 열 수정 모달의 항목을 저장합니다.
+  // [추가] 수정 중인 니즈 분석 결과
+  // 모달에서 저장한 값은 API 호출 없이 이 상태에 반영합니다.
+  const [editedAnalysis, setEditedAnalysis] = useState(analysisData);
+
+  // [수정] 현재 열려 있는 수정 모달 종류
+  // category / color / material / size 중 하나를 저장합니다.
   const [editingField, setEditingField] = useState(null);
+
+  // [수정] 현재 상태의 분석 결과 카드 목록
+  const analysisItems = [
+    {
+      type: "category",
+      label: "제품 카테고리",
+      value: editedAnalysis.productCategory,
+    },
+    {
+      type: "color",
+      label: "선호 컬러",
+      value: editedAnalysis.preferredColor,
+    },
+    {
+      type: "material",
+      label: "선호 소재",
+      value: editedAnalysis.preferredMaterial,
+    },
+    {
+      type: "size",
+      label: "선호 사이즈",
+      value: editedAnalysis.preferredSize,
+    },
+  ];
 
   // [수정] entry 상태에서만 분석1·2 진입 화면을 표시합니다.
   const showAnalysisEntry = analysisStep === "entry";
@@ -86,6 +102,11 @@ function Analysis({
 
   // [추가] 분석 결과가 있고 저장 제품이 2개 이상이면 업데이트할 수 있습니다.
   const canUpdateAnalysis = hasAnalysis && savedCount >= 2;
+
+  // [추가] 현재 수정 모달에 전달할 분석 결과 값
+  const editingValue = editingField
+    ? editedAnalysis[analysisFieldMap[editingField]]
+    : "";
 
   /**
    * [수정] 최초 니즈 분석 시작
@@ -116,11 +137,38 @@ function Analysis({
   };
 
   /**
-   * [추가] 수정할 니즈 항목 선택
-   * 다음 커밋에서 editingField에 따라 하나의 수정 모달 내용을 변경합니다.
+   * [수정] 수정할 니즈 항목 선택
+   * 선택한 종류에 맞는 분석9~12 모달을 엽니다.
    */
-  const handleSelectEditField = (field) => {
-    setEditingField(field);
+  const handleSelectEditField = (type) => {
+    setEditingField(type);
+  };
+
+  /**
+   * [추가] 니즈 항목 수정값 저장
+   * 선택한 값을 수정 중인 분석 결과에 즉시 반영하고 모달을 닫습니다.
+   */
+  const handleSaveEdit = (value) => {
+    const analysisField = analysisFieldMap[editingField];
+
+    if (!analysisField) {
+      return;
+    }
+
+    setEditedAnalysis((previousAnalysis) => ({
+      ...previousAnalysis,
+      [analysisField]: value,
+    }));
+
+    setEditingField(null);
+  };
+
+  /**
+   * [추가] 수정 모달 닫기
+   * 저장하지 않고 분석8 화면으로 돌아갑니다.
+   */
+  const handleCloseEditModal = () => {
+    setEditingField(null);
   };
 
   /**
@@ -128,7 +176,7 @@ function Analysis({
    * 다음 커밋 이후 분석13 수정 완료 화면으로 이동하도록 연결합니다.
    */
   const handleCompleteEdit = () => {
-    onCompleteEdit?.();
+    onCompleteEdit?.(editedAnalysis);
   };
 
   /**
@@ -196,7 +244,7 @@ function Analysis({
           <p className="analysis-description">
             스캔한 제품을 바탕으로 나의 제품 선호를 분석했어요.
             <br />
-            제품을 추가하거나 삭제했다면 ‘니즈 다시 분석하기’를 눌러주세요.
+            제품을 추가하거나 삭제했다면 ‘니즈 분석 업데이트’를 눌러주세요.
           </p>
         </section>
 
@@ -207,14 +255,14 @@ function Analysis({
           }`}
           aria-hidden={showAnalysisEntry}
         >
-          {/* [수정] 카테고리·컬러·소재·사이즈 분석 결과 */}
+          {/* [수정] 수정 상태가 반영되는 니즈 분석 결과 카드 */}
           <section className="analysis-result-grid" aria-label="니즈 분석 결과">
             {analysisItems.map((item) => (
               <article
                 className={`analysis-result-card ${
                   showEditControls ? "analysis-result-card--editable" : ""
                 }`}
-                key={item.field}
+                key={item.type}
               >
                 <p className="analysis-result-label">{item.label}</p>
                 <p className="analysis-result-value">{item.value}</p>
@@ -225,7 +273,7 @@ function Analysis({
                     className="analysis-card-edit-button"
                     type="button"
                     aria-label={`${item.label} 수정`}
-                    onClick={() => handleSelectEditField(item.field)}
+                    onClick={() => handleSelectEditField(item.type)}
                   >
                     수정
                   </button>
@@ -245,7 +293,7 @@ function Analysis({
             </p>
 
             <div className="analysis-comment">
-              <p>{analysisData.comment}</p>
+              <p>{editedAnalysis.comment}</p>
             </div>
           </section>
 
@@ -293,6 +341,16 @@ function Analysis({
 
       {/* [추가] 분석 탭이 활성화된 공통 하단 네비게이션 */}
       <BottomNav activeTab="analysis" />
+
+      {/* [추가] 선택한 항목에 따라 분석9~12 수정 모달 표시 */}
+      {editingField && (
+        <AnalysisEditModal
+          type={editingField}
+          value={editingValue}
+          onSave={handleSaveEdit}
+          onClose={handleCloseEditModal}
+        />
+      )}
     </div>
   );
 }
