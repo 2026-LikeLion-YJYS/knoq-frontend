@@ -4,17 +4,19 @@ import { useState } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 
 import Help from "./pages/help/Help";
+
 import Onboarding1 from "./pages/onboarding/Onboarding1";
 import Onboarding2 from "./pages/onboarding/Onboarding2";
 import OnboardingSetup from "./pages/onboarding/OnboardingSetup";
 import OnboardingComplete from "./pages/onboarding/OnboardingComplete";
 
-// [추가] 직원 화면
 import StaffIntro from "./pages/staff/StaffIntro";
 import StaffLogin from "./pages/staff/StaffLogin";
 import StaffRequests from "./pages/staff/StaffRequests";
 import StaffRequestDetail from "./pages/staff/StaffRequestDetail";
 import StaffConsultationEnd from "./pages/staff/StaffConsultationEnd";
+
+import Analysis from "./pages/analysis/Analysis";
 
 function App() {
   // 페이지 전환은 react-router-dom으로 이관
@@ -146,6 +148,19 @@ function App() {
               }));
               setSelectedRequestId(null);
               navigate("/staff/requests");
+            }}
+          />
+        }
+      />
+
+      {/* [추가] 니즈 분석 결과 기본 화면 */}
+      <Route
+        path="/analysis"
+        element={
+          <Analysis
+            onUpdateAnalysis={() => {
+              // [추가] 다음 커밋에서 분석 업데이트 로딩 화면으로 연결
+              alert("니즈 분석 업데이트");
             }}
           />
         }
