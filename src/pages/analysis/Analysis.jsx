@@ -97,7 +97,6 @@ function Analysis({
       <MainHeader
         onLogoClick={() => navigate("/explore")}
         onNotificationClick={() => navigate("/notification")}
-        onSettingClick={() => navigate("/setting")}
       />
 
       {/* [추가] 분석 화면 콘텐츠 */}
