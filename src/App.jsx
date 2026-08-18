@@ -352,14 +352,11 @@ function App() {
         }
       />
 
-      {/* [추가] 탐색 기본 화면 */}
+      {/* [추가] 탐색 기본 화면 _____ 여기!!!!!! */}
       <Route
         path="/explore"
         element={
           <ExploreHome
-            onOpenDetail={() =>
-              alert("상세보기 모달 - 다음 단계에서 연결 예정")
-            }
             onScan={() => alert("제품 스캔")}
           />
         }

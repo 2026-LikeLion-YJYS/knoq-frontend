@@ -11,6 +11,7 @@ import sideBag from "../../assets/images/side-bag.png";
 import topBag from "../../assets/images/top-bag.png";
 import MainHeader from "../../components/MainHeader/MainHeader";
 import BottomNav from "../../components/BottomNav/BottomNav";
+import ProductDetailModal from "./ProductDetailModal";
 
 const HERO_IMAGES = [frontBag, sideBag, topBag];
 
@@ -19,10 +20,11 @@ const INITIAL_SAVED_ITEMS = Array.from({ length: 8 }, (_, i) => ({
   isRecommended: i === 4 || i === 5,
 }));
 
-function ExploreHome({ onOpenDetail, onScan }) {
+function ExploreHome({ onScan }) {
   const [angleIndex, setAngleIndex] = useState(0);
   const [savedItems, setSavedItems] = useState(INITIAL_SAVED_ITEMS);
   const [selectedId, setSelectedId] = useState(4); // [임시] 기본 선택값
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
   const navigate = useNavigate();
 
   const goPrev = () =>
@@ -55,7 +57,6 @@ function ExploreHome({ onOpenDetail, onScan }) {
         <div className="explore-home__header-wrap">
         <MainHeader
             onNotificationClick={() => alert("알림")}
-
         />
     </div>
 
@@ -78,7 +79,7 @@ function ExploreHome({ onOpenDetail, onScan }) {
             <button
               type="button"
               className="explore-home__detail-badge"
-              onClick={onOpenDetail}
+              onClick={() => setIsDetailOpen(true)}
             >
               상세 보기
             </button>
@@ -152,6 +153,12 @@ function ExploreHome({ onOpenDetail, onScan }) {
       </button>
 
       <BottomNav activeTab="explore" onNavigate={handleNavigate} />
+
+      {/* 상품 상세 정보 모달 */}
+      <ProductDetailModal
+        isOpen={isDetailOpen}
+        onClose={() => setIsDetailOpen(false)}
+      />
     </div>
   );
 }
