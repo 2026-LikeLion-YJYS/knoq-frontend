@@ -22,10 +22,27 @@ function Onboarding2({ onBack, onSubmit }) {
   const toggleConsent = (key) => {
     setConsents((prev) => ({ ...prev, [key]: !prev[key] }));
   };
-
+  
   const handleSubmit = () => {
     if (!isAllRequiredChecked) return;
-    onSubmit?.(consents);
+
+    if (!window.Kakao || !window.Kakao.isInitialized()) {
+      console.warn("카카오 SDK가 초기화되지 않았어요. .env의 키를 확인해주세요.");
+      onSubmit?.(consents);
+      return;
+    }
+
+    window.Kakao.Auth.login({
+      success: (authObj) => {
+        // TODO: 백엔드 API 붙으면 authObj.access_token을 서버로 전달해서
+        // 서버에서 카카오 사용자 정보 확인 + 우리 서비스 로그인 세션 발급받기
+        console.log("카카오 로그인 성공:", authObj);
+        onSubmit?.(consents);
+      },
+      fail: (error) => {
+        console.error("카카오 로그인 실패:", error);
+      },
+    });
   };
 
    return (
