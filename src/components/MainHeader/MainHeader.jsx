@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./MainHeader.css";
 
-import logoKnoq from "../../assets/icons/logo-knoq.svg";
+import logoKnoq from "../../assets/icons/knoq-newlogo.svg";
 import notificationIcon from "../../assets/icons/notification.svg";
 import settingIcon from "../../assets/icons/setting.svg";
 import ExitModal from "../../pages/exit/ExitModal";
@@ -14,7 +14,7 @@ import ExitModal from "../../pages/exit/ExitModal";
 function MainHeader({
   onLogoClick,
   onNotificationClick,
-  onSettingClick, // 기존에 쓰고 계셨다면 그대로 유지 (모달 여는 것과 별개로 계속 호출됨)
+  onSettingClick,
   isLoggedIn = false, // TODO: 로그인 상태 관리 붙으면 그 값으로 교체
 }) {
   const navigate = useNavigate();
