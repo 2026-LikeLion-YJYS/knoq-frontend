@@ -12,6 +12,10 @@ import OnboardingSetup from "./pages/onboarding/OnboardingSetup";
 import OnboardingComplete from "./pages/onboarding/OnboardingComplete";
 
 import ExploreHome from "./pages/explore/ExploreHome";
+import ScanCapture from "./pages/explore/ScanCapture";
+import ScanRecognizing from "./pages/explore/ScanRecognizing";
+import ScanConfirm from "./pages/explore/ScanConfirm";
+import ScanComplete from "./pages/explore/ScanComplete";
 
 import StaffIntro from "./pages/staff/StaffIntro";
 import StaffLogin from "./pages/staff/StaffLogin";
@@ -90,6 +94,32 @@ function App() {
   const [analysisState, setAnalysisState] = useState(
     createInitialAnalysisState,
   );
+
+  // [추가] 탐색 화면 저장목록 (스캔한 제품이 여기 반영됩니다)
+  const [savedItems, setSavedItems] = useState(
+    Array.from({ length: 8 }, (_, i) => ({
+      id: i,
+      isRecommended: i === 4 || i === 5,
+    })),
+  );
+
+  // [추가] 저장목록에서 삭제
+  const handleDeleteSavedItem = (id) => {
+    setSavedItems((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  // [추가] 스캔 완료한 제품을 저장목록에 추가
+  const handleAddScannedProduct = (product) => {
+    setSavedItems((prev) => [
+      ...prev,
+      {
+        id: Date.now(),
+        image: product.image,
+        name: product.name,
+        isRecommended: false,
+      },
+    ]);
+  };
 
   // [추가] 수정할 항목이 선택되면 모달을 표시합니다.
   const isEditModalOpen = Boolean(analysisState.editModalType);
@@ -352,12 +382,60 @@ function App() {
         }
       />
 
-      {/* [추가] 탐색 기본 화면 _____ 여기!!!!!! */}
+      {/* [추가] 탐색 기본 화면 */}
       <Route
         path="/explore"
         element={
           <ExploreHome
-            onScan={() => alert("제품 스캔")}
+            savedItems={savedItems}
+            onDeleteSavedItem={handleDeleteSavedItem}
+          />
+        }
+      />
+
+      {/* [추가] 제품 스캔 - 촬영 */}
+      <Route
+        path="/explore/scan"
+        element={
+          <ScanCapture
+            onClose={() => navigate("/explore")}
+            onCapture={() => navigate("/explore/scan/recognizing")}
+          />
+        }
+      />
+
+      {/* [추가] 제품 스캔 - 인식 중 */}
+      <Route
+        path="/explore/scan/recognizing"
+        element={
+          <ScanRecognizing
+            onComplete={() => navigate("/explore/scan/confirm", { replace: true })}
+          />
+        }
+      />
+
+      {/* [추가] 제품 스캔 - 촬영 완료(확인) */}
+      <Route
+        path="/explore/scan/confirm"
+        element={
+          <ScanConfirm
+            onRetake={() => navigate("/explore/scan", { replace: true })}
+            onConfirm={(product) => {
+              handleAddScannedProduct(product);
+              navigate("/explore/scan/complete", { replace: true });
+            }}
+          />
+        }
+      />
+
+      {/* [추가] 제품 스캔 - 등록 완료 */}
+      <Route
+        path="/explore/scan/complete"
+        element={
+          <ScanComplete
+            onBack={() => navigate("/explore")}
+            onScanAgain={() => navigate("/explore/scan")}
+            onViewAnalysis={() => navigate("/explore")}
           />
         }
       />

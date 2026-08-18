@@ -15,14 +15,8 @@ import ProductDetailModal from "./ProductDetailModal";
 
 const HERO_IMAGES = [frontBag, sideBag, topBag];
 
-const INITIAL_SAVED_ITEMS = Array.from({ length: 8 }, (_, i) => ({
-  id: i,
-  isRecommended: i === 4 || i === 5,
-}));
-
-function ExploreHome({ onScan }) {
+function ExploreHome({ savedItems, onDeleteSavedItem }) {
   const [angleIndex, setAngleIndex] = useState(0);
-  const [savedItems, setSavedItems] = useState(INITIAL_SAVED_ITEMS);
   const [selectedId, setSelectedId] = useState(4); // [임시] 기본 선택값
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const navigate = useNavigate();
@@ -45,7 +39,7 @@ function ExploreHome({ onScan }) {
 
   const handleDelete = (id, e) => {
     e.stopPropagation();
-    setSavedItems((prev) => prev.filter((item) => item.id !== id));
+    onDeleteSavedItem?.(id);
     if (selectedId === id) setSelectedId(null);
   };
 
@@ -130,6 +124,14 @@ function ExploreHome({ onScan }) {
                 onClick={() => handleSelect(item.id)}
                 aria-label="상품 선택"
               >
+                {/* 스캔으로 등록된 제품은 썸네일 표시 */}
+                {item.image && (
+                  <img
+                    src={item.image}
+                    alt={item.name || ""}
+                    className="explore-home__saved-card-image"
+                  />
+                )}
                 {item.isRecommended && (
                   <span className="explore-home__recommend-badge">추천</span>
                 )}
@@ -147,14 +149,18 @@ function ExploreHome({ onScan }) {
         </div>
       </section>
 
-      <button type="button" className="explore-home__scan-fab" onClick={onScan}>
+      {/* onScan prop 대신 스캔 화면으로 직접 이동 */}
+      <button
+        type="button"
+        className="explore-home__scan-fab"
+        onClick={() => navigate("/explore/scan")}
+      >
         <img src={cameraIcon} alt="" />
         <span>제품 스캔</span>
       </button>
 
       <BottomNav activeTab="explore" onNavigate={handleNavigate} />
 
-      {/* 상품 상세 정보 모달 */}
       <ProductDetailModal
         isOpen={isDetailOpen}
         onClose={() => setIsDetailOpen(false)}
