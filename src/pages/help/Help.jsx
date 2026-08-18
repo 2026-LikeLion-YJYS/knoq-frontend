@@ -145,7 +145,6 @@ function Help() {
       <MainHeader
         onLogoClick={() => navigate("/explore")}
         onNotificationClick={() => navigate("/notification")}
-        onSettingClick={() => navigate("/setting")}
       />
 
       {/* [추가] 도움 요청 본문 */}

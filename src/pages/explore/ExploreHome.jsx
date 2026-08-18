@@ -55,7 +55,7 @@ function ExploreHome({ onOpenDetail, onScan }) {
         <div className="explore-home__header-wrap">
         <MainHeader
             onNotificationClick={() => alert("알림")}
-            onSettingClick={() => alert("설정")}
+
         />
     </div>
 
