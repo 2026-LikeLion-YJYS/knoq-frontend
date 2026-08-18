@@ -1,4 +1,5 @@
 // [추가] 공통 헤더와 하단 네비게이션 사용
+import { useNavigate } from "react-router-dom";
 import MainHeader from "../../components/MainHeader/MainHeader";
 import BottomNav from "../../components/BottomNav/BottomNav";
 
@@ -28,6 +29,9 @@ function Analysis({
   onCompleteEdit,
   onUpdateAnalysis,
 }) {
+  // [추가] 다른 화면으로 이동
+  const navigate = useNavigate();
+
   // [추가] 분석1·2 진입 화면 표시 여부
   const showAnalysisEntry = analysisStep === "initial";
 
@@ -90,7 +94,11 @@ function Analysis({
       data-editing-field={editModalType ?? ""}
     >
       {/* [추가] 분석 화면 공통 헤더 */}
-      <MainHeader />
+      <MainHeader
+        onLogoClick={() => navigate("/explore")}
+        onNotificationClick={() => navigate("/notification")}
+        onSettingClick={() => navigate("/setting")}
+      />
 
       {/* [추가] 분석 화면 콘텐츠 */}
       <main className="analysis-content">
