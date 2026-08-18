@@ -134,7 +134,7 @@ function Help() {
         // [수정] 상담 신청 상태 초기화 후 도움 홈 화면으로 이동
         onGoHome={handleGoHome}
         // [추가] 알림 화면으로 이동
-        onViewNotifications={() => navigate("/alarm")}
+        onViewNotifications={() => navigate("/notification")}
       />
     );
   }
@@ -142,7 +142,11 @@ function Help() {
   return (
     <div className="help-page">
       {/* [추가] 공통 상단 헤더 */}
-      <MainHeader />
+      <MainHeader
+        onLogoClick={() => navigate("/explore")}
+        onNotificationClick={() => navigate("/notification")}
+        onSettingClick={() => navigate("/setting")}
+      />
 
       {/* [추가] 도움 요청 본문 */}
       <main className="help-content">

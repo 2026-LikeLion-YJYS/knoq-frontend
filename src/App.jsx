@@ -23,6 +23,8 @@ import Analysis from "./pages/analysis/Analysis";
 import AnalysisLoading from "./pages/analysis/AnalysisLoading";
 import AnalysisEditComplete from "./pages/analysis/AnalysisEditComplete";
 
+import NotificationPage from "./pages/Notification/NotificationPage";
+
 /**
  * [추가] 분석 화면 진행 단계
  * 분석 관련 조건문에서 문자열을 직접 반복하지 않도록 관리합니다.
@@ -447,6 +449,8 @@ function App() {
 
       {/* [추가] 존재하지 않는 주소로 접근하면 시작 화면으로 이동 */}
       <Route path="*" element={<Navigate to="/" replace />} />
+
+      <Route path="/notification" element={<NotificationPage />} />
     </Routes>
   );
 }
