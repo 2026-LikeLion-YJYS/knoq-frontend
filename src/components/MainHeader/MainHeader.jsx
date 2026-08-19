@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./MainHeader.css";
 
-import logoKnoq from "../../assets/icons/knoq-newlogo.svg";
+import logoKnoq from "../../assets/icons/logo-knoq.svg";
 import notificationIcon from "../../assets/icons/notification.svg";
 import settingIcon from "../../assets/icons/setting.svg";
 import ExitModal from "../../pages/exit/ExitModal";
@@ -15,7 +15,8 @@ function MainHeader({
   onLogoClick,
   onNotificationClick,
   onSettingClick,
-  isLoggedIn = false, // TODO: 로그인 상태 관리 붙으면 그 값으로 교체
+  isLoggedIn = false,
+  onLogout, // [추가] 로그인 상태에서 종료할 때 App.jsx의 로그인 상태를 초기화하기 위해 필요
 }) {
   const navigate = useNavigate();
   const [isExitOpen, setIsExitOpen] = useState(false);
@@ -29,7 +30,10 @@ function MainHeader({
   };
 
   const handleEndSession = () => {
-    // TODO: 로그인 상태면 로그아웃 처리, 비로그인 상태면 탐색 기록 초기화 처리
+    // [수정] 로그인 상태였다면 App.jsx의 로그인 상태도 false로 되돌립니다.
+    if (isLoggedIn) {
+      onLogout?.();
+    }
     setIsExitOpen(false);
     navigate(ENTRY_PATH);
   };
