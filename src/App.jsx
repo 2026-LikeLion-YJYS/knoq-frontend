@@ -114,15 +114,12 @@ function App() {
 
   const [selectedRequestId, setSelectedRequestId] = useState(null);
 
-  const [requestStatuses, setRequestStatuses] = useState({});
-
   /**
    * [추가] POS 종료 성공 후 직원 화면 상태와 토큰을 삭제하고 시작 화면으로 이동합니다.
    */
   const handleStaffExitSuccess = () => {
     removeStaffToken();
     setSelectedRequestId(null);
-    setRequestStatuses({});
     navigate("/staff");
   };
 
@@ -609,16 +606,9 @@ function App() {
         path="/staff/requests"
         element={
           <StaffRequests
-            requestStatuses={requestStatuses}
             onSelectRequest={(requestId) => {
               setSelectedRequestId(requestId);
-
-              setRequestStatuses((previousStatuses) => ({
-                ...previousStatuses,
-                [requestId]: "ACCEPTED",
-              }));
-
-              navigate("/staff/requests/detail");
+              navigate(`/staff/requests/${encodeURIComponent(requestId)}`);
             }}
             onExitPos={handleStaffExitSuccess}
           />
@@ -626,7 +616,7 @@ function App() {
       />
 
       <Route
-        path="/staff/requests/detail"
+        path="/staff/requests/:requestId"
         element={
           <StaffRequestDetail
             requestId={selectedRequestId}
@@ -643,13 +633,8 @@ function App() {
         element={
           <StaffConsultationEnd
             requestId={selectedRequestId}
-            onContinue={() => navigate("/staff/requests/detail")}
-            onConfirmEnd={(requestId) => {
-              setRequestStatuses((previousStatuses) => ({
-                ...previousStatuses,
-                [requestId]: "COMPLETED",
-              }));
-
+            onContinue={() => navigate(`/staff/requests/${selectedRequestId}`)}
+            onConfirmEnd={() => {
               setSelectedRequestId(null);
               navigate("/staff/requests");
             }}

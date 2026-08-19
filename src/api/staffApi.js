@@ -25,3 +25,23 @@ export const deleteStaffSession = () => {
     method: "DELETE",
   });
 };
+
+/**
+ * [추가] 직원 매장에 접수된 상담 요청 목록을 조회합니다.
+ */
+export const getStaffRequests = () => {
+  return staffApiRequest("/staff/requests");
+};
+
+/**
+ * [추가] 선택한 상담 요청의 진행 상태를 변경합니다.
+ */
+export const updateStaffRequestStatus = (requestId, status) => {
+  return staffApiRequest(
+    `/staff/requests/${encodeURIComponent(requestId)}/status`,
+    {
+      method: "PUT",
+      body: { status },
+    },
+  );
+};
