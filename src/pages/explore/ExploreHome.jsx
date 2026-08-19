@@ -18,7 +18,14 @@ const HERO_IMAGES = [frontBag, sideBag, topBag];
 // [수정] 저장목록은 이제 App.jsx에서 관리해서 props로 받습니다.
 // (제품 스캔 화면에서 등록한 제품이 여기 반영되려면, 화면이 바뀌어도
 // 상태가 유지되는 상위 컴포넌트(App.jsx)에서 관리해야 해요)
-function ExploreHome({ savedItems, onDeleteSavedItem, isLoggedIn, onLogout }) {
+function ExploreHome({
+  savedItems,
+  onDeleteSavedItem,
+  isLoggedIn,
+  onLogout,
+  title = "나에게 맞는 제품 분석",
+  showDelete = true,
+}) {
   const [angleIndex, setAngleIndex] = useState(0);
   const [selectedId, setSelectedId] = useState(4); // [임시] 기본 선택값
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -53,13 +60,13 @@ function ExploreHome({ savedItems, onDeleteSavedItem, isLoggedIn, onLogout }) {
 
         <div className="explore-home__header-wrap">
         <MainHeader
-            onNotificationClick={() => alert("알림")}
+            onNotificationClick={() => navigate("/notification")}
             isLoggedIn={isLoggedIn}
             onLogout={onLogout}
         />
     </div>
 
-        <h1 className="explore-home__title">나에게 맞는 제품 분석</h1>
+        <h1 className="explore-home__title">{title}</h1>
 
         <section className="explore-home__insight-card">
           <p className="explore-home__insight-label">라이프스타일 적합 분석</p>
@@ -146,6 +153,7 @@ function ExploreHome({ savedItems, onDeleteSavedItem, isLoggedIn, onLogout }) {
                 className="explore-home__saved-card-delete"
                 onClick={(e) => handleDelete(item.id, e)}
                 aria-label="삭제"
+                style={{ display: showDelete ? undefined : "none" }}
               >
                 <img src={closeIcon} alt="" />
               </button>
