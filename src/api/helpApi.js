@@ -45,3 +45,15 @@ export const getHelpNeedsAnalysis = (sessionId) => {
 export const getProductDetail = (productId) => {
   return withRequestTimeout(apiRequest(`/products/${productId}`));
 };
+
+/**
+ * [추가] 선택한 도움 유형과 제품·니즈 공유 여부로 상담 요청을 생성합니다.
+ */
+export const createConsultationRequest = (sessionId, requestData) => {
+  return withRequestTimeout(
+    customerApiRequest(`/sessions/${sessionId}/consultation-requests`, {
+      method: "POST",
+      body: requestData,
+    }),
+  );
+};

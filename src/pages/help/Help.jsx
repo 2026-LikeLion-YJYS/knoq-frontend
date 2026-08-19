@@ -1,16 +1,21 @@
-// [수정] 도움 화면 상태, 조회 시점 관리와 화면 이동 사용
-import { useEffect, useState } from "react";
+// [수정] 도움 화면 상태, 요청 중복 방지와 화면 이동 사용
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 // [추가] 저장제품·상품 상세·니즈 분석 조회 API 사용
 import {
+  createConsultationRequest,
   getHelpNeedsAnalysis,
   getProductDetail,
   getSavedProducts,
 } from "../../api/helpApi";
 
-// [추가] 고객 세션 ID와 라이프스타일 태그 조회
-import { getLifestyleTags, getSessionId } from "../../utils/storage";
+// [수정] 고객 세션 정보 조회와 상담 요청 ID 저장
+import {
+  getLifestyleTags,
+  getSessionId,
+  setConsultationRequestId,
+} from "../../utils/storage";
 
 // [추가] 기존 공통 컴포넌트 사용
 import MainHeader from "../../components/MainHeader/MainHeader";
@@ -97,7 +102,7 @@ const getHelpErrorMessage = (error, fallbackMessage) => {
 /**
  * [수정] 어드바이저 도움 요청 화면
  */
-function Help() {
+function Help({ isLoggedIn, onLogout }) {
   // [추가] 다른 화면으로 이동
   const navigate = useNavigate();
 
@@ -118,6 +123,13 @@ function Help() {
 
   // [추가] 상담 요청 완료 화면 표시 여부 관리
   const [isRequestComplete, setIsRequestComplete] = useState(false);
+
+  // [추가] 상담 요청 진행 여부와 실패 안내 메시지 관리
+  const [isRequestSubmitting, setIsRequestSubmitting] = useState(false);
+  const [consultationRequestError, setConsultationRequestError] = useState("");
+
+  // [추가] 상태 반영 전 빠른 연속 클릭도 즉시 차단합니다.
+  const isRequestSubmittingRef = useRef(false);
 
   // [추가] API로 조회한 저장제품 목록 관리
   const [savedProducts, setSavedProducts] = useState([]);
@@ -146,8 +158,9 @@ function Help() {
   // [추가] 현재 매장 운영시간 여부 확인
   const isStoreOpen = checkStoreOpen();
 
-  // [추가] 운영시간 내이며 도움 유형을 선택했을 때 요청 가능
-  const canRequestHelp = isStoreOpen && selectedHelpType !== "";
+  // [수정] 운영시간 내이며 도움 유형을 선택하고 요청 중이 아닐 때 요청 가능
+  const canRequestHelp =
+    isStoreOpen && selectedHelpType !== "" && !isRequestSubmitting;
 
   // [추가] 선택 제품 수만큼 제외한 빈 제품 칸 개수
   const emptyProductSlotCount = 3 - selectedProducts.length;
@@ -252,23 +265,57 @@ function Help() {
   };
 
   /**
-   * [수정] 도움 요청하기 클릭 시 요청 데이터를 구성하고
-   * 상담 요청 POST 연동 전에는 바로 완료 화면으로 이동합니다.
+   * [수정] 도움 요청하기 클릭 시 상담 요청 POST를 실행합니다.
+   * 요청 성공 후에만 requestId를 저장하고 완료 화면으로 이동합니다.
    */
-  const handleRequestHelp = () => {
-    if (!canRequestHelp) return;
+  const handleRequestHelp = async () => {
+    if (!canRequestHelp || isRequestSubmittingRef.current) {
+      return;
+    }
 
-    // [수정] 상담 요청 API에서 사용할 실제 productId 기반 데이터 구조
+    if (!sessionId) {
+      setConsultationRequestError(
+        "세션 정보를 확인할 수 없습니다. 다시 시도해주세요.",
+      );
+      return;
+    }
+
     const requestData = {
       helpType: selectedHelpType,
       productIds: selectedProducts.map((product) => product.productId),
       includeNeedsAnalysis: shareMyInfo,
     };
 
-    console.log("도움 요청 데이터:", requestData);
+    isRequestSubmittingRef.current = true;
+    setIsRequestSubmitting(true);
+    setConsultationRequestError("");
 
-    // [추가] 상담 요청 POST 연동 전 임시로 완료 화면 표시
-    setIsRequestComplete(true);
+    try {
+      const response = await createConsultationRequest(sessionId, requestData);
+
+      if (!response?.requestId) {
+        throw new Error(
+          "상담 요청 결과를 확인할 수 없습니다. 다시 시도해주세요.",
+        );
+      }
+
+      setConsultationRequestId(response.requestId);
+      setIsRequestComplete(true);
+    } catch (error) {
+      if (error?.status === 409) {
+        setConsultationRequestError("이미 진행 중인 상담 요청이 있습니다.");
+      } else if (error?.status !== 410) {
+        setConsultationRequestError(
+          getHelpErrorMessage(
+            error,
+            "상담 요청에 실패했습니다. 다시 시도해주세요.",
+          ),
+        );
+      }
+    } finally {
+      isRequestSubmittingRef.current = false;
+      setIsRequestSubmitting(false);
+    }
   };
 
   /**
@@ -301,6 +348,8 @@ function Help() {
       <MainHeader
         onLogoClick={() => navigate("/explore")}
         onNotificationClick={() => navigate("/notification")}
+        isLoggedIn={isLoggedIn}
+        onLogout={onLogout}
       />
 
       {/* [추가] 도움 요청 본문 */}
@@ -448,8 +497,19 @@ function Help() {
           disabled={!canRequestHelp}
           onClick={handleRequestHelp}
         >
-          {isStoreOpen ? "도움 요청하기" : "매장 오픈전입니다"}
+          {isRequestSubmitting
+            ? "요청 중..."
+            : isStoreOpen
+              ? "도움 요청하기"
+              : "매장 오픈전입니다"}
         </button>
+
+        {/* [추가] 상담 요청 실패 및 활성 요청 중복 안내 */}
+        {consultationRequestError && (
+          <p className="help-request-message" role="alert">
+            {consultationRequestError}
+          </p>
+        )}
       </main>
 
       {/* [추가] 공통 하단 내비게이션 */}
