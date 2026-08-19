@@ -1,13 +1,16 @@
 import deleteIcon from "../../assets/icons/pin-delete.svg";
 
-// [추가] PIN 입력 상태 관리를 위한 React 기능
-import { useEffect, useState } from "react";
+// [수정] 로그인 요청 상태와 중복 요청 방지를 위한 React 기능
+import { useRef, useState } from "react";
+
+// [추가] 직원 매장 로그인 API
+import { createStaffSession } from "../../api/staffApi";
+
+// [추가] 로그인 성공 시 직원 토큰 저장 함수
+import { setStaffToken } from "../../utils/storage";
 
 // [추가] 직원 PIN 로그인 화면 스타일
 import "./StaffLogin.css";
-
-// [추가] API 연동 전 화면 동작 확인용 임시 PIN
-const TEMP_PIN = "1234";
 
 // [추가] PIN 최대 입력 길이
 const PIN_LENGTH = 4;
@@ -26,50 +29,68 @@ function StaffLogin({ onBack, onLogin }) {
   // [추가] 잘못된 PIN 입력 안내 상태
   const [errorMessage, setErrorMessage] = useState("");
 
+  // [추가] 직원 로그인 API 요청 진행 여부
+  const [isLoginSubmitting, setIsLoginSubmitting] = useState(false);
+
+  // [추가] 상태 갱신 전 빠른 연속 입력으로 발생하는 중복 요청을 차단합니다.
+  const isLoginSubmittingRef = useRef(false);
+
   /**
-   * PIN이 4자리 입력되면 임시 PIN과 비교한다.
-   * API 연결 시 POST /staff/sessions 요청으로 교체한다.
+   * [추가] 4자리 PIN으로 직원 로그인을 요청하고 성공 토큰을 저장합니다.
    */
-  useEffect(() => {
-    if (pin.length !== PIN_LENGTH) {
-      return undefined;
+  const requestStaffLogin = async (completedPin) => {
+    if (isLoginSubmittingRef.current) {
+      return;
     }
 
-    // [추가] PIN 4자리 채움 상태를 보여주기 위한 짧은 대기
-    const loginTimer = window.setTimeout(() => {
-      if (pin === TEMP_PIN) {
-        setErrorMessage("");
-        onLogin?.();
-        return;
+    isLoginSubmittingRef.current = true;
+    setIsLoginSubmitting(true);
+    setErrorMessage("");
+
+    try {
+      const response = await createStaffSession(completedPin);
+
+      if (!response?.staffToken) {
+        throw new Error("직원 로그인 토큰이 응답에 없습니다.");
       }
 
+      setStaffToken(response.staffToken);
+      onLogin?.();
+    } catch {
       setErrorMessage("비밀번호를 다시 확인해주세요.");
       setPin("");
-    }, 300);
-
-    // [추가] 화면 이동 또는 PIN 변경 시 예약된 검사 제거
-    return () => window.clearTimeout(loginTimer);
-  }, [pin, onLogin]);
+    } finally {
+      isLoginSubmittingRef.current = false;
+      setIsLoginSubmitting(false);
+    }
+  };
 
   /**
    * 숫자 버튼을 눌렀을 때 PIN을 한 자리 추가한다.
    */
   const handleNumberClick = (number) => {
+    if (isLoginSubmittingRef.current || pin.length >= PIN_LENGTH) {
+      return;
+    }
+
     setErrorMessage("");
+    const nextPin = `${pin}${number}`;
 
-    setPin((previousPin) => {
-      if (previousPin.length >= PIN_LENGTH) {
-        return previousPin;
-      }
+    setPin(nextPin);
 
-      return `${previousPin}${number}`;
-    });
+    if (nextPin.length === PIN_LENGTH) {
+      requestStaffLogin(nextPin);
+    }
   };
 
   /**
    * 삭제 버튼을 눌렀을 때 마지막 숫자를 제거한다.
    */
   const handleDelete = () => {
+    if (isLoginSubmittingRef.current) {
+      return;
+    }
+
     setErrorMessage("");
     setPin((previousPin) => previousPin.slice(0, -1));
   };
@@ -126,6 +147,7 @@ function StaffLogin({ onBack, onLogin }) {
               key={number}
               className="staff-login__key-button"
               type="button"
+              disabled={isLoginSubmitting}
               onClick={() => handleNumberClick(number)}
               aria-label={`${number} 입력`}
             >
@@ -141,6 +163,7 @@ function StaffLogin({ onBack, onLogin }) {
           <button
             className="staff-login__key-button"
             type="button"
+            disabled={isLoginSubmitting}
             onClick={() => handleNumberClick("0")}
             aria-label="0 입력"
           >
@@ -151,6 +174,7 @@ function StaffLogin({ onBack, onLogin }) {
           <button
             className="staff-login__delete-button"
             type="button"
+            disabled={isLoginSubmitting}
             onClick={handleDelete}
             aria-label="마지막 숫자 삭제"
           >

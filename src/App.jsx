@@ -18,8 +18,8 @@ import {
   updateNeedsAnalysis,
 } from "./api/analysisApi";
 
-// [추가] 고객 세션 ID 조회
-import { getSessionId } from "./utils/storage";
+// [수정] 고객 세션 ID 조회 및 직원 POS 종료 후 토큰 삭제
+import { getSessionId, removeStaffToken } from "./utils/storage";
 
 import Help from "./pages/help/Help";
 
@@ -115,6 +115,16 @@ function App() {
   const [selectedRequestId, setSelectedRequestId] = useState(null);
 
   const [requestStatuses, setRequestStatuses] = useState({});
+
+  /**
+   * [추가] POS 종료 성공 후 직원 화면 상태와 토큰을 삭제하고 시작 화면으로 이동합니다.
+   */
+  const handleStaffExitSuccess = () => {
+    removeStaffToken();
+    setSelectedRequestId(null);
+    setRequestStatuses({});
+    navigate("/staff");
+  };
 
   const [analysisState, setAnalysisState] = useState(
     createInitialAnalysisState,
@@ -610,11 +620,7 @@ function App() {
 
               navigate("/staff/requests/detail");
             }}
-            onExitPos={() => {
-              setSelectedRequestId(null);
-              setRequestStatuses({});
-              navigate("/staff");
-            }}
+            onExitPos={handleStaffExitSuccess}
           />
         }
       />

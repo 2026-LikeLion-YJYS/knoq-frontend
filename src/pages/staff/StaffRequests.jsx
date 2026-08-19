@@ -1,5 +1,8 @@
-// [추가] POS 종료 모달 상태 관리
-import { useState } from "react";
+// [수정] POS 종료 요청 상태와 중복 요청 방지를 위한 React 기능
+import { useRef, useState } from "react";
+
+// [추가] 직원 POS 종료 API
+import { deleteStaffSession } from "../../api/staffApi";
 
 // [추가] POS 종료 확인 모달
 import StaffExitModal from "./StaffExitModal";
@@ -69,6 +72,15 @@ function StaffRequests({ onSelectRequest, onExitPos, requestStatuses = {} }) {
   // [추가] POS 종료 확인 모달 상태
   const [isExitModalOpen, setIsExitModalOpen] = useState(false);
 
+  // [추가] POS 종료 API 요청 진행 여부
+  const [isExitSubmitting, setIsExitSubmitting] = useState(false);
+
+  // [추가] POS 종료 실패 안내 메시지
+  const [exitError, setExitError] = useState("");
+
+  // [추가] 빠른 연속 클릭으로 발생하는 POS 종료 중복 요청을 차단합니다.
+  const isExitSubmittingRef = useRef(false);
+
   // [수정] 임시 상태를 반영하고 요청 접수 시간을 기준으로 최신순 정렬
   const sortedRequests = TEMP_REQUESTS.map((request) => ({
     ...request,
@@ -82,6 +94,7 @@ function StaffRequests({ onSelectRequest, onExitPos, requestStatuses = {} }) {
    * 설정 아이콘을 누르면 POS 종료 확인 모달을 연다.
    */
   const handleOpenExitModal = () => {
+    setExitError("");
     setIsExitModalOpen(true);
   };
 
@@ -89,15 +102,39 @@ function StaffRequests({ onSelectRequest, onExitPos, requestStatuses = {} }) {
    * 계속 상담하기를 누르면 모달만 닫는다.
    */
   const handleContinueConsultation = () => {
+    if (isExitSubmittingRef.current) {
+      return;
+    }
+
+    setExitError("");
     setIsExitModalOpen(false);
   };
 
   /**
-   * POS 종료를 확정하고 부모 컴포넌트로 전달한다.
+   * [수정] POS 종료 API 성공 후 부모 컴포넌트에 상태 정리와 이동을 요청합니다.
    */
-  const handleExitPos = () => {
-    setIsExitModalOpen(false);
-    onExitPos?.();
+  const handleExitPos = async () => {
+    if (isExitSubmittingRef.current) {
+      return;
+    }
+
+    isExitSubmittingRef.current = true;
+    setIsExitSubmitting(true);
+    setExitError("");
+
+    try {
+      await deleteStaffSession();
+      setIsExitModalOpen(false);
+      onExitPos?.();
+    } catch (error) {
+      // [추가] 401은 공통 API 요청 함수가 직원 로그인 화면 이동까지 처리합니다.
+      if (error?.status !== 401) {
+        setExitError("POS 종료에 실패했습니다. 다시 시도해주세요.");
+      }
+    } finally {
+      isExitSubmittingRef.current = false;
+      setIsExitSubmitting(false);
+    }
   };
 
   /**
@@ -211,6 +248,8 @@ function StaffRequests({ onSelectRequest, onExitPos, requestStatuses = {} }) {
         isOpen={isExitModalOpen}
         onContinue={handleContinueConsultation}
         onExit={handleExitPos}
+        isSubmitting={isExitSubmitting}
+        errorMessage={exitError}
       />
     </main>
   );

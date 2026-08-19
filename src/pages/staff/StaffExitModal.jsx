@@ -4,7 +4,13 @@ import "./StaffExitModal.css";
  * 직원 POS 종료 확인 모달
  * 상담 유지 또는 POS 종료 작업을 선택한다.
  */
-function StaffExitModal({ isOpen, onContinue, onExit }) {
+function StaffExitModal({
+  isOpen,
+  onContinue,
+  onExit,
+  isSubmitting = false,
+  errorMessage = "",
+}) {
   if (!isOpen) {
     return null;
   }
@@ -24,10 +30,7 @@ function StaffExitModal({ isOpen, onContinue, onExit }) {
         aria-modal="true"
         aria-labelledby="staff-exit-modal-title"
       >
-        <h2
-          className="staff-exit-modal__title"
-          id="staff-exit-modal-title"
-        >
+        <h2 className="staff-exit-modal__title" id="staff-exit-modal-title">
           업무를 어떻게 이어갈까요?
         </h2>
 
@@ -37,10 +40,18 @@ function StaffExitModal({ isOpen, onContinue, onExit }) {
           POS에서 로그아웃할 수 있습니다.
         </p>
 
+        {/* [추가] POS 종료 실패 시 모달을 유지하고 재시도 안내를 표시합니다. */}
+        {errorMessage && (
+          <p className="staff-exit-modal__description" role="alert">
+            {errorMessage}
+          </p>
+        )}
+
         <div className="staff-exit-modal__buttons">
           <button
             className="staff-exit-modal__button staff-exit-modal__button--continue"
             type="button"
+            disabled={isSubmitting}
             onClick={onContinue}
           >
             계속 상담하기
@@ -49,9 +60,11 @@ function StaffExitModal({ isOpen, onContinue, onExit }) {
           <button
             className="staff-exit-modal__button staff-exit-modal__button--exit"
             type="button"
+            disabled={isSubmitting}
             onClick={handleExit}
           >
-            POS 종료하기
+            {/* [추가] 요청 진행 중임을 버튼 문구로 안내합니다. */}
+            {isSubmitting ? "종료 중..." : "POS 종료하기"}
           </button>
         </div>
       </section>
