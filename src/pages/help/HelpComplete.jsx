@@ -14,11 +14,7 @@ function HelpComplete({ onGoHome, onViewNotifications }) {
       <main className="help-complete-content">
         <div className="help-complete-guide">
           {/* [추가] 상담 요청 완료 아이콘 */}
-          <img
-            className="help-complete-icon"
-            src={helpCompleteIcon}
-            alt=""
-          />
+          <img className="help-complete-icon" src={helpCompleteIcon} alt="" />
 
           {/* [추가] 상담 요청 완료 문구 */}
           <div className="help-complete-text">
@@ -42,6 +38,7 @@ function HelpComplete({ onGoHome, onViewNotifications }) {
             홈으로 가기
           </button>
 
+          {/* [수정] 기존 알림 화면 이동 경로를 그대로 사용합니다. */}
           <button
             className="help-complete-notification-button"
             type="button"
