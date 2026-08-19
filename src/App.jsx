@@ -130,6 +130,9 @@ function App() {
   // [추가] 분석 GET 요청 진행 여부
   const [isAnalysisFetching, setIsAnalysisFetching] = useState(false);
 
+  // [추가] 상태 갱신 전 발생할 수 있는 분석 GET 중복 요청을 즉시 차단합니다.
+  const isAnalysisFetchingRef = useRef(false);
+
   // [추가] 분석 GET·POST 실패 안내 메시지
   const [analysisError, setAnalysisError] = useState("");
 
@@ -138,6 +141,9 @@ function App() {
 
   // [추가] 연속 클릭 사이에도 PUT 중복 요청을 즉시 차단합니다.
   const isAnalysisSavingRef = useRef(false);
+
+  // [추가] 최초 분석·재분석 POST 요청의 빠른 중복 실행을 즉시 차단합니다.
+  const isAnalysisRequestingRef = useRef(false);
 
   // [추가] 분석 경로의 이전 진입 상태를 저장해 중복 GET 요청을 방지합니다.
   const wasAnalysisRouteRef = useRef(false);
@@ -187,12 +193,18 @@ function App() {
    * [추가] 분석 탭 진입 시 실제 분석 가능 여부와 기존 결과를 조회합니다.
    */
   const loadNeedsAnalysis = useCallback(async () => {
+    if (isAnalysisFetchingRef.current) {
+      return;
+    }
+
     const sessionId = getSessionId();
 
+    isAnalysisFetchingRef.current = true;
     setIsAnalysisFetching(true);
     setAnalysisError("");
 
     if (!sessionId) {
+      isAnalysisFetchingRef.current = false;
       setIsAnalysisInitialized(false);
       setIsAnalysisFetching(false);
       setAnalysisError("세션 정보를 확인할 수 없습니다. 다시 시도해주세요.");
@@ -228,6 +240,7 @@ function App() {
         ),
       );
     } finally {
+      isAnalysisFetchingRef.current = false;
       setIsAnalysisFetching(false);
     }
   }, []);
@@ -245,6 +258,10 @@ function App() {
    * [추가] 최초 분석과 업데이트에서 공통 POST 요청을 실행합니다.
    */
   const requestNeedsAnalysis = async (loadingStep, failureStep) => {
+    if (isAnalysisRequestingRef.current) {
+      return;
+    }
+
     const sessionId = getSessionId();
 
     if (!sessionId) {
@@ -252,6 +269,7 @@ function App() {
       return;
     }
 
+    isAnalysisRequestingRef.current = true;
     setAnalysisError("");
     setAnalysisState((previousState) => ({
       ...previousState,
@@ -284,6 +302,8 @@ function App() {
           "니즈 분석에 실패했습니다. 다시 시도해주세요.",
         ),
       );
+    } finally {
+      isAnalysisRequestingRef.current = false;
     }
   };
 

@@ -68,6 +68,28 @@ const getAuthorizationToken = (authType) => {
 };
 
 /**
+ * [추가] 인증 API 호출 전에 필요한 토큰이 없으면 storage를 정리하고
+ * 각 인증 시작 화면으로 이동합니다.
+ */
+const handleMissingAuthentication = (authType) => {
+  if (authType === "customer") {
+    clearCustomerStorage();
+
+    if (typeof window !== "undefined") {
+      window.location.replace("/onboarding");
+    }
+  }
+
+  if (authType === "staff") {
+    removeStaffToken();
+
+    if (typeof window !== "undefined") {
+      window.location.replace("/staff/login");
+    }
+  }
+};
+
+/**
  * [추가] 고객 세션 만료와 직원 인증 만료를 공통 처리합니다.
  */
 const handleAuthenticationError = (authType, status) => {
@@ -96,6 +118,14 @@ export const apiRequest = async (
   { method = "GET", body, headers = {}, authType = "none" } = {},
 ) => {
   const token = getAuthorizationToken(authType);
+
+  // [추가] 인증 토큰 누락 시 잘못된 API 요청을 보내지 않고 공통 만료 흐름을 실행합니다.
+  if (authType !== "none" && !token) {
+    handleMissingAuthentication(authType);
+
+    throw new ApiError("인증 정보를 확인할 수 없습니다.", 401, null);
+  }
+
   const requestHeaders = {
     ...headers,
   };
