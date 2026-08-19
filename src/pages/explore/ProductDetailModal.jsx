@@ -1,7 +1,4 @@
 // 탐색 화면 - 상품 상세 정보 모달
-// "상세 보기" 버튼 클릭 시 표시됩니다.
-// [추가] createPortal로 document.body에 직접 렌더링 (ExitModal과 동일한 이유:
-// 부모 요소의 stacking context에 갇혀 다른 콘텐츠에 가려지는 걸 방지)
 
 import { createPortal } from "react-dom";
 import "./ProductDetailModal.css";
@@ -11,7 +8,7 @@ import orangeCheckIcon from "../../assets/icons/orange-check.svg";
 import bagStyleImage from "../../assets/images/bag-style.svg";
 import bagCompositionImage from "../../assets/images/bag-composition.svg";
 
-// [추가] 백엔드 연동 전 임시 더미 데이터 (Figma 값 그대로)
+// 백엔드 연동 전 임시 더미 데이터 (Figma 값 그대로)
 const DEFAULT_PRODUCT = {
   image: defaultBagImage,
   category: "숄더백",
@@ -20,7 +17,7 @@ const DEFAULT_PRODUCT = {
   price: "₩1,490,000",
   size: "Large",
   sizeDetail: "(약 11 x 33 x 31)",
-  color: "Congnac", // ⚠️ Figma 원본 표기 그대로 씀 (오타로 보이면 알려주세요, "Cognac"으로 바꿀게요)
+  color: "Congnac",
   features: {
     style: {
       image: bagStyleImage,
@@ -50,7 +47,6 @@ function ProductDetailModal({ isOpen, onClose, product = DEFAULT_PRODUCT }) {
         role="dialog"
         aria-modal="true"
       >
-        {/* [수정] X 텍스트 대신 close-circle 아이콘 사용 */}
         <button
           type="button"
           className="product-detail-modal__close"
@@ -60,7 +56,7 @@ function ProductDetailModal({ isOpen, onClose, product = DEFAULT_PRODUCT }) {
           <img src={closeCircleIcon} alt="" className="product-detail-modal__close-icon" />
         </button>
 
-        {/* [추가] 상품 대표 이미지 */}
+        {/* 상품 대표 이미지 */}
         <div className="product-detail-modal__image-wrap">
           <img
             src={product.image}
@@ -69,7 +65,7 @@ function ProductDetailModal({ isOpen, onClose, product = DEFAULT_PRODUCT }) {
           />
         </div>
 
-        {/* [추가] 카테고리 뱃지 + 상품명 */}
+        {/* 카테고리 뱃지 + 상품명 */}
         <div className="product-detail-modal__heading">
           <span className="product-detail-modal__badge">
             {product.category}
@@ -77,7 +73,7 @@ function ProductDetailModal({ isOpen, onClose, product = DEFAULT_PRODUCT }) {
           <p className="product-detail-modal__name">{product.name}</p>
         </div>
 
-        {/* [추가] 제품 정보 */}
+        {/* 제품 정보 */}
         <section className="product-detail-modal__info-section">
           <p className="product-detail-modal__section-title">제품 정보</p>
 
@@ -115,7 +111,6 @@ function ProductDetailModal({ isOpen, onClose, product = DEFAULT_PRODUCT }) {
           </div>
         </section>
 
-        {/* [추가] 특징 (스타일 / 구성 / 활용) - 이미지 없이 텍스트만 */}
         <section className="product-detail-modal__feature-section">
           <p className="product-detail-modal__section-title">특징</p>
 
@@ -130,7 +125,6 @@ function ProductDetailModal({ isOpen, onClose, product = DEFAULT_PRODUCT }) {
                   </li>
                 ))}
               </ul>
-              {/* [추가] 카드 하단에 가장자리까지 꽉 채우는 이미지 (Figma 반영) */}
               <img
                 src={product.features.style.image}
                 alt=""
@@ -148,7 +142,6 @@ function ProductDetailModal({ isOpen, onClose, product = DEFAULT_PRODUCT }) {
                   </li>
                 ))}
               </ul>
-              {/* [추가] 카드 하단에 가장자리까지 꽉 채우는 이미지 (Figma 반영) */}
               <img
                 src={product.features.composition.image}
                 alt=""

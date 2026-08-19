@@ -70,7 +70,6 @@ const ANALYSIS_FIELD_MAP = {
  * 분석 원본과 수정 중인 데이터가 같은 객체를 공유하지 않도록 복사합니다.
  */
 const createInitialAnalysisState = () => ({
-  // [테스트] 분석1은 1, 분석2부터 전체 플로우 테스트는 2로 변경합니다.
   savedCount: 2,
 
   hasAnalysis: false,
@@ -81,21 +80,16 @@ const createInitialAnalysisState = () => ({
 });
 
 function App() {
-  // [수정] react-router-dom을 이용해 화면을 전환합니다.
   const navigate = useNavigate();
 
-  // [추가] 선택한 상담 요청 ID
   const [selectedRequestId, setSelectedRequestId] = useState(null);
 
-  // [추가] API 연동 전 요청별 상담 상태
   const [requestStatuses, setRequestStatuses] = useState({});
 
-  // [수정] 분석 관련 상태를 하나의 객체에서 통합 관리
   const [analysisState, setAnalysisState] = useState(
     createInitialAnalysisState,
   );
 
-  // [추가] 탐색 화면 저장목록 (스캔한 제품이 여기 반영됩니다)
   const [savedItems, setSavedItems] = useState(
     Array.from({ length: 8 }, (_, i) => ({
       id: i,
@@ -103,12 +97,10 @@ function App() {
     })),
   );
 
-  // [추가] 저장목록에서 삭제
   const handleDeleteSavedItem = (id) => {
     setSavedItems((prev) => prev.filter((item) => item.id !== id));
   };
 
-  // [추가] 스캔 완료한 제품을 저장목록에 추가
   const handleAddScannedProduct = (product) => {
     setSavedItems((prev) => [
       ...prev,
@@ -121,13 +113,21 @@ function App() {
     ]);
   };
 
-  // [추가] 수정할 항목이 선택되면 모달을 표시합니다.
+  // [추가] 로그인 상태 (내 정보 기억하고 이어서 탐색하기 → 카카오 로그인 완료 시 true)
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // [추가] 카카오 로그인 성공 시 호출
+  const handleLoginSuccess = () => {
+    setIsLoggedIn(true);
+  };
+
+  // [추가] 종료 모달에서 로그아웃 시 호출
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+  };
+
   const isEditModalOpen = Boolean(analysisState.editModalType);
 
-  /**
-   * [추가] 최초 니즈 분석 시작
-   * 저장 제품이 2개 이상일 때 분석 로딩 화면으로 이동합니다.
-   */
   const handleStartAnalysis = () => {
     if (analysisState.savedCount < 2) {
       return;
@@ -139,10 +139,6 @@ function App() {
     }));
   };
 
-  /**
-   * [추가] 최초 니즈 분석 로딩 완료
-   * 새 분석 결과를 저장하고 분석 검토 화면으로 이동합니다.
-   */
   const handleInitialLoadingComplete = () => {
     const newAnalysisData = { ...INITIAL_ANALYSIS_DATA };
 
@@ -155,10 +151,6 @@ function App() {
     }));
   };
 
-  /**
-   * [추가] 분석 결과 승인
-   * 분석 검토 화면에서 최종 결과 화면으로 이동합니다.
-   */
   const handleApproveAnalysis = () => {
     setAnalysisState((previousState) => ({
       ...previousState,
@@ -167,10 +159,6 @@ function App() {
     }));
   };
 
-  /**
-   * [추가] 분석 결과 수정 시작
-   * 현재 분석 결과를 복사한 뒤 분석 수정 화면으로 이동합니다.
-   */
   const handleStartEditAnalysis = () => {
     setAnalysisState((previousState) => ({
       ...previousState,
@@ -180,9 +168,6 @@ function App() {
     }));
   };
 
-  /**
-   * [추가] 니즈 항목 수정 모달을 엽니다.
-   */
   const handleOpenEditModal = (modalType) => {
     setAnalysisState((previousState) => ({
       ...previousState,
@@ -190,9 +175,6 @@ function App() {
     }));
   };
 
-  /**
-   * [추가] 니즈 항목 수정 모달을 닫습니다.
-   */
   const handleCloseEditModal = () => {
     setAnalysisState((previousState) => ({
       ...previousState,
@@ -200,9 +182,6 @@ function App() {
     }));
   };
 
-  /**
-   * [추가] 수정 모달에서 선택한 값을 임시 수정 결과에 반영합니다.
-   */
   const handleSaveEditValue = (value) => {
     setAnalysisState((previousState) => {
       const analysisField = ANALYSIS_FIELD_MAP[previousState.editModalType];
@@ -222,10 +201,6 @@ function App() {
     });
   };
 
-  /**
-   * [추가] 전체 니즈 수정 완료
-   * 수정 결과를 확정한 뒤 수정 완료 화면으로 이동합니다.
-   */
   const handleCompleteAnalysisEdit = () => {
     setAnalysisState((previousState) => ({
       ...previousState,
@@ -236,9 +211,6 @@ function App() {
     }));
   };
 
-  /**
-   * [추가] 수정 완료 화면에서 분석 결과 화면으로 이동합니다.
-   */
   const handleContinueAnalysis = () => {
     setAnalysisState((previousState) => ({
       ...previousState,
@@ -246,10 +218,6 @@ function App() {
     }));
   };
 
-  /**
-   * [추가] 니즈 분석 업데이트 시작
-   * 기존 결과에 값을 추가하지 않고 재분석 로딩 화면으로 이동합니다.
-   */
   const handleUpdateAnalysis = () => {
     if (!analysisState.hasAnalysis || analysisState.savedCount < 2) {
       return;
@@ -261,12 +229,7 @@ function App() {
     }));
   };
 
-  /**
-   * [추가] 니즈 분석 업데이트 완료
-   * 현재 저장 제품 기준의 새 분석 결과로 기존 결과를 교체합니다.
-   */
   const handleUpdateLoadingComplete = () => {
-    // [추가] API 연결 전에는 동일한 임시 데이터로 재분석 결과를 구성합니다.
     const reanalyzedData = { ...INITIAL_ANALYSIS_DATA };
 
     setAnalysisState((previousState) => ({
@@ -278,9 +241,6 @@ function App() {
     }));
   };
 
-  /**
-   * [추가] 현재 분석 단계에 맞는 화면을 표시합니다.
-   */
   const renderAnalysisScreen = () => {
     if (analysisState.analysisStep === ANALYSIS_STEP.LOADING) {
       return (
@@ -321,34 +281,35 @@ function App() {
         onSaveEditValue={handleSaveEditValue}
         onCompleteEdit={handleCompleteAnalysisEdit}
         onUpdateAnalysis={handleUpdateAnalysis}
+        isLoggedIn={isLoggedIn}
+        onLogout={handleLogout}
       />
     );
   };
 
   return (
     <Routes>
-      {/* [수정] 앱 최초 진입 시 온보딩 첫 화면으로 이동 */}
       <Route path="/" element={<Navigate to="/onboarding" replace />} />
 
-      {/* [수정] 온보딩 저장 범위 선택 후 약관 동의 화면으로 이동 */}
+      {/* [수정] 프라이빗 둘러보기는 동의 화면 없이 바로 쇼핑 셋업으로 이동 */}
       <Route
         path="/onboarding"
         element={
           <Onboarding1
-            onSelectPrivate={() => navigate("/onboarding/consent")}
+            onSelectPrivate={() => navigate("/onboarding/setup")}
             onSelectAccount={() => navigate("/onboarding/consent")}
           />
         }
       />
 
-      {/* [수정] 약관 동의 완료 후 사용자 설정 화면으로 이동 */}
+      {/* [수정] 카카오 로그인 성공 시 App.jsx의 isLoggedIn을 true로 설정 */}
       <Route
         path="/onboarding/consent"
         element={
           <Onboarding2
             onBack={() => navigate(-1)}
+            onLoginSuccess={handleLoginSuccess}
             onSubmit={(consents) => {
-              // [테스트] API 연동 전 제출된 동의 값을 확인합니다.
               console.log("제출된 동의값:", consents);
               navigate("/onboarding/setup");
             }}
@@ -356,14 +317,12 @@ function App() {
         }
       />
 
-      {/* [수정] 닉네임과 라이프스타일 설정 후 완료 화면으로 이동 */}
       <Route
         path="/onboarding/setup"
         element={
           <OnboardingSetup
             onBack={() => navigate(-1)}
             onSubmit={(data) => {
-              // [테스트] API 연동 전 설정한 사용자 정보를 확인합니다.
               console.log("닉네임/라이프스타일:", data);
               navigate("/onboarding/complete");
             }}
@@ -371,7 +330,6 @@ function App() {
         }
       />
 
-      {/* [수정] 온보딩 완료 후 탐색 화면으로 이동 */}
       <Route
         path="/onboarding/complete"
         element={
@@ -382,18 +340,19 @@ function App() {
         }
       />
 
-      {/* [추가] 탐색 기본 화면 */}
+      {/* [수정] 탐색 기본 화면 - 로그인 상태 전달 */}
       <Route
         path="/explore"
         element={
           <ExploreHome
             savedItems={savedItems}
             onDeleteSavedItem={handleDeleteSavedItem}
+            isLoggedIn={isLoggedIn}
+            onLogout={handleLogout}
           />
         }
       />
 
-      {/* [추가] 제품 스캔 - 촬영 */}
       <Route
         path="/explore/scan"
         element={
@@ -404,7 +363,6 @@ function App() {
         }
       />
 
-      {/* [추가] 제품 스캔 - 인식 중 */}
       <Route
         path="/explore/scan/recognizing"
         element={
@@ -414,7 +372,6 @@ function App() {
         }
       />
 
-      {/* [추가] 제품 스캔 - 촬영 완료(확인) */}
       <Route
         path="/explore/scan/confirm"
         element={
@@ -428,7 +385,6 @@ function App() {
         }
       />
 
-      {/* [추가] 제품 스캔 - 등록 완료 */}
       <Route
         path="/explore/scan/complete"
         element={
@@ -440,19 +396,19 @@ function App() {
         }
       />
 
-      {/* [추가] 분석 화면 */}
       <Route path="/analysis/*" element={renderAnalysisScreen()} />
 
-      {/* [추가] 도움 화면 */}
-      <Route path="/help" element={<Help />} />
+      {/* [수정] 도움 화면 - 로그인 상태 전달 */}
+      <Route
+        path="/help"
+        element={<Help isLoggedIn={isLoggedIn} onLogout={handleLogout} />}
+      />
 
-      {/* [추가] 직원 로그인 진입 화면 */}
       <Route
         path="/staff"
         element={<StaffIntro onLogin={() => navigate("/staff/login")} />}
       />
 
-      {/* [추가] 직원 PIN 로그인 화면 */}
       <Route
         path="/staff/login"
         element={
@@ -463,7 +419,6 @@ function App() {
         }
       />
 
-      {/* [추가] 직원 상담 요청 목록 화면 */}
       <Route
         path="/staff/requests"
         element={
@@ -488,7 +443,6 @@ function App() {
         }
       />
 
-      {/* [추가] 직원 상담 요청 상세 화면 */}
       <Route
         path="/staff/requests/detail"
         element={
@@ -502,7 +456,6 @@ function App() {
         }
       />
 
-      {/* [추가] 직원 상담 종료 확인 화면 */}
       <Route
         path="/staff/requests/end"
         element={
@@ -522,7 +475,6 @@ function App() {
         }
       />
 
-      {/* [추가] 존재하지 않는 주소로 접근하면 시작 화면으로 이동 */}
       <Route path="*" element={<Navigate to="/" replace />} />
 
       <Route path="/notification" element={<NotificationPage />} />

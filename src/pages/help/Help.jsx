@@ -50,7 +50,7 @@ const checkStoreOpen = () => {
 /**
  * [수정] 어드바이저 도움 요청 화면
  */
-function Help() {
+function Help({ isLoggedIn, onLogout }) {
   // [추가] 다른 화면으로 이동
   const navigate = useNavigate();
 
@@ -93,7 +93,6 @@ function Help() {
   const handleRequestHelp = () => {
     if (!canRequestHelp) return;
 
-    // [수정] 추후 POST 상담 요청 API에서 사용할 데이터 구조
     const requestData = {
       helpType: selectedHelpType,
       productIds: selectedProducts.map((product) => product.id),
@@ -102,17 +101,7 @@ function Help() {
 
     console.log("도움 요청 데이터:", requestData);
 
-    // [추가] API 연동 전 임시로 완료 화면 표시
     setIsRequestComplete(true);
-
-    /*
-     * [추후 API 연동]
-     * const response = await requestAdvisorHelp(requestData);
-     *
-     * if (response 성공) {
-     *   setIsRequestComplete(true);
-     * }
-     */
   };
 
   /**
@@ -131,9 +120,7 @@ function Help() {
   if (isRequestComplete) {
     return (
       <HelpComplete
-        // [수정] 상담 신청 상태 초기화 후 도움 홈 화면으로 이동
         onGoHome={handleGoHome}
-        // [추가] 알림 화면으로 이동
         onViewNotifications={() => navigate("/notification")}
       />
     );
@@ -141,10 +128,12 @@ function Help() {
 
   return (
     <div className="help-page">
-      {/* [추가] 공통 상단 헤더 */}
+      {/* [수정] 공통 상단 헤더 - 로그인 상태 전달 */}
       <MainHeader
         onLogoClick={() => navigate("/explore")}
         onNotificationClick={() => navigate("/notification")}
+        isLoggedIn={isLoggedIn}
+        onLogout={onLogout}
       />
 
       {/* [추가] 도움 요청 본문 */}
@@ -170,7 +159,6 @@ function Help() {
                   className="help-type-button"
                   type="button"
                   aria-pressed={isSelected}
-                  // [수정] 선택된 유형을 다시 누르면 선택 취소
                   onClick={() =>
                     setSelectedHelpType(isSelected ? "" : type.value)
                   }
@@ -187,7 +175,6 @@ function Help() {
           <h2>제품 추가하기(선택)</h2>
 
           <div className="help-product-list">
-            {/* [추가] 모달에서 추가한 상담 제품 표시 */}
             {selectedProducts.map((product) => (
               <button
                 className="help-product-card"
@@ -200,7 +187,6 @@ function Help() {
               </button>
             ))}
 
-            {/* [수정] 남은 제품 칸을 추가 버튼으로 표시 */}
             {Array.from({ length: emptyProductSlotCount }).map((_, index) => (
               <button
                 key={`empty-product-${index}`}
@@ -222,7 +208,6 @@ function Help() {
           <div className="help-share-title">
             <h2>어드바이저에게 공유할 나의 정보(선택)</h2>
 
-            {/* [수정] 라이프스타일과 니즈를 하나의 체크박스로 관리 */}
             <input
               className="help-checkbox"
               type="checkbox"
@@ -232,7 +217,6 @@ function Help() {
             />
           </div>
 
-          {/* [추가] 라이프스타일과 나의 니즈 */}
           <div className="help-info-card">
             <div className="help-lifestyle">
               <h3>라이프스타일</h3>
