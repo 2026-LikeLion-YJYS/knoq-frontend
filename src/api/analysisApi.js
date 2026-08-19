@@ -16,3 +16,18 @@ export const createNeedsAnalysis = (sessionId) => {
     method: "POST",
   });
 };
+
+/**
+ * [추가] 사용자가 수정한 니즈 분석 결과를 현재 세션에 저장합니다.
+ */
+export const updateNeedsAnalysis = (sessionId, analysisData) => {
+  return customerApiRequest(`/sessions/${sessionId}/needs-analysis`, {
+    method: "PUT",
+    body: {
+      productCategory: analysisData.productCategory,
+      preferredColor: analysisData.preferredColor,
+      preferredMaterial: analysisData.preferredMaterial,
+      preferredSize: analysisData.preferredSize,
+    },
+  });
+};

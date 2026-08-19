@@ -11,7 +11,12 @@ import {
 } from "react-router-dom";
 
 // [추가] 니즈 분석 조회·생성·재분석 API
-import { createNeedsAnalysis, getNeedsAnalysis } from "./api/analysisApi";
+import {
+  createNeedsAnalysis,
+  getNeedsAnalysis,
+  // [추가] 수정한 니즈 분석 결과 저장 API
+  updateNeedsAnalysis,
+} from "./api/analysisApi";
 
 // [추가] 고객 세션 ID 조회
 import { getSessionId } from "./utils/storage";
@@ -123,6 +128,12 @@ function App() {
 
   // [추가] 분석 GET·POST 실패 안내 메시지
   const [analysisError, setAnalysisError] = useState("");
+
+  // [추가] 니즈 분석 수정 저장 요청 진행 여부
+  const [isAnalysisSaving, setIsAnalysisSaving] = useState(false);
+
+  // [추가] 연속 클릭 사이에도 PUT 중복 요청을 즉시 차단합니다.
+  const isAnalysisSavingRef = useRef(false);
 
   // [추가] 분석 경로의 이전 진입 상태를 저장해 중복 GET 요청을 방지합니다.
   const wasAnalysisRouteRef = useRef(false);
@@ -284,6 +295,7 @@ function App() {
   };
 
   const handleApproveAnalysis = () => {
+    // [수정] 승인은 별도 API 호출 없이 결과 화면으로 이동합니다.
     setAnalysisState((previousState) => ({
       ...previousState,
       hasAnalysis: true,
@@ -292,6 +304,8 @@ function App() {
   };
 
   const handleStartEditAnalysis = () => {
+    // [추가] 수정 화면에 진입할 때 이전 API 오류 안내를 초기화합니다.
+    setAnalysisError("");
     setAnalysisState((previousState) => ({
       ...previousState,
       editedAnalysis: { ...previousState.analysisData },
@@ -334,16 +348,54 @@ function App() {
   };
 
   /**
-   * [수정] PUT 연동 전까지 수정 결과를 화면 상태에만 반영합니다.
+   * [수정] 수정 완료 시 PUT 요청을 보내고 서버가 반환한 결과를 반영합니다.
    */
-  const handleCompleteAnalysisEdit = () => {
-    setAnalysisState((previousState) => ({
-      ...previousState,
-      hasAnalysis: true,
-      analysisData: { ...previousState.editedAnalysis },
-      editModalType: null,
-      analysisStep: ANALYSIS_STEP.EDIT_COMPLETE,
-    }));
+  const handleCompleteAnalysisEdit = async () => {
+    if (isAnalysisSavingRef.current) {
+      return;
+    }
+
+    const sessionId = getSessionId();
+
+    if (!sessionId) {
+      setAnalysisError("세션 정보를 확인할 수 없습니다. 다시 시도해주세요.");
+      return;
+    }
+
+    isAnalysisSavingRef.current = true;
+    setIsAnalysisSaving(true);
+    setAnalysisError("");
+
+    try {
+      const response = await updateNeedsAnalysis(
+        sessionId,
+        analysisState.editedAnalysis,
+      );
+      const nextAnalysisData = {
+        ...EMPTY_ANALYSIS_DATA,
+        ...analysisState.editedAnalysis,
+        ...response,
+      };
+
+      setAnalysisState((previousState) => ({
+        ...previousState,
+        hasAnalysis: true,
+        analysisData: nextAnalysisData,
+        editedAnalysis: { ...nextAnalysisData },
+        editModalType: null,
+        analysisStep: ANALYSIS_STEP.EDIT_COMPLETE,
+      }));
+    } catch (error) {
+      setAnalysisError(
+        getAnalysisErrorMessage(
+          error,
+          "니즈 분석 수정 저장에 실패했습니다. 다시 시도해주세요.",
+        ),
+      );
+    } finally {
+      isAnalysisSavingRef.current = false;
+      setIsAnalysisSaving(false);
+    }
   };
 
   const handleContinueAnalysis = () => {
@@ -391,6 +443,7 @@ function App() {
         editModalType={analysisState.editModalType}
         isEditModalOpen={isEditModalOpen}
         isAnalysisFetching={isAnalysisFetching}
+        isAnalysisSaving={isAnalysisSaving}
         isAnalysisInitialized={isAnalysisInitialized}
         analysisError={analysisError}
         onRetryAnalysisLoad={loadNeedsAnalysis}

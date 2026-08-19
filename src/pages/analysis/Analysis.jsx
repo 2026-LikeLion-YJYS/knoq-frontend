@@ -22,6 +22,7 @@ function Analysis({
   editModalType,
   isEditModalOpen,
   isAnalysisFetching,
+  isAnalysisSaving,
   isAnalysisInitialized,
   analysisError,
   onRetryAnalysisLoad,
@@ -142,9 +143,10 @@ function Analysis({
               <button
                 className="analysis-edit-complete-button"
                 type="button"
+                disabled={isAnalysisSaving}
                 onClick={onCompleteEdit}
               >
-                수정 완료하기
+                {isAnalysisSaving ? "저장 중..." : "수정 완료하기"}
               </button>
             )}
           </div>
@@ -182,6 +184,7 @@ function Analysis({
                     className="analysis-card-edit-button"
                     type="button"
                     aria-label={`${item.label} 수정`}
+                    disabled={isAnalysisSaving}
                     onClick={() => onOpenEditModal?.(item.type)}
                   >
                     수정
@@ -210,13 +213,13 @@ function Analysis({
           <button
             className="analysis-update-button"
             type="button"
-            disabled={!canUpdateAnalysis}
+            disabled={!canUpdateAnalysis || isAnalysisSaving}
             onClick={onUpdateAnalysis}
           >
             니즈 분석 업데이트
           </button>
 
-          {/* [추가] 재분석 POST 실패 안내 */}
+          {/* [수정] 재분석 및 수정 저장 API 실패 안내 */}
           {analysisError && !showAnalysisEntry && (
             <p className="analysis-update-message" role="alert">
               {analysisError}
