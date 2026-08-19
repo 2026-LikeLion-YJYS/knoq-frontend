@@ -27,7 +27,7 @@ import Analysis from "./pages/analysis/Analysis";
 import AnalysisLoading from "./pages/analysis/AnalysisLoading";
 import AnalysisEditComplete from "./pages/analysis/AnalysisEditComplete";
 
-import NotificationPage from "./pages/Notification/NotificationPage";
+import NotificationPage from "./pages/notification/NotificationPage";
 
 /**
  * [추가] 분석 화면 진행 단계
