@@ -4,23 +4,43 @@
 import { createPortal } from "react-dom";
 import "./ExitModal.css";
 
+/**
+ * [추가] 로그인 여부와 요청 상태에 맞는 종료 버튼 문구를 반환합니다.
+ */
+const getEndButtonLabel = (isLoggedIn, isSubmitting) => {
+  if (isSubmitting) {
+    return isLoggedIn ? "로그아웃 중..." : "종료 중...";
+  }
+
+  return isLoggedIn ? "로그아웃" : "기록지우고 종료하기";
+};
+
 function ExitModal({
   isOpen,
   isLoggedIn = false,
+  // [추가] 종료 요청 상태와 실패 안내를 기존 모달 안에서 표시합니다.
+  isSubmitting = false,
+  errorMessage = "",
   onContinue,
   onEndSession,
 }) {
   if (!isOpen) return null;
 
-  const variantClass = isLoggedIn ? "exit-modal--logged-in" : "exit-modal--guest";
+  const variantClass = isLoggedIn
+    ? "exit-modal--logged-in"
+    : "exit-modal--guest";
 
   return createPortal(
-    <div className="exit-modal-overlay" onClick={onContinue}>
+    <div
+      className="exit-modal-overlay"
+      onClick={isSubmitting ? undefined : onContinue}
+    >
       <div
         className={`exit-modal ${variantClass}`}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
+        aria-busy={isSubmitting}
       >
         {/* 안내 문구 영역 */}
         <div className="exit-modal__text-group">
@@ -48,6 +68,7 @@ function ExitModal({
               type="button"
               className="exit-modal__button exit-modal__button--secondary"
               onClick={onContinue}
+              disabled={isSubmitting}
             >
               계속 쇼핑하기
             </button>
@@ -55,10 +76,18 @@ function ExitModal({
               type="button"
               className="exit-modal__button exit-modal__button--primary"
               onClick={onEndSession}
+              disabled={isSubmitting}
             >
-              {isLoggedIn ? "로그아웃" : "기록지우고 종료하기"}
+              {getEndButtonLabel(isLoggedIn, isSubmitting)}
             </button>
           </div>
+
+          {/* [추가] 종료 실패 시 모달을 유지하고 재시도 안내를 표시합니다. */}
+          {errorMessage && (
+            <p className="exit-modal__error" role="alert">
+              {errorMessage}
+            </p>
+          )}
 
           <p className="exit-modal__caption">
             {isLoggedIn
@@ -68,7 +97,7 @@ function ExitModal({
         </div>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 }
 

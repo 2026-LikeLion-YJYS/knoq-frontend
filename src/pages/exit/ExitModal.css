@@ -114,6 +114,23 @@
   color: #ffffff;
 }
 
+/* [추가] 종료 요청 중에는 모달 버튼의 중복 클릭을 막습니다. */
+.exit-modal__button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* [추가] 종료·로그아웃 실패 시 재시도 안내 문구 */
+.exit-modal__error {
+  margin: 0;
+  padding: 0 12px;
+  font-family: "Pretendard", sans-serif;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #d94b45;
+  text-align: center;
+}
+
 .exit-modal__caption {
   margin: 0;
   font-family: "Pretendard", sans-serif;
