@@ -5,16 +5,15 @@ import { useParams } from "react-router-dom";
 // [추가] 직원 상담 요청 상세 조회 API
 import { getStaffRequestDetail } from "../../api/staffApi";
 
+// [추가] API가 반환한 상대 상품 이미지 경로에 백엔드 Base URL을 연결합니다.
+import { createApiAssetUrl } from "../../api/apiClient";
+
 // [추가] 직원 상담 요청 상세 화면 스타일
 import "./StaffRequestDetail.css";
 
 // [추가] 상단 아이콘
 import settingIcon from "../../assets/icons/setting.svg";
 import logoKnoq from "../../assets/icons/logo-knoq.svg";
-
-// [수정] API에 이미지 URL이 없어 기존 상품 이미지를 fallback으로 사용합니다.
-import brownBagImage from "../../assets/images/help-product-brown.png";
-import blackBagImage from "../../assets/images/help-product-black.png";
 
 // [추가] 화면에 표시할 도움 유형 목록
 const HELP_TYPES = [
@@ -34,21 +33,8 @@ const LIFESTYLE_TAG_LABELS = {
   TRENDY: "트렌디",
 };
 
-// [추가] 기존 로컬 상품 이미지가 확인된 productId만 매핑합니다.
-const PRODUCT_IMAGE_MAP = {
-  prod_12: brownBagImage,
-  prod_33: blackBagImage,
-};
-
 // [추가] 상담을 종료할 수 없는 상태입니다.
 const END_DISABLED_STATUSES = ["COMPLETED", "EXPIRED"];
-
-/**
- * [추가] productId에 매핑된 로컬 fallback 이미지를 반환합니다.
- */
-const getProductImage = (productId) => {
-  return PRODUCT_IMAGE_MAP[productId] ?? null;
-};
 
 /**
  * 직원 상담 요청 상세 화면
@@ -248,8 +234,9 @@ function StaffRequestDetail({ onEndConsultation, onSettings }) {
 
           <div className="staff-request-detail__products">
             {productSlots.map((product, index) => {
+              // [수정] 직원 상담 상세 응답의 thumbnailUrl을 실제 백엔드 이미지 주소로 변환합니다.
               const productImage = product
-                ? getProductImage(product.productId)
+                ? createApiAssetUrl(product.thumbnailUrl)
                 : null;
 
               if (product && productImage) {
