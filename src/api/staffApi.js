@@ -34,6 +34,13 @@ export const getStaffRequests = () => {
 };
 
 /**
+ * [추가] URL의 요청 ID에 해당하는 직원 상담 요청 상세를 조회합니다.
+ */
+export const getStaffRequestDetail = (requestId) => {
+  return staffApiRequest(`/staff/requests/${encodeURIComponent(requestId)}`);
+};
+
+/**
  * [추가] 선택한 상담 요청의 진행 상태를 변경합니다.
  */
 export const updateStaffRequestStatus = (requestId, status) => {

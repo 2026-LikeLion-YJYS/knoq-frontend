@@ -112,14 +112,11 @@ function App() {
   // [추가] 분석 탭 진입 여부 확인에 사용하는 현재 경로
   const location = useLocation();
 
-  const [selectedRequestId, setSelectedRequestId] = useState(null);
-
   /**
-   * [추가] POS 종료 성공 후 직원 화면 상태와 토큰을 삭제하고 시작 화면으로 이동합니다.
+   * [수정] POS 종료 성공 후 직원 토큰을 삭제하고 시작 화면으로 이동합니다.
    */
   const handleStaffExitSuccess = () => {
     removeStaffToken();
-    setSelectedRequestId(null);
     navigate("/staff");
   };
 
@@ -607,7 +604,6 @@ function App() {
         element={
           <StaffRequests
             onSelectRequest={(requestId) => {
-              setSelectedRequestId(requestId);
               navigate(`/staff/requests/${encodeURIComponent(requestId)}`);
             }}
             onExitPos={handleStaffExitSuccess}
@@ -619,23 +615,24 @@ function App() {
         path="/staff/requests/:requestId"
         element={
           <StaffRequestDetail
-            requestId={selectedRequestId}
             onSettings={() => {
               alert("상담을 종료한 후 POS를 종료해주세요.");
             }}
-            onEndConsultation={() => navigate("/staff/requests/end")}
+            onEndConsultation={(requestId) =>
+              navigate(`/staff/requests/${encodeURIComponent(requestId)}/end`)
+            }
           />
         }
       />
 
       <Route
-        path="/staff/requests/end"
+        path="/staff/requests/:requestId/end"
         element={
           <StaffConsultationEnd
-            requestId={selectedRequestId}
-            onContinue={() => navigate(`/staff/requests/${selectedRequestId}`)}
+            onContinue={(requestId) =>
+              navigate(`/staff/requests/${encodeURIComponent(requestId)}`)
+            }
             onConfirmEnd={() => {
-              setSelectedRequestId(null);
               navigate("/staff/requests");
             }}
           />
