@@ -32,6 +32,22 @@ const createApiUrl = (path) => {
 };
 
 /**
+ * [추가] 백엔드가 반환한 상대 이미지 경로를 Base URL이 포함된 주소로 변환합니다.
+ * 이미 완전한 URL이면 그대로 반환합니다.
+ */
+export const createApiAssetUrl = (assetPath) => {
+  if (!assetPath) {
+    return null;
+  }
+
+  if (/^https?:\/\//i.test(assetPath)) {
+    return assetPath;
+  }
+
+  return createApiUrl(assetPath);
+};
+
+/**
  * [추가] 204 또는 본문이 없는 응답을 제외하고 JSON 응답을 변환합니다.
  */
 const parseResponse = async (response) => {

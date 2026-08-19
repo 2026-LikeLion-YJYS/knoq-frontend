@@ -10,6 +10,9 @@ import {
   getSavedProducts,
 } from "../../api/helpApi";
 
+// [추가] API가 반환한 상대 상품 이미지 경로에 백엔드 Base URL을 연결합니다.
+import { createApiAssetUrl } from "../../api/apiClient";
+
 // [수정] 고객 세션 정보 조회와 상담 요청 ID 저장
 import {
   getLifestyleTags,
@@ -26,10 +29,6 @@ import SavedProductModal from "./SavedProductModal";
 
 // [추가] 상담 요청 완료 화면 사용
 import HelpComplete from "./HelpComplete";
-
-// [추가] API에 이미지 URL이 없는 제품의 기존 로컬 이미지 fallback
-import brownBagImage from "../../assets/images/help-product-brown.png";
-import blackBagImage from "../../assets/images/help-product-black.png";
 
 import "./Help.css";
 
@@ -68,19 +67,18 @@ const LIFESTYLE_TAG_LABELS = {
 };
 
 /**
- * [추가] 기존 코드에서 productId가 확인된 제품에만 로컬 이미지를 연결합니다.
- * 알 수 없는 productId는 잘못된 이미지를 표시하지 않도록 빈 슬롯으로 둡니다.
- */
-const PRODUCT_IMAGE_MAP = {
-  prod_12: brownBagImage,
-  prod_33: blackBagImage,
-};
-
-/**
- * [추가] 현재 시간이 매장 운영시간인지 확인합니다.
- * 매장 운영시간은 11:00 이상, 22:00 미만입니다.
+ * [수정] 개발 환경에서는 환경변수로 매장 운영시간을 강제 활성화할 수 있습니다.
+ * 실제 운영 환경에서는 11:00 이상, 22:00 미만일 때만 활성화됩니다.
  */
 const checkStoreOpen = () => {
+  // [추가] 로컬 개발 환경의 운영시간 테스트 설정
+  const isForcedOpen =
+    import.meta.env.DEV && import.meta.env.VITE_FORCE_STORE_OPEN === "true";
+
+  if (isForcedOpen) {
+    return true;
+  }
+
   const now = new Date();
   const hour = now.getHours();
 
@@ -183,7 +181,8 @@ function Help({ isLoggedIn, onLogout }) {
         const productsWithFallback = savedProductItems.map((product) => ({
           ...product,
           name: "상품 정보 없음",
-          image: PRODUCT_IMAGE_MAP[product.productId] ?? null,
+          // [수정] 상세 조회 전에는 아직 상품 이미지 경로가 없으므로 빈 슬롯으로 둡니다.
+          image: null,
         }));
 
         // [수정] 상품 상세 조회를 기다리지 않고 저장목록부터 즉시 표시합니다.
@@ -213,7 +212,8 @@ function Help({ isLoggedIn, onLogout }) {
             ...detail,
             productId: product.productId,
             name: detail?.name ?? "상품 정보 없음",
-            image: PRODUCT_IMAGE_MAP[product.productId] ?? null,
+            // [수정] 상품 상세 응답의 thumbnailUrl을 실제 백엔드 이미지 주소로 변환합니다.
+            image: createApiAssetUrl(detail?.thumbnailUrl),
           };
         });
 

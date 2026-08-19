@@ -45,6 +45,34 @@
   padding: 0;
 }
 
+/* [추가] 알림 조회·빈 목록·오류 상태 안내 */
+.notification-page__state {
+  padding: 48px 24px;
+  color: #8d8d8d;
+  font-family: "Pretendard", sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* [추가] 오류 문구의 기본 여백을 제거합니다. */
+.notification-page__state-message {
+  margin: 0;
+}
+
+/* [추가] 알림 조회 실패 시 사용하는 재시도 버튼 */
+.notification-page__retry-button {
+  margin-top: 16px;
+  padding: 8px 16px;
+  border: 1px solid #fd903b;
+  border-radius: 20px;
+  background: transparent;
+  color: #fd903b;
+  font-family: "Pretendard", sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+}
+
 .notification-item {
   position: relative;
   display: flex;
