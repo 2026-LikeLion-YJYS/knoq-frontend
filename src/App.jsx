@@ -1,8 +1,20 @@
-// [추가] 화면 상태 관리를 위한 useState
-import { useState } from "react";
+// [수정] 화면 상태와 분석 API 진입 처리를 위한 React 기능
+import { useCallback, useEffect, useRef, useState } from "react";
 
-// [추가] react-router-dom을 이용한 페이지 전환
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+// [수정] react-router-dom을 이용한 페이지 전환 및 현재 경로 확인
+import {
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
+
+// [추가] 니즈 분석 조회·생성·재분석 API
+import { createNeedsAnalysis, getNeedsAnalysis } from "./api/analysisApi";
+
+// [추가] 고객 세션 ID 조회
+import { getSessionId } from "./utils/storage";
 
 import Help from "./pages/help/Help";
 
@@ -44,15 +56,15 @@ const ANALYSIS_STEP = {
 };
 
 /**
- * [추가] API 연결 전 니즈 분석 임시 데이터
+ * [수정] API 조회 전 분석 데이터의 빈 구조
+ * 임시 분석값 대신 응답을 안전하게 표시하기 위한 기본 필드만 유지합니다.
  */
-const INITIAL_ANALYSIS_DATA = {
-  productCategory: "토트백 / 쇼퍼백",
-  preferredColor: "Black · Cognac",
-  preferredMaterial: "Leather",
-  preferredSize: "Medium · Large",
-  comment:
-    "고객님은 컬러와 디자인보다 수납 가능한 사이즈를 더 일관되게 선택하고 있어요.",
+const EMPTY_ANALYSIS_DATA = {
+  productCategory: "",
+  preferredColor: "",
+  preferredMaterial: "",
+  preferredSize: "",
+  comment: "",
 };
 
 /**
@@ -66,21 +78,34 @@ const ANALYSIS_FIELD_MAP = {
 };
 
 /**
- * [추가] 최초 분석 상태 생성
- * 분석 원본과 수정 중인 데이터가 같은 객체를 공유하지 않도록 복사합니다.
+ * [수정] 실제 API 응답을 받기 전 최초 분석 상태를 생성합니다.
  */
 const createInitialAnalysisState = () => ({
-  savedCount: 2,
-
+  canAnalyze: false,
+  savedCount: 0,
   hasAnalysis: false,
-  analysisData: { ...INITIAL_ANALYSIS_DATA },
-  editedAnalysis: { ...INITIAL_ANALYSIS_DATA },
+  analysisData: { ...EMPTY_ANALYSIS_DATA },
+  editedAnalysis: { ...EMPTY_ANALYSIS_DATA },
   analysisStep: ANALYSIS_STEP.INITIAL,
   editModalType: null,
 });
 
+/**
+ * [추가] API 오류에서 화면에 표시할 메시지를 구성합니다.
+ */
+const getAnalysisErrorMessage = (error, fallbackMessage) => {
+  return (
+    error?.data?.message ??
+    error?.data?.error ??
+    (error?.status ? error.message : fallbackMessage)
+  );
+};
+
 function App() {
   const navigate = useNavigate();
+
+  // [추가] 분석 탭 진입 여부 확인에 사용하는 현재 경로
+  const location = useLocation();
 
   const [selectedRequestId, setSelectedRequestId] = useState(null);
 
@@ -89,6 +114,18 @@ function App() {
   const [analysisState, setAnalysisState] = useState(
     createInitialAnalysisState,
   );
+
+  // [추가] 분석 GET 요청 완료 여부
+  const [isAnalysisInitialized, setIsAnalysisInitialized] = useState(false);
+
+  // [추가] 분석 GET 요청 진행 여부
+  const [isAnalysisFetching, setIsAnalysisFetching] = useState(false);
+
+  // [추가] 분석 GET·POST 실패 안내 메시지
+  const [analysisError, setAnalysisError] = useState("");
+
+  // [추가] 분석 경로의 이전 진입 상태를 저장해 중복 GET 요청을 방지합니다.
+  const wasAnalysisRouteRef = useRef(false);
 
   const [savedItems, setSavedItems] = useState(
     Array.from({ length: 8 }, (_, i) => ({
@@ -128,27 +165,122 @@ function App() {
 
   const isEditModalOpen = Boolean(analysisState.editModalType);
 
-  const handleStartAnalysis = () => {
-    if (analysisState.savedCount < 2) {
+  // [추가] 현재 경로가 분석 화면인지 확인합니다.
+  const isAnalysisRoute = location.pathname.startsWith("/analysis");
+
+  /**
+   * [추가] 분석 탭 진입 시 실제 분석 가능 여부와 기존 결과를 조회합니다.
+   */
+  const loadNeedsAnalysis = useCallback(async () => {
+    const sessionId = getSessionId();
+
+    setIsAnalysisFetching(true);
+    setAnalysisError("");
+
+    if (!sessionId) {
+      setIsAnalysisInitialized(false);
+      setIsAnalysisFetching(false);
+      setAnalysisError("세션 정보를 확인할 수 없습니다. 다시 시도해주세요.");
       return;
     }
 
+    try {
+      const response = await getNeedsAnalysis(sessionId);
+      const hasAnalysis = Boolean(response.analysis);
+      const nextAnalysisData = hasAnalysis
+        ? { ...EMPTY_ANALYSIS_DATA, ...response.analysis }
+        : { ...EMPTY_ANALYSIS_DATA };
+
+      setAnalysisState((previousState) => ({
+        ...previousState,
+        canAnalyze: Boolean(response.canAnalyze),
+        savedCount: response.savedCount ?? 0,
+        hasAnalysis,
+        analysisData: nextAnalysisData,
+        editedAnalysis: { ...nextAnalysisData },
+        analysisStep: hasAnalysis
+          ? ANALYSIS_STEP.RESULT
+          : ANALYSIS_STEP.INITIAL,
+        editModalType: null,
+      }));
+      setIsAnalysisInitialized(true);
+    } catch (error) {
+      setIsAnalysisInitialized(false);
+      setAnalysisError(
+        getAnalysisErrorMessage(
+          error,
+          "니즈 분석 정보를 불러오지 못했습니다. 다시 시도해주세요.",
+        ),
+      );
+    } finally {
+      setIsAnalysisFetching(false);
+    }
+  }, []);
+
+  // [추가] 분석 경로에 새로 진입했을 때만 GET 요청을 실행합니다.
+  useEffect(() => {
+    if (isAnalysisRoute && !wasAnalysisRouteRef.current) {
+      loadNeedsAnalysis();
+    }
+
+    wasAnalysisRouteRef.current = isAnalysisRoute;
+  }, [isAnalysisRoute, loadNeedsAnalysis]);
+
+  /**
+   * [추가] 최초 분석과 업데이트에서 공통 POST 요청을 실행합니다.
+   */
+  const requestNeedsAnalysis = async (loadingStep, failureStep) => {
+    const sessionId = getSessionId();
+
+    if (!sessionId) {
+      setAnalysisError("세션 정보를 확인할 수 없습니다. 다시 시도해주세요.");
+      return;
+    }
+
+    setAnalysisError("");
     setAnalysisState((previousState) => ({
       ...previousState,
-      analysisStep: ANALYSIS_STEP.LOADING,
+      analysisStep: loadingStep,
     }));
+
+    try {
+      const response = await createNeedsAnalysis(sessionId);
+      const nextAnalysisData = {
+        ...EMPTY_ANALYSIS_DATA,
+        ...response,
+      };
+
+      setAnalysisState((previousState) => ({
+        ...previousState,
+        hasAnalysis: true,
+        analysisData: nextAnalysisData,
+        editedAnalysis: { ...nextAnalysisData },
+        analysisStep: ANALYSIS_STEP.REVIEW,
+        editModalType: null,
+      }));
+    } catch (error) {
+      setAnalysisState((previousState) => ({
+        ...previousState,
+        analysisStep: failureStep,
+      }));
+      setAnalysisError(
+        getAnalysisErrorMessage(
+          error,
+          "니즈 분석에 실패했습니다. 다시 시도해주세요.",
+        ),
+      );
+    }
   };
 
-  const handleInitialLoadingComplete = () => {
-    const newAnalysisData = { ...INITIAL_ANALYSIS_DATA };
+  /**
+   * [수정] 최초 니즈 분석 POST 요청을 시작합니다.
+   */
+  const handleStartAnalysis = async () => {
+    if (!analysisState.canAnalyze) {
+      return;
+    }
 
-    setAnalysisState((previousState) => ({
-      ...previousState,
-      hasAnalysis: true,
-      analysisData: newAnalysisData,
-      editedAnalysis: { ...newAnalysisData },
-      analysisStep: ANALYSIS_STEP.REVIEW,
-    }));
+    await requestNeedsAnalysis(ANALYSIS_STEP.LOADING, ANALYSIS_STEP.INITIAL);
   };
 
   const handleApproveAnalysis = () => {
@@ -201,6 +333,9 @@ function App() {
     });
   };
 
+  /**
+   * [수정] PUT 연동 전까지 수정 결과를 화면 상태에만 반영합니다.
+   */
   const handleCompleteAnalysisEdit = () => {
     setAnalysisState((previousState) => ({
       ...previousState,
@@ -218,46 +353,27 @@ function App() {
     }));
   };
 
-  const handleUpdateAnalysis = () => {
-    if (!analysisState.hasAnalysis || analysisState.savedCount < 2) {
+  /**
+   * [수정] 기존 결과 업데이트 시 동일한 니즈 분석 POST 요청을 실행합니다.
+   */
+  const handleUpdateAnalysis = async () => {
+    if (!analysisState.hasAnalysis || !analysisState.canAnalyze) {
       return;
     }
 
-    setAnalysisState((previousState) => ({
-      ...previousState,
-      analysisStep: ANALYSIS_STEP.UPDATE_LOADING,
-    }));
-  };
-
-  const handleUpdateLoadingComplete = () => {
-    const reanalyzedData = { ...INITIAL_ANALYSIS_DATA };
-
-    setAnalysisState((previousState) => ({
-      ...previousState,
-      hasAnalysis: true,
-      analysisData: reanalyzedData,
-      editedAnalysis: { ...reanalyzedData },
-      analysisStep: ANALYSIS_STEP.REVIEW,
-    }));
+    await requestNeedsAnalysis(
+      ANALYSIS_STEP.UPDATE_LOADING,
+      ANALYSIS_STEP.RESULT,
+    );
   };
 
   const renderAnalysisScreen = () => {
     if (analysisState.analysisStep === ANALYSIS_STEP.LOADING) {
-      return (
-        <AnalysisLoading
-          mode="initial"
-          onComplete={handleInitialLoadingComplete}
-        />
-      );
+      return <AnalysisLoading mode="initial" />;
     }
 
     if (analysisState.analysisStep === ANALYSIS_STEP.UPDATE_LOADING) {
-      return (
-        <AnalysisLoading
-          mode="update"
-          onComplete={handleUpdateLoadingComplete}
-        />
-      );
+      return <AnalysisLoading mode="update" />;
     }
 
     if (analysisState.analysisStep === ANALYSIS_STEP.EDIT_COMPLETE) {
@@ -267,12 +383,17 @@ function App() {
     return (
       <Analysis
         analysisStep={analysisState.analysisStep}
+        canAnalyze={analysisState.canAnalyze}
         savedCount={analysisState.savedCount}
         hasAnalysis={analysisState.hasAnalysis}
         analysisData={analysisState.analysisData}
         editedAnalysis={analysisState.editedAnalysis}
         editModalType={analysisState.editModalType}
         isEditModalOpen={isEditModalOpen}
+        isAnalysisFetching={isAnalysisFetching}
+        isAnalysisInitialized={isAnalysisInitialized}
+        analysisError={analysisError}
+        onRetryAnalysisLoad={loadNeedsAnalysis}
         onStartAnalysis={handleStartAnalysis}
         onApproveAnalysis={handleApproveAnalysis}
         onStartEditAnalysis={handleStartEditAnalysis}
@@ -367,7 +488,9 @@ function App() {
         path="/explore/scan/recognizing"
         element={
           <ScanRecognizing
-            onComplete={() => navigate("/explore/scan/confirm", { replace: true })}
+            onComplete={() =>
+              navigate("/explore/scan/confirm", { replace: true })
+            }
           />
         }
       />

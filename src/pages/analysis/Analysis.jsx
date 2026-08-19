@@ -10,16 +10,21 @@ import "./Analysis.css";
 
 /**
  * [수정] 니즈 분석 화면
- * App.jsx에서 관리하는 상태를 전달받아 현재 단계의 UI를 표시합니다.
+ * App.jsx에서 관리하는 API 상태와 분석 단계를 전달받아 표시합니다.
  */
 function Analysis({
   analysisStep,
+  canAnalyze,
   savedCount,
   hasAnalysis,
   analysisData,
   editedAnalysis,
   editModalType,
   isEditModalOpen,
+  isAnalysisFetching,
+  isAnalysisInitialized,
+  analysisError,
+  onRetryAnalysisLoad,
   onStartAnalysis,
   onApproveAnalysis,
   onStartEditAnalysis,
@@ -43,13 +48,14 @@ function Analysis({
   // [추가] 분석8 수정 버튼 표시 여부
   const showEditControls = analysisStep === "edit";
 
-  // [추가] 저장 제품이 2개 이상이면 최초 분석 가능
-  const canAnalyze = savedCount >= 2;
+  // [수정] 기존 분석 결과가 있고 API에서 분석 가능할 때 업데이트 가능
+  const canUpdateAnalysis = hasAnalysis && canAnalyze;
 
-  // [추가] 기존 분석 결과가 있고 저장 제품이 2개 이상이면 업데이트 가능
-  const canUpdateAnalysis = hasAnalysis && savedCount >= 2;
+  // [추가] 최초 GET 요청에 실패해 조회를 다시 시도해야 하는 상태
+  const hasInitialLoadError =
+    showAnalysisEntry && !isAnalysisInitialized && Boolean(analysisError);
 
-  // [추가] 분석8에서는 수정 중인 결과를 표시하고 나머지는 확정 결과 표시
+  // [수정] 분석8에서는 수정 중인 결과를 표시하고 나머지는 확정 결과 표시
   const displayedAnalysis = showEditControls ? editedAnalysis : analysisData;
 
   // [추가] 현재 화면에 표시할 니즈 분석 카드
@@ -94,6 +100,7 @@ function Analysis({
       className="analysis-page"
       data-analysis-step={analysisStep}
       data-editing-field={editModalType ?? ""}
+      data-saved-count={savedCount}
     >
       {/* [수정] 분석 화면 공통 헤더 - 로그인 상태 전달 */}
       <MainHeader
@@ -199,7 +206,7 @@ function Analysis({
             </div>
           </section>
 
-          {/* [수정] 저장 제품 개수에 따라 활성화되는 업데이트 버튼 */}
+          {/* [수정] API 분석 가능 여부에 따라 활성화되는 업데이트 버튼 */}
           <button
             className="analysis-update-button"
             type="button"
@@ -209,8 +216,15 @@ function Analysis({
             니즈 분석 업데이트
           </button>
 
+          {/* [추가] 재분석 POST 실패 안내 */}
+          {analysisError && !showAnalysisEntry && (
+            <p className="analysis-update-message" role="alert">
+              {analysisError}
+            </p>
+          )}
+
           {/* [수정] 분석7 업데이트 불가 안내 */}
-          {hasAnalysis && !canUpdateAnalysis && (
+          {!analysisError && hasAnalysis && !canUpdateAnalysis && (
             <p className="analysis-update-message">
               제품을 2개 이상 스캔해야 니즈분석이 가능해요.
             </p>
@@ -226,16 +240,26 @@ function Analysis({
             <button
               className="analysis-start-button"
               type="button"
-              disabled={!canAnalyze}
-              onClick={onStartAnalysis}
+              disabled={
+                isAnalysisFetching || (!hasInitialLoadError && !canAnalyze)
+              }
+              onClick={
+                hasInitialLoadError ? onRetryAnalysisLoad : onStartAnalysis
+              }
             >
-              니즈 분석하기
+              {hasInitialLoadError ? "다시 시도하기" : "니즈 분석하기"}
             </button>
 
-            <p className="analysis-entry-message">
-              {canAnalyze
-                ? "나의 니즈를 찾아서 탐색을 이어가보세요"
-                : "제품을 2개 이상 스캔해야 니즈분석이 가능해요."}
+            <p
+              className="analysis-entry-message"
+              role={analysisError ? "alert" : undefined}
+            >
+              {isAnalysisFetching
+                ? "니즈 분석 정보를 불러오는 중이에요."
+                : analysisError ||
+                  (canAnalyze
+                    ? "나의 니즈를 찾아서 탐색을 이어가보세요"
+                    : "제품을 2개 이상 스캔해야 니즈분석이 가능해요.")}
             </p>
           </section>
         )}
