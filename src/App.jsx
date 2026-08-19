@@ -29,6 +29,9 @@ import OnboardingSetup from "./pages/onboarding/OnboardingSetup";
 import OnboardingComplete from "./pages/onboarding/OnboardingComplete";
 
 import ExploreHome from "./pages/explore/ExploreHome";
+// [추가] 로그인 재방문 시 탐색 아카이브 / 과거 방문 스냅샷
+import ExploreArchive from "./pages/explore/ExploreArchive";
+import ExplorePastVisit from "./pages/explore/ExplorePastVisit";
 import ScanCapture from "./pages/explore/ScanCapture";
 import ScanRecognizing from "./pages/explore/ScanRecognizing";
 import ScanConfirm from "./pages/explore/ScanConfirm";
@@ -45,6 +48,10 @@ import AnalysisLoading from "./pages/analysis/AnalysisLoading";
 import AnalysisEditComplete from "./pages/analysis/AnalysisEditComplete";
 
 import NotificationPage from "./pages/notification/NotificationPage";
+
+// [추가] 탐색 아카이브 카드 썸네일 이미지
+import reShoesImage from "./assets/images/re-shoes.svg";
+import reBagImage from "./assets/images/re-bag.svg";
 
 /**
  * [추가] 분석 화면 진행 단계
@@ -105,6 +112,16 @@ const getAnalysisErrorMessage = (error, fallbackMessage) => {
     (error?.status ? error.message : fallbackMessage)
   );
 };
+
+/**
+ * [추가] 탐색 아카이브 더미 데이터 (API 연동 전)
+ * isNew: true인 항목만 "지금 이 로그인 세션의 실시간 탐색 화면"으로 연결됩니다.
+ * TODO: 방문 기록 API 나오면 이 더미 대신 실제 데이터로 교체
+ */
+const VISIT_ARCHIVE = [
+  { id: "visit-2", label: "두번째 MCM", date: "2025.08.16", isNew: true, image: reShoesImage },
+  { id: "visit-1", label: "첫 MCM", date: "2025.08.16", isNew: false, image: reBagImage },
+];
 
 function App() {
   const navigate = useNavigate();
@@ -182,6 +199,14 @@ function App() {
   // [추가] 종료 모달에서 로그아웃 시 호출
   const handleLogout = () => {
     setIsLoggedIn(false);
+  };
+
+  // [추가] 쇼핑 셋업에서 입력한 최신 닉네임 (탐색 아카이브 등 개인화 표시용)
+  const [userName, setUserName] = useState("");
+
+  // [추가] 쇼핑 셋업 완료 시 닉네임 저장
+  const handleSetUserName = (name) => {
+    setUserName(name);
   };
 
   const isEditModalOpen = Boolean(analysisState.editModalType);
@@ -515,6 +540,7 @@ function App() {
         }
       />
 
+      {/* [수정] 쇼핑 셋업 완료 시 닉네임을 App.jsx에 저장 */}
       <Route
         path="/onboarding/setup"
         element={
@@ -522,6 +548,7 @@ function App() {
             onBack={() => navigate(-1)}
             onSubmit={(data) => {
               console.log("닉네임/라이프스타일:", data);
+              handleSetUserName(data.nickname);
               navigate("/onboarding/complete");
             }}
           />
@@ -538,13 +565,56 @@ function App() {
         }
       />
 
-      {/* [수정] 탐색 기본 화면 - 로그인 상태 전달 */}
+      {/* [수정] 탐색 기본 화면 - 로그인 상태면 탐색 아카이브, 아니면 기존 화면 */}
       <Route
         path="/explore"
+        element={
+          isLoggedIn ? (
+            <ExploreArchive
+              userName={userName}
+              visits={VISIT_ARCHIVE}
+              isLoggedIn={isLoggedIn}
+              onLogout={handleLogout}
+              onScan={() => navigate("/explore/scan")}
+              onSelectVisit={(visit) => {
+                if (visit.isNew) {
+                  navigate("/explore/home");
+                } else {
+                  navigate(`/explore/visit/${visit.id}`);
+                }
+              }}
+            />
+          ) : (
+            <ExploreHome
+              savedItems={savedItems}
+              onDeleteSavedItem={handleDeleteSavedItem}
+              isLoggedIn={isLoggedIn}
+              onLogout={handleLogout}
+            />
+          )
+        }
+      />
+
+      {/* [수정] 탐색 아카이브에서 "New" 방문 클릭 시 이동하는 실시간 탐색 화면
+          - 사용자 확인: 개인화 없이 기존 탐색 화면 그대로(X 버튼, 기본 제목) */}
+      <Route
+        path="/explore/home"
         element={
           <ExploreHome
             savedItems={savedItems}
             onDeleteSavedItem={handleDeleteSavedItem}
+            isLoggedIn={isLoggedIn}
+            onLogout={handleLogout}
+          />
+        }
+      />
+
+      {/* [추가] 탐색 아카이브에서 과거 방문 클릭 시 이동하는 읽기 전용 스냅샷 */}
+      <Route
+        path="/explore/visit/:visitId"
+        element={
+          <ExplorePastVisit
+            userName={userName}
             isLoggedIn={isLoggedIn}
             onLogout={handleLogout}
           />

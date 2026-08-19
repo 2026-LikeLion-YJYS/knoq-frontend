@@ -1,3 +1,4 @@
+/* [추가] 오버레이 */
 .product-detail-overlay {
   position: fixed;
   inset: 0;
@@ -10,7 +11,7 @@
   z-index: 9999;
 }
 
-/* 모달 카드 */
+/* [추가] 모달 카드 */
 .product-detail-modal {
   position: relative;
 
@@ -31,6 +32,7 @@
   display: none;
 }
 
+/* [수정] close-circle 아이콘을 그대로 보여주는 닫기 버튼 */
 .product-detail-modal__close {
   position: absolute;
   top: 16px;
@@ -54,7 +56,7 @@
   height: 100%;
 }
 
-/* 상품 대표 이미지 */
+/* [추가] 상품 대표 이미지 */
 .product-detail-modal__image-wrap {
   display: flex;
   align-items: center;
@@ -70,7 +72,7 @@
   object-fit: contain;
 }
 
-/* 카테고리 뱃지 + 상품명 */
+/* [추가] 카테고리 뱃지 + 상품명 */
 .product-detail-modal__heading {
   display: flex;
   flex-direction: column;
@@ -105,7 +107,7 @@
   color: #111111;
 }
 
-/* 섹션 공통 타이틀 */
+/* [추가] 섹션 공통 타이틀 */
 .product-detail-modal__section-title {
   margin: 0 0 8px;
   font-family: "Pretendard", sans-serif;
@@ -115,7 +117,7 @@
   color: #525252;
 }
 
-/* 제품 정보 섹션 */
+/* [추가] 제품 정보 섹션 */
 .product-detail-modal__info-section {
   margin-top: 24px;
 }
@@ -169,14 +171,14 @@
   color: #8d8d8d;
 }
 
-/* 특징 섹션 */
+/* [추가] 특징 섹션 */
 .product-detail-modal__feature-section {
   margin-top: 24px;
 }
 
 .product-detail-modal__feature-grid {
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 9px;
 }
 
@@ -192,11 +194,15 @@
   overflow: hidden;
 }
 
+/* [수정] 카드 높이가 이제 서로 같아지므로(align-items: stretch), 이미지는
+   남는 세로 공간을 flex로 채우되 비율은 유지(contain)합니다. */
 .product-detail-modal__feature-image {
   display: block;
+  flex: 1;
+  min-height: 0;
   margin: 6px -8px -12px;
   width: calc(100% + 16px);
-  height: auto;
+  object-fit: contain;
 }
 
 /* [추가] Figma 실측 값: 스타일 75px / 구성 89px / 활용 130px */
@@ -247,9 +253,10 @@
   word-break: keep-all;
 }
 
+/* [수정] 텍스트 체크 표시 대신 orange-check 아이콘 사용 */
 .product-detail-modal__check-icon {
   width: 8px;
-  height: 5px;
+  height: 8px;
   margin-top: 3px;
   flex-shrink: 0;
 }
