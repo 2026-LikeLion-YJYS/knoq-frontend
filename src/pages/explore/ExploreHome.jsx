@@ -15,7 +15,10 @@ import ProductDetailModal from "./ProductDetailModal";
 
 const HERO_IMAGES = [frontBag, sideBag, topBag];
 
-function ExploreHome({ savedItems, onDeleteSavedItem }) {
+// [수정] 저장목록은 이제 App.jsx에서 관리해서 props로 받습니다.
+// (제품 스캔 화면에서 등록한 제품이 여기 반영되려면, 화면이 바뀌어도
+// 상태가 유지되는 상위 컴포넌트(App.jsx)에서 관리해야 해요)
+function ExploreHome({ savedItems, onDeleteSavedItem, isLoggedIn, onLogout }) {
   const [angleIndex, setAngleIndex] = useState(0);
   const [selectedId, setSelectedId] = useState(4); // [임시] 기본 선택값
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -51,6 +54,8 @@ function ExploreHome({ savedItems, onDeleteSavedItem }) {
         <div className="explore-home__header-wrap">
         <MainHeader
             onNotificationClick={() => alert("알림")}
+            isLoggedIn={isLoggedIn}
+            onLogout={onLogout}
         />
     </div>
 
@@ -124,7 +129,7 @@ function ExploreHome({ savedItems, onDeleteSavedItem }) {
                 onClick={() => handleSelect(item.id)}
                 aria-label="상품 선택"
               >
-                {/* 스캔으로 등록된 제품은 썸네일 표시 */}
+                {/* [추가] 스캔으로 등록된 제품은 썸네일 표시 */}
                 {item.image && (
                   <img
                     src={item.image}
@@ -149,7 +154,7 @@ function ExploreHome({ savedItems, onDeleteSavedItem }) {
         </div>
       </section>
 
-      {/* onScan prop 대신 스캔 화면으로 직접 이동 */}
+      {/* [수정] onScan prop 대신 스캔 화면으로 직접 이동 */}
       <button
         type="button"
         className="explore-home__scan-fab"

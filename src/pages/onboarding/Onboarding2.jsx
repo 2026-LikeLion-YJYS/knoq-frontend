@@ -9,7 +9,7 @@ import kakaoDarkIcon from "../../assets/icons/kakao-dark.svg";
 
 const REQUIRED_KEYS = ["termsOfService", "privacyPolicy", "over14"];
 
-function Onboarding2({ onBack, onSubmit }) {
+function Onboarding2({ onBack, onSubmit, onLoginSuccess }) {
   const [consents, setConsents] = useState({
     termsOfService: false,
     privacyPolicy: false,
@@ -22,7 +22,12 @@ function Onboarding2({ onBack, onSubmit }) {
   const toggleConsent = (key) => {
     setConsents((prev) => ({ ...prev, [key]: !prev[key] }));
   };
-  
+
+  /**
+   * [수정] "카카오로 시작하기" 클릭 시 카카오 로그인 팝업을 먼저 띄우고,
+   * 로그인 성공하면 기존처럼 동의값을 넘기며 다음 단계로 이동합니다.
+   * 지금은 백엔드 연동 전이라 로그인 성공 여부와 무관하게 흐름은 이어집니다.
+   */
   const handleSubmit = () => {
     if (!isAllRequiredChecked) return;
 
@@ -37,6 +42,7 @@ function Onboarding2({ onBack, onSubmit }) {
         // TODO: 백엔드 API 붙으면 authObj.access_token을 서버로 전달해서
         // 서버에서 카카오 사용자 정보 확인 + 우리 서비스 로그인 세션 발급받기
         console.log("카카오 로그인 성공:", authObj);
+        onLoginSuccess?.();
         onSubmit?.(consents);
       },
       fail: (error) => {

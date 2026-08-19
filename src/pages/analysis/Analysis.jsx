@@ -28,6 +28,8 @@ function Analysis({
   onSaveEditValue,
   onCompleteEdit,
   onUpdateAnalysis,
+  isLoggedIn,
+  onLogout,
 }) {
   // [추가] 다른 화면으로 이동
   const navigate = useNavigate();
@@ -93,10 +95,12 @@ function Analysis({
       data-analysis-step={analysisStep}
       data-editing-field={editModalType ?? ""}
     >
-      {/* [추가] 분석 화면 공통 헤더 */}
+      {/* [수정] 분석 화면 공통 헤더 - 로그인 상태 전달 */}
       <MainHeader
         onLogoClick={() => navigate("/explore")}
         onNotificationClick={() => navigate("/notification")}
+        isLoggedIn={isLoggedIn}
+        onLogout={onLogout}
       />
 
       {/* [추가] 분석 화면 콘텐츠 */}
