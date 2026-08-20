@@ -35,10 +35,7 @@ import {
 } from "./api/sessionApi";
 
 // [수정] 추천 제품 상세와 라이프스타일 제품 적합 분석 조회
-import {
-  getProductDetail,
-  getProductFitAnalysis,
-} from "./api/productsApi";
+import { getProductDetail, getProductFitAnalysis } from "./api/productsApi";
 
 // [윤서][추가] 제품 스캔(FR-200) 인식/확인 API
 import { recognizeProduct, confirmRecognition } from "./api/scanApi";
@@ -894,6 +891,15 @@ function App() {
       // [추가] 백엔드는 카카오 연결 실패도 200 + PRIVATE로 반환할 수 있습니다.
       if (loginResponse?.storageScope === "ACCOUNT") {
         handleLoginSuccess();
+
+        // [수정] 이미 온보딩을 마친 재방문 계정이면 닉네임/라이프스타일 설정을
+        // 다시 거치지 않고 바로 탐색 화면(아카이브)으로 보냅니다.
+        if (loginResponse?.onboardingCompleted) {
+          setUserName(loginResponse.nickname ?? "");
+          setLifestyleTags(loginResponse.lifestyleTags ?? []);
+          navigate("/explore");
+          return;
+        }
       } else {
         setIsLoggedIn(false);
       }
