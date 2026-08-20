@@ -46,6 +46,8 @@ const buildModalProduct = (detail) => {
             detail.features.compositionImageUrl,
           ),
           usage: detail.features.usage ?? [],
+          // [추가] 과거 방문 제품의 활용 이미지 상대 경로를 전체 URL로 변환합니다.
+          usageImageUrl: createApiAssetUrl(detail.features.usageImageUrl),
         }
       : null,
   };

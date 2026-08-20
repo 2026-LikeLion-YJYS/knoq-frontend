@@ -401,6 +401,10 @@ function App() {
                     detail.features.compositionImageUrl,
                   ),
                   usage: detail.features.usage ?? [],
+                  // [추가] 제품 상세의 활용 이미지 상대 경로를 전체 URL로 변환합니다.
+                  usageImageUrl: createApiAssetUrl(
+                    detail.features.usageImageUrl,
+                  ),
                 }
               : null,
             // [수정] 적합 분석 실패 시 제품 상세의 AI 설명을 안전한 대체 문구로 사용합니다.
@@ -1112,6 +1116,10 @@ function App() {
                     detail.features.compositionImageUrl,
                   ),
                   usage: detail.features.usage ?? [],
+                  // [추가] 온보딩 추천 제품의 활용 이미지도 탐색 상세에 전달합니다.
+                  usageImageUrl: createApiAssetUrl(
+                    detail.features.usageImageUrl,
+                  ),
                 }
               : null,
             // [추가] 최초 탐색 진입 전에도 추천 근거가 즉시 표시되도록 저장합니다.

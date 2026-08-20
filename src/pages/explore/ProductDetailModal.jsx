@@ -16,6 +16,8 @@ function ProductDetailModal({ isOpen, onClose, product }) {
     composition: product.features?.composition ?? [],
     compositionImageUrl: product.features?.compositionImageUrl ?? null,
     usage: product.features?.usage ?? [],
+    // [추가] 활용 카드 하단에 표시할 제품 이미지 URL입니다.
+    usageImageUrl: product.features?.usageImageUrl ?? null,
   };
 
   return createPortal(
@@ -158,6 +160,14 @@ function ProductDetailModal({ isOpen, onClose, product }) {
                   </li>
                 ))}
               </ul>
+              {/* [추가] 백엔드가 제공한 활용 이미지를 카드 하단에 표시합니다. */}
+              {features.usageImageUrl && (
+                <img
+                  src={features.usageImageUrl}
+                  alt=""
+                  className="product-detail-modal__feature-image"
+                />
+              )}
             </div>
           </div>
         </section>
