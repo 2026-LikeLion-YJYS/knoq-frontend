@@ -7,17 +7,14 @@ function Onboarding1({
   storeName,
   onSelectPrivate,
   onSelectAccount,
-  // [윤서][추가] API 연동 - 로딩/에러 상태
+  // [추가] FR-000 세션 생성 완료 여부와 API 로딩/에러 상태
+  isSessionReady = false,
   isSubmitting = false,
   errorMessage = "",
 }) {
   return (
     <div className="onboarding-start">
-      <img
-        className="onboarding-start__bg"
-        src={heroImage}
-        alt=""
-      />
+      <img className="onboarding-start__bg" src={heroImage} alt="" />
 
       <div className="onboarding-start__content">
         <h1 className="onboarding-start__title">
@@ -26,8 +23,8 @@ function Onboarding1({
         <p className="onboarding-start__subtitle">
           현재 접속하신 매장은
           <br />
-          {/* [윤서][수정] FR-000 매장 진입 응답의 storeName을 표시. 아직 안 받아왔으면 로딩 문구 */}
-          MCM 하우스 [ {storeName || "확인 중..."} ]점 입니다.
+          {/* [수정] FR-000 응답의 매장명을 중복 문구 없이 그대로 표시 */}
+          {storeName || "매장 확인 중..."}입니다.
         </p>
       </div>
 
@@ -41,13 +38,14 @@ function Onboarding1({
           type="button"
           className="onboarding-start__btn onboarding-start__btn--white"
           onClick={onSelectPrivate}
-          disabled={isSubmitting}
+          disabled={!isSessionReady || isSubmitting}
         >
           <span className="onboarding-start__btn-label">
             저장 없이 프라이빗하게 둘러보기
           </span>
           <span className="onboarding-start__btn-caption">
-            필수 서비스 이용약관 및 만 14세 이상 이용에 동의한 것으로 간주됩니다.
+            필수 서비스 이용약관 및 만 14세 이상 이용에 동의한 것으로
+            간주됩니다.
           </span>
         </button>
 
@@ -55,7 +53,7 @@ function Onboarding1({
           type="button"
           className="onboarding-start__btn onboarding-start__btn--primary"
           onClick={onSelectAccount}
-          disabled={isSubmitting}
+          disabled={!isSessionReady || isSubmitting}
         >
           <span className="onboarding-start__btn-label">
             내 정보 기억하고 이어서 탐색하기
