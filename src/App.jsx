@@ -304,6 +304,10 @@ function App() {
    * 주의: /products/{productId} CORS가 아직 안 풀린 상태라, 상세 조회 하나가 실패해도
    * 저장목록 자체(개수, 선택/삭제 기능)는 깨지지 않도록 제품별로 따로 catch 합니다.
    * CORS가 풀리면 별도 코드 수정 없이 이미지/이름이 자동으로 채워집니다.
+   *
+   * [윤서][추가] material/price/size/color/images도 여기서 이미 조회한 detail에서 같이 저장해둡니다.
+   * ExploreHome에서 카드 선택 시 같은 API를 또 호출하지 않고 이 값을 그대로 재사용하기 위함입니다
+   * (중복 API 호출 방지 - CORS로 예민한 상황이라 특히 중요).
    */
   const loadSavedProducts = useCallback(async () => {
     if (isSavedItemsFetchingRef.current) return;
@@ -328,6 +332,12 @@ function App() {
             name: "",
             isRecommended: product.source === "RECOMMEND",
             fitAnalysis: [],
+            // [윤서][추가] 상세 조회 실패 시에도 필드 형태가 일정하도록 기본값을 둡니다.
+            material: "",
+            price: undefined,
+            size: [],
+            color: [],
+            images: [],
           };
 
           // [추가] 제품 상세와 세션별 적합 분석을 병렬 조회해 고정 문구를 제거합니다.
@@ -361,6 +371,13 @@ function App() {
             ...base,
             image: createApiAssetUrl(detail?.thumbnailUrl),
             name: detail?.name ?? "",
+            // [윤서][추가] 탐색 화면 히어로 카드 각도 전환과 상세 모달에서
+            // 재조회 없이 바로 쓸 수 있도록 이미 가져온 상세 정보를 그대로 저장해둡니다.
+            material: detail?.material ?? "",
+            price: detail?.price,
+            size: detail?.size ?? [],
+            color: detail?.color ?? [],
+            images: detail?.images ?? [],
             // [수정] 적합 분석 실패 시 제품 상세의 AI 설명을 안전한 대체 문구로 사용합니다.
             fitAnalysis:
               fitAnalysis.length > 0
@@ -985,12 +1002,19 @@ function App() {
         // [윤서][수정] FR-103 추천 생성 시 서버가 자동 저장하므로(source: RECOMMEND),
         // 여기서도 화면에 바로 반영되도록 같은 데이터로 savedItems를 채워둡니다.
         // (다음에 /explore 진입 시 loadSavedProducts가 실제 저장목록으로 다시 덮어씁니다)
+        // [윤서][추가] material/price/size/color/images도 함께 저장해서 탐색 화면에서
+        // 재조회 없이 바로 히어로 카드/상세 모달에 쓸 수 있게 합니다.
         setSavedItems(
           validDetails.map((detail) => ({
             id: detail.productId,
             image: createApiAssetUrl(detail.thumbnailUrl),
             name: detail.name,
             isRecommended: true,
+            material: detail.material ?? "",
+            price: detail.price,
+            size: detail.size ?? [],
+            color: detail.color ?? [],
+            images: detail.images ?? [],
             // [추가] 최초 탐색 진입 전에도 추천 근거가 즉시 표시되도록 저장합니다.
             fitAnalysis: detail.recommendationReason
               ? [detail.recommendationReason]
