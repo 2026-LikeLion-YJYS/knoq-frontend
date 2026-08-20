@@ -138,3 +138,14 @@ export const getVisitArchive = (sessionId) => {
     `/sessions/${encodeURIComponent(sessionId)}/archive`,
   );
 };
+
+/**
+ * [윤서][추가] FR-203 적합 분석 조회
+ * 선택한 제품이 고객의 라이프스타일 태그와 왜 잘 맞는지에 대한 근거 문구를 가져옵니다.
+ * 탐색 화면에서 저장목록 카드를 선택했을 때 호출합니다.
+ */
+export const getFitAnalysis = (sessionId, productId) => {
+  return customerApiRequest(
+    `/sessions/${encodeURIComponent(sessionId)}/fit-analysis?productId=${encodeURIComponent(productId)}`,
+  );
+};
