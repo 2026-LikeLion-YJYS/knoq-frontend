@@ -368,7 +368,7 @@
   min-width: 60px;
 }
 
-/* [수정] 카테고리, 소재, 사이즈, 컬러 */
+/* [수정] 카테고리, 소재, 사이즈, 컬러 - text-align: center 추가 (텍스트 자체가 박스 안에서 왼쪽 정렬되어 값이 짧을수록 왼쪽으로 쏠려 보이던 문제) */
 .help-needs-list span {
   display: block;
   margin-bottom: 6px;
@@ -378,10 +378,11 @@
   font-weight: 400;
   line-height: 150%;
   letter-spacing: -0.2px;
+  text-align: center;
   white-space: nowrap;
 }
 
-/* [수정] 니즈 분석값 - 피그마 기준 모든 항목 너비 60px로 통일 (기존 46/83/80px 불균등이 겹침 원인) */
+/* [수정] 니즈 분석값 - text-align: center 추가 (핵심 수정: 이 속성이 없어서 값 텍스트가 박스 안에서 왼쪽 정렬되어 있었음) */
 .help-needs-list p {
   /* [수정] 모든 니즈 값은 지정 영역 안에서 최대 3줄까지만 표시합니다. */
   display: -webkit-box;
@@ -397,6 +398,7 @@
   font-weight: 400;
   line-height: 12px;
   letter-spacing: -0.22px;
+  text-align: center;
   white-space: normal;
   word-break: keep-all;
   overflow-wrap: anywhere;
