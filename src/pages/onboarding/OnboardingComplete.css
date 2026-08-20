@@ -1,9 +1,15 @@
 /* 온보딩 - 쇼핑 셋업 완료 */
 .onboarding-complete {
   position: relative;
+
+  /* [수정] 버튼을 화면 맨 아래에 배치할 수 있도록 세로 레이아웃을 적용합니다. */
+  display: flex;
+  flex-direction: column;
+
   min-height: 100dvh;
   height: 100dvh;
   overflow-y: auto;
+
   background:
     radial-gradient(
       ellipse 480px 480px at 100% 0%,
@@ -15,6 +21,7 @@
       rgba(36, 34, 30, 0.5) 100%
     ),
     #24221e;
+
   max-width: 393px;
   margin: 0 auto;
 }
@@ -22,20 +29,27 @@
 .onboarding-complete__header {
   position: relative;
   height: 46px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   /* [수정] 제거된 모바일 상태바의 빈 공간을 제외합니다. */
   margin-top: var(--app-header-top-offset, 18px);
+
+  /* [추가] 세로 레이아웃에서 헤더 크기가 줄어들지 않게 합니다. */
+  flex-shrink: 0;
 }
 
 .onboarding-complete__back {
   position: absolute;
   left: 24px;
-  background: none;
-  border: none;
-  cursor: pointer;
+
   padding: 0;
+  border: none;
+  background: none;
+
+  cursor: pointer;
 }
 
 .onboarding-complete__title {
@@ -49,11 +63,16 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* [윤서][수정] 253px → 300px: 문장이 중간에서 잘려 3줄로 안 깨지도록 넓힘 */
+
+  /* [윤서][수정] 문장이 중간에서 잘리지 않도록 넓이를 유지합니다. */
   width: 300px;
   margin: 131px auto 0;
-  /* [윤서][수정] 체크 아이콘 ~ 텍스트 간격 줄임 (36px → 20px) */
+
+  /* [윤서][수정] 체크 아이콘과 텍스트 사이 간격을 유지합니다. */
   gap: 20px;
+
+  /* [추가] 콘텐츠 크기가 줄어들지 않게 합니다. */
+  flex-shrink: 0;
 }
 
 .onboarding-complete__check {
@@ -65,8 +84,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* [윤서][수정] 제목 ~ 설명 간격 줄임 (24px → 12px) */
+
+  /* [윤서][수정] 제목과 설명 사이 간격을 유지합니다. */
   gap: 12px;
+
   text-align: center;
 }
 
@@ -79,7 +100,6 @@
 }
 
 .onboarding-complete__subtext {
-  /* [윤서][수정] 16px → 14px + white-space: nowrap: 문장 하나가 한 줄에 딱 맞게 */
   font-size: 14px;
   color: #8d8d8d;
   line-height: 1.5;
@@ -91,45 +111,59 @@
   display: flex;
   justify-content: center;
   gap: 14px;
+
   margin-top: 85px;
+
+  /* [추가] 하단 버튼에 의해 제품 카드가 줄어들지 않게 합니다. */
+  flex-shrink: 0;
 }
 
 .onboarding-complete__product-card {
   width: 106px;
   height: 116px;
-  background: rgba(104, 104, 104, 0.5);
-  border-radius: 16px;
-  overflow: hidden;
-  /* [추가] 추천 제품 이미지를 카드 중앙에 배치합니다. */
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  overflow: hidden;
+
+  background: rgba(104, 104, 104, 0.5);
+  border-radius: 16px;
 }
 
 .onboarding-complete__product-card img {
-  /* [수정] 큰 원본 이미지도 카드 안에서 여백을 유지하도록 표시 영역을 제한합니다. */
+  /* [수정] 큰 원본 이미지도 카드 안에서 여백과 비율을 유지합니다. */
   width: 76%;
   height: 70%;
   object-fit: contain;
 }
 
 .onboarding-complete__cta {
-  position: fixed;
-  left: 50%;
-  bottom: 50px;
-  transform: translateX(-50%);
+  /* [수정] fixed를 제거해 제품 카드를 가리지 않고 화면 맨 아래에 배치합니다. */
+  position: relative;
+
   width: 301px;
   height: 50px;
+
+  /* [수정] 남은 공간을 위쪽 여백으로 사용해 버튼을 화면 하단으로 내립니다. */
+  margin: auto auto max(24px, env(safe-area-inset-bottom));
+
+  flex-shrink: 0;
+
   border: none;
   border-radius: 50px;
+
   background: radial-gradient(
     ellipse 150% 150% at 50% 100%,
     #f59e0b 0%,
     #fc7810 100%
   );
+
   color: #fff;
   font-size: 16px;
   font-weight: 500;
   letter-spacing: -0.32px;
+
   cursor: pointer;
 }

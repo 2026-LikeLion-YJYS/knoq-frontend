@@ -1,4 +1,5 @@
 /* 온보딩 1단계 - 매장진입/저장범위선택 */
+
 .onboarding-start {
   position: relative;
   height: 100dvh;
@@ -13,10 +14,15 @@
   position: absolute;
   left: 0;
   top: 111px;
-  bottom: 0;
+
   width: 100%;
-  object-fit: cover;
-  object-position: center 80%;
+  height: calc(100% - 111px);
+
+  /* [수정] 이미지가 잘리지 않도록 원본 비율을 유지합니다. */
+  object-fit: contain;
+  object-position: center bottom;
+
+  display: block;
 }
 
 /* 상단 텍스트 */
@@ -51,9 +57,11 @@
   right: 0;
   bottom: 50px;
   z-index: 1;
+
   display: flex;
   flex-direction: column;
   gap: 8px;
+
   padding: 0 24px;
 }
 
@@ -62,9 +70,11 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
   border: none;
   border-radius: 50px;
   padding: 13px 24px;
+
   cursor: pointer;
 }
 
