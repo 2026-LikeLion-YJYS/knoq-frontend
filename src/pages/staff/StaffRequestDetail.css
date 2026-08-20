@@ -277,11 +277,15 @@
 
 /* 니즈 분석 카드 */
 .staff-request-detail__analysis-card {
-  width: 100%;
+  /* [수정] 피그마 기준 라이프스타일 및 니즈 전체 카드 크기 */
+  width: 491px;
+  max-width: 100%;
+  height: 260px;
 
-  margin-top: clamp(12px, 1.7vh, 20px);
+  margin: clamp(12px, 1.7vh, 20px) auto 0;
 
-  padding: clamp(12px, 1.5vh, 18px) 20px clamp(12px, 1.4vh, 16px);
+  padding: 12px 18px;
+  overflow: hidden;
   border-radius: 22.771px;
   background: radial-gradient(
     59.76% 166% at 51.59% 129%,
@@ -372,15 +376,18 @@
 
 /* 니즈 값 목록 */
 .staff-request-detail__needs-grid {
-  width: 100%;
+  /* [수정] 피그마 기준 니즈 상세 박스 크기 */
+  width: 454px;
+  max-width: 100%;
 
-  min-height: clamp(62px, 6.9vh, 78px);
-  padding: clamp(8px, 1vh, 13px) 12px;
+  height: 134px;
+  padding: 8px 12px;
 
   display: grid;
 
   /* 카테고리 / 소재 / 사이즈 / 컬러 */
-  grid-template-columns: 1.15fr 0.85fr 1.25fr 1.15fr;
+  grid-template-columns: repeat(4, 96px);
+  justify-content: space-between;
 
   align-items: center;
   border-radius: 14.232px;
@@ -416,18 +423,26 @@
 
 /* 니즈 분석값 */
 .staff-request-detail__needs-value {
-  display: block;
+  /* [수정] 상세 값은 96×73px 안에서 최대 3줄까지만 표시합니다. */
+  display: -webkit-box;
 
+  width: 96px;
   max-width: 100%;
+  height: 73px;
+  overflow: hidden;
 
   color: #ffffff;
 
-  font-size: clamp(11px, 1.8vw, 14px);
+  font-size: 15px;
   font-weight: 400;
-  line-height: 1.25;
+  line-height: 24px;
   letter-spacing: -0.32px;
 
-  white-space: nowrap;
+  white-space: normal;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 
 /* 공유된 니즈 분석이 없을 때 */

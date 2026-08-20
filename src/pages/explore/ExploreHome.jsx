@@ -68,7 +68,7 @@ function ExploreHome({
   onDeleteSavedItem,
   isLoggedIn,
   onLogout,
-  title = "나에게 맞는 제품 분석",
+  title = "나에게 딱 맞는 제품, 찾아볼까요?",
   showDelete = true,
 }) {
   const [angleIndex, setAngleIndex] = useState(0);

@@ -269,8 +269,10 @@
 
 /* [수정] 라이프스타일과 니즈를 묶는 상자 */
 .help-info-card {
-  width: 100%;
-  height: 142px;
+  /* [수정] 피그마 기준 공유 정보 전체 카드 크기 */
+  width: 345px;
+  max-width: 100%;
+  height: 169px;
   padding: 10px 13px;
 
   background: radial-gradient(
@@ -340,11 +342,14 @@
 /* [수정] 나의 니즈를 묶는 상자 */
 .help-needs-list {
   display: grid;
-  grid-template-columns: 1.15fr 0.9fr 1.3fr 1.2fr;
-  gap: 12px;
+  /* [수정] 항목별 텍스트 영역의 지정 너비를 유지합니다. */
+  grid-template-columns: 60px 46px 83px 80px;
+  justify-content: space-between;
+  gap: 0;
 
-  width: 100%;
-  height: 58px;
+  width: 319px;
+  max-width: 100%;
+  height: 81px;
   margin-top: 4px;
   padding: 7px 8px;
 
@@ -377,17 +382,44 @@
 
 /* [수정] 니즈 분석값 */
 .help-needs-list p {
-  display: block;
+  /* [수정] 모든 니즈 값은 지정 영역 안에서 최대 3줄까지만 표시합니다. */
+  display: -webkit-box;
 
   max-width: 100%;
   margin: 0;
+  overflow: hidden;
 
   color: rgba(255, 255, 255, 0.9);
   font-size: 11px;
   font-weight: 400;
-  line-height: 150%;
+  line-height: 12px;
   letter-spacing: -0.22px;
-  white-space: nowrap;
+  white-space: normal;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+/* [수정] 도움 화면 니즈 항목별 텍스트 박스 크기 */
+.help-needs-list div:nth-child(1) p {
+  width: 60px;
+  height: 34px;
+}
+
+.help-needs-list div:nth-child(2) p {
+  width: 46px;
+  height: 36px;
+}
+
+.help-needs-list div:nth-child(3) p {
+  width: 83px;
+  height: 36px;
+}
+
+.help-needs-list div:nth-child(4) p {
+  width: 80px;
+  height: 36px;
 }
 
 /* =========================
