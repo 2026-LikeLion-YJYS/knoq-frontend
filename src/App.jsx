@@ -1096,7 +1096,24 @@ function App() {
             price: detail.price,
             size: detail.size ?? [],
             color: detail.color ?? [],
-            images: detail.images ?? [],
+            // [수정] 백엔드가 반환하는 상대 이미지 URL을 화면에서 사용할 전체 URL로 변환합니다.
+            images: (detail.images ?? [])
+              .map(createApiAssetUrl)
+              .filter(Boolean),
+            // [수정] 더미 대신 제품 상세 API의 특징 정보를 보관합니다.
+            features: detail.features
+              ? {
+                  style: detail.features.style ?? [],
+                  styleImageUrl: createApiAssetUrl(
+                    detail.features.styleImageUrl,
+                  ),
+                  composition: detail.features.composition ?? [],
+                  compositionImageUrl: createApiAssetUrl(
+                    detail.features.compositionImageUrl,
+                  ),
+                  usage: detail.features.usage ?? [],
+                }
+              : null,
             // [추가] 최초 탐색 진입 전에도 추천 근거가 즉시 표시되도록 저장합니다.
             fitAnalysis: detail.recommendationReason
               ? [detail.recommendationReason]
