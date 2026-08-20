@@ -267,9 +267,12 @@
 
 .explore-home__saved-card-image {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: absolute;
-  border-radius: 16px;
+  /* [수정] 큰 원본 이미지도 카드 안에서 여백을 유지하도록 표시 영역을 제한합니다. */
+  top: 50%;
+  left: 50%;
+  width: 76%;
+  height: 70%;
+  object-fit: contain;
+  border-radius: 12px;
+  transform: translate(-50%, -50%);
 }
