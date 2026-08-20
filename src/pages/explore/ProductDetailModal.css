@@ -211,6 +211,13 @@
   width: 75px;
 }
 
+/* [수정] 스타일 이미지는 원본 크기가 이미 박스에 맞게 준비되어 있어서
+   확대/축소(cover) 없이 위치만 조정합니다 (구성/활용과 다르게 별도 처리). */
+.product-detail-modal__feature-card--style .product-detail-modal__feature-image {
+  object-fit: none;
+  object-position: center bottom;
+}
+
 .product-detail-modal__feature-card--composition {
   width: 89px;
 }
