@@ -180,14 +180,25 @@
   overflow: hidden;
 }
 
-/* [수정] 특징 이미지를 별도 크기 조절 없이 원본 크기와 비율 그대로 표시 */
+/* [수정] 원본 크기를 유지하고 이미지 끝을 카드 좌우/하단 끝에 맞춤 */
 .product-detail-modal__feature-image {
   display: block;
+
+  /* [수정] 원본 크기 유지 */
   width: auto;
   height: auto;
   max-width: none;
   max-height: none;
+
+  /* [수정] 남는 공간만 위쪽에 두어 이미지를 카드 하단으로 이동 */
   margin-top: auto;
+
+  /* [수정] 카드의 좌우 padding 8px을 상쇄 */
+  margin-left: -8px;
+  margin-right: -8px;
+
+  /* [수정] 카드의 하단 padding 12px을 상쇄 */
+  margin-bottom: -12px;
 }
 
 .product-detail-modal__feature-card--style {
