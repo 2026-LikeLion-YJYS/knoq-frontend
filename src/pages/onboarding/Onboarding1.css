@@ -101,3 +101,10 @@
 .onboarding-start__btn--primary .onboarding-start__btn-caption {
   color: #ffffff;
 }
+
+.onboarding-start__error {
+  color: #ff6b6b;
+  font-size: 13px;
+  text-align: center;
+  margin: 12px 24px 0;
+}

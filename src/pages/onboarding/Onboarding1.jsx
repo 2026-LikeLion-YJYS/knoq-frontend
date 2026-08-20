@@ -3,7 +3,14 @@
 import "./Onboarding1.css";
 import heroImage from "../../assets/images/onboarding-hero.png";
 
-function Onboarding1({ storeName = "청담", onSelectPrivate, onSelectAccount }) {
+function Onboarding1({
+  storeName,
+  onSelectPrivate,
+  onSelectAccount,
+  // [윤서][추가] API 연동 - 로딩/에러 상태
+  isSubmitting = false,
+  errorMessage = "",
+}) {
   return (
     <div className="onboarding-start">
       <img
@@ -19,15 +26,22 @@ function Onboarding1({ storeName = "청담", onSelectPrivate, onSelectAccount })
         <p className="onboarding-start__subtitle">
           현재 접속하신 매장은
           <br />
-          MCM 하우스 [ {storeName} ]점 입니다.
+          {/* [윤서][수정] FR-000 매장 진입 응답의 storeName을 표시. 아직 안 받아왔으면 로딩 문구 */}
+          MCM 하우스 [ {storeName || "확인 중..."} ]점 입니다.
         </p>
       </div>
+
+      {/* [윤서][추가] 온보딩 API 실패 시 안내 문구 */}
+      {errorMessage && (
+        <p className="onboarding-start__error">{errorMessage}</p>
+      )}
 
       <div className="onboarding-start__actions">
         <button
           type="button"
           className="onboarding-start__btn onboarding-start__btn--white"
           onClick={onSelectPrivate}
+          disabled={isSubmitting}
         >
           <span className="onboarding-start__btn-label">
             저장 없이 프라이빗하게 둘러보기
@@ -41,6 +55,7 @@ function Onboarding1({ storeName = "청담", onSelectPrivate, onSelectAccount })
           type="button"
           className="onboarding-start__btn onboarding-start__btn--primary"
           onClick={onSelectAccount}
+          disabled={isSubmitting}
         >
           <span className="onboarding-start__btn-label">
             내 정보 기억하고 이어서 탐색하기
