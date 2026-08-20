@@ -13,6 +13,8 @@ function Onboarding2({
   onBack,
   // [윤서][수정] onSubmit/onLoginSuccess 대신 onKakaoSubmit 하나로 통합 (App.jsx가 API 호출 담당)
   onKakaoSubmit,
+  // [추가] 카카오 팝업 실패·취소 시 PRIVATE 경로로 계속 진행
+  onKakaoFailure,
   isSubmitting = false,
   errorMessage = "",
 }) {
@@ -22,6 +24,8 @@ function Onboarding2({
     over14: false,
     marketingOptIn: false,
   });
+  // [추가] 카카오 팝업이 열리는 동안 빠른 중복 클릭을 차단합니다.
+  const [isKakaoOpening, setIsKakaoOpening] = useState(false);
 
   const isAllRequiredChecked = REQUIRED_KEYS.every((key) => consents[key]);
 
@@ -34,24 +38,34 @@ function Onboarding2({
    * 성공하면 access token과 동의값을 App.jsx로 넘겨서 실제 API 호출(동의 저장 + 카카오 로그인)을 맡깁니다.
    */
   const handleSubmit = () => {
-    if (!isAllRequiredChecked || isSubmitting) return;
+    if (!isAllRequiredChecked || isSubmitting || isKakaoOpening) return;
 
     if (!window.Kakao || !window.Kakao.isInitialized()) {
-      console.warn("카카오 SDK가 초기화되지 않았어요. .env의 키를 확인해주세요.");
+      console.warn(
+        "카카오 SDK가 초기화되지 않았어요. .env의 키를 확인해주세요.",
+      );
+      // [수정] PRIVATE로 계속 진행할 때도 현재 약관 동의값을 서버에 저장할 수 있도록 전달합니다.
+      onKakaoFailure?.(consents);
       return;
     }
 
+    setIsKakaoOpening(true);
+
     window.Kakao.Auth.login({
       success: (authObj) => {
+        setIsKakaoOpening(false);
         onKakaoSubmit?.(consents, authObj.access_token);
       },
       fail: (error) => {
         console.error("카카오 로그인 실패:", error);
+        setIsKakaoOpening(false);
+        // [수정] 카카오 실패·취소 시에도 사용자가 체크한 약관 동의값을 전달합니다.
+        onKakaoFailure?.(consents);
       },
     });
   };
 
-   return (
+  return (
     <div className="onboarding-consent">
       <header className="onboarding-consent__header">
         <button
@@ -68,8 +82,8 @@ function Onboarding2({
       <section className="onboarding-consent__section">
         <h2 className="onboarding-consent__section-title">필수 동의</h2>
         <p className="onboarding-consent__section-desc">
-          ※ 수집된 상담 맥락(탐색 제품, 니즈 분석)은 다음 방문 시 맞춤형
-          서비스 복원을 위해서만 사용됩니다.
+          ※ 수집된 상담 맥락(탐색 제품, 니즈 분석)은 다음 방문 시 맞춤형 서비스
+          복원을 위해서만 사용됩니다.
         </p>
 
         {/* TODO: 두 번째 항목 라벨이 Figma상 "서비스 이용약관"과 중복됨.
@@ -92,7 +106,7 @@ function Onboarding2({
         />
       </section>
 
-     <section className="onboarding-consent__section onboarding-consent__section--select">
+      <section className="onboarding-consent__section onboarding-consent__section--select">
         <h2 className="onboarding-consent__section-title onboarding-consent__section-title--select">
           선택 동의
         </h2>
@@ -115,17 +129,17 @@ function Onboarding2({
           (isAllRequiredChecked ? " onboarding-consent__cta--active" : "")
         }
         onClick={handleSubmit}
-        disabled={isSubmitting}
+        disabled={!isAllRequiredChecked || isSubmitting || isKakaoOpening}
       >
         <img
           src={isAllRequiredChecked ? kakaoDarkIcon : kakaoIcon}
           alt=""
           className="onboarding-consent__cta-icon"
         />
-        {isSubmitting ? "처리 중..." : "카카오로 시작하기"}
+        {isSubmitting || isKakaoOpening ? "처리 중..." : "카카오로 시작하기"}
       </button>
     </div>
-   );
+  );
 }
 
 // 동의 항목 행 (재사용)

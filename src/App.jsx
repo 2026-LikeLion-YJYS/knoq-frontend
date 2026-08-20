@@ -48,6 +48,8 @@ import {
   getSessionToken,
   setSessionId,
   setSessionToken,
+  // [추가] 온보딩에서 선택·복원한 라이프스타일 태그를 공통 storage에 저장
+  setLifestyleTags,
   removeStaffToken,
 } from "./utils/storage";
 
@@ -150,7 +152,8 @@ const getAnalysisErrorMessage = (error, fallbackMessage) => {
  * 그 객체를 그대로 화면에 넣으면 "[object Object]"로 보이는 문제를 막기 위한 함수입니다.
  */
 const getOnboardingErrorMessage = (error, fallbackMessage) => {
-  const candidate = error?.data?.message ?? error?.data?.error ?? error?.message;
+  const candidate =
+    error?.data?.message ?? error?.data?.error ?? error?.message;
 
   return typeof candidate === "string" && candidate.trim().length > 0
     ? candidate
@@ -165,9 +168,27 @@ const getOnboardingErrorMessage = (error, fallbackMessage) => {
 const VISIT_ARCHIVE = [
   // TODO: Figma에 3번째 카드 라벨/날짜가 아직 확정 안 돼서(디자이너가 "첫 MCM" 그대로 복제해둠)
   // 일단 이미지만 먼저 넣어둡니다. 확정되면 label/date 교체 필요.
-  { id: "visit-3", label: "세번째 MCM", date: "2025.08.16", isNew: true, image: reShirtImage },
-  { id: "visit-2", label: "두번째 MCM", date: "2025.08.16", isNew: false, image: reShoesImage },
-  { id: "visit-1", label: "첫 MCM", date: "2025.08.16", isNew: false, image: reBagImage },
+  {
+    id: "visit-3",
+    label: "세번째 MCM",
+    date: "2025.08.16",
+    isNew: true,
+    image: reShirtImage,
+  },
+  {
+    id: "visit-2",
+    label: "두번째 MCM",
+    date: "2025.08.16",
+    isNew: false,
+    image: reShoesImage,
+  },
+  {
+    id: "visit-1",
+    label: "첫 MCM",
+    date: "2025.08.16",
+    isNew: false,
+    image: reBagImage,
+  },
 ];
 
 function App() {
@@ -302,7 +323,12 @@ function App() {
     setScanError("");
 
     try {
-      await confirmRecognition(sessionId, recognitionId, product.productId, true);
+      await confirmRecognition(
+        sessionId,
+        recognitionId,
+        product.productId,
+        true,
+      );
       // TODO: 저장목록을 실제 API(getSavedProducts)로 교체하면 이 줄은 지우고 재조회로 대체
       handleAddScannedProduct(product);
       navigate("/explore/scan/complete", { replace: true });
@@ -329,7 +355,12 @@ function App() {
 
     if (sessionId && recognitionId && product) {
       try {
-        await confirmRecognition(sessionId, recognitionId, product.productId, false);
+        await confirmRecognition(
+          sessionId,
+          recognitionId,
+          product.productId,
+          false,
+        );
       } catch (error) {
         // [윤서][추가] 재촬영 자체는 막지 않고 콘솔에만 남김
         console.error("재촬영 처리(confirmed:false) 실패:", error);
@@ -349,6 +380,21 @@ function App() {
 
   // [추가] 쇼핑 셋업에서 입력한 최신 닉네임 (탐색 아카이브 등 개인화 표시용)
   const [userName, setUserName] = useState("");
+
+  // [추가] FR-000 매장 진입 응답 또는 세션 조회 응답의 매장명
+  const [storeName, setStoreName] = useState("");
+
+  // [추가] 고객 세션 생성 전 온보딩 버튼이 실행되지 않도록 준비 상태 관리
+  const [isOnboardingSessionReady, setIsOnboardingSessionReady] = useState(() =>
+    Boolean(getSessionId() && getSessionToken()),
+  );
+
+  // [추가] 온보딩 API 호출 공통 진행 상태와 빠른 중복 요청 차단 ref
+  const [isOnboardingSubmitting, setIsOnboardingSubmitting] = useState(false);
+  const isOnboardingSubmittingRef = useRef(false);
+
+  // [추가] 온보딩 API 호출 실패 안내 메시지
+  const [onboardingError, setOnboardingError] = useState("");
 
   // [추가] 쇼핑 셋업 완료 시 닉네임 저장
   const handleSetUserName = (name) => {
@@ -384,13 +430,14 @@ function App() {
           return;
         }
 
+        // [추가] 세션 조회 최신 응답의 온보딩 공통 정보를 복원합니다.
+        setStoreName(response?.storeName ?? "");
+        setUserName(response?.nickname ?? "");
+        setLifestyleTags(response?.lifestyleTags ?? []);
+        setIsOnboardingSessionReady(true);
+
         if (response?.storageScope === "ACCOUNT") {
           setIsLoggedIn(true);
-          // [윤서][추가] 백엔드 응답에 nickname이 새로 추가됨.
-          // 새로고침 시 "OO님의 저장목록" 문구가 사라지지 않도록 여기서도 복원합니다.
-          if (response?.nickname) {
-            setUserName(response.nickname);
-          }
           return;
         }
 
@@ -429,42 +476,74 @@ function App() {
     setIsLoggedIn(false);
   };
 
-  // ===== [윤서] 여기부터 온보딩 API 연동을 위해 추가한 부분 =====
+  // ===== 온보딩 API 연동 =====
 
-  // [윤서][추가] FR-000 매장 진입에서 받아온 매장명 (Onboarding1 화면 표시용)
-  const [storeName, setStoreName] = useState("");
-
-  // [윤서][추가] 온보딩 API 호출(저장 범위/동의/카카오/닉네임 등) 공통 진행 상태
-  const [isOnboardingSubmitting, setIsOnboardingSubmitting] = useState(false);
-
-  // [윤서][추가] 온보딩 API 호출 실패 안내 메시지
-  const [onboardingError, setOnboardingError] = useState("");
+  // [추가] StrictMode에서도 FR-000 세션 생성 요청이 중복되지 않도록 Promise를 보관합니다.
+  const createSessionRequestRef = useRef(null);
 
   /**
-   * [윤서][추가] FR-000 매장 진입
-   * 이미 세션이 있으면(새로고침·재방문) 새로 만들지 않고, 없을 때만 QR 진입으로 간주해 세션을 생성합니다.
-   * TODO: 실제 QR 배포 전 쿼리 파라미터 이름(storeCode) 최종 확인 필요
+   * [추가] FR-000 매장 진입
+   * 온보딩 경로에서 기존 세션이 없을 때만 QR의 storeCode로 세션을 생성합니다.
    */
   useEffect(() => {
+    const isOnboardingRoute = location.pathname.startsWith("/onboarding");
+
+    // [추가] 직원 화면 등 온보딩 외 경로에서는 고객 세션을 만들지 않습니다.
+    if (!isOnboardingRoute) {
+      return undefined;
+    }
+
     if (getSessionId() && getSessionToken()) {
       return undefined;
     }
 
     let isActive = true;
     const params = new URLSearchParams(window.location.search);
-    const storeCode = params.get("storeCode") || "TEST-001";
+    const storeCode = params.get("storeCode")?.trim();
 
-    createSession(storeCode)
+    // [수정] 임시 TEST-001 대체값을 제거하고 QR에 매장 코드가 없으면 세션을 생성하지 않습니다.
+    if (!storeCode) {
+      // [추가] effect 본문에서 동기 setState를 피하고 현재 effect가 유효할 때만 안내합니다.
+      Promise.resolve().then(() => {
+        if (!isActive) return;
+
+        setIsOnboardingSessionReady(false);
+        setOnboardingError(
+          "매장 정보를 확인할 수 없습니다. 매장 QR을 다시 스캔해주세요.",
+        );
+      });
+
+      return () => {
+        isActive = false;
+      };
+    }
+
+    // [추가] 이전 매장 코드 오류는 API 요청 시작 시 비동기로 초기화합니다.
+    Promise.resolve().then(() => {
+      if (isActive) {
+        setOnboardingError("");
+      }
+    });
+
+    if (!createSessionRequestRef.current) {
+      createSessionRequestRef.current = createSession(storeCode);
+    }
+
+    const sessionRequest = createSessionRequestRef.current;
+
+    sessionRequest
       .then((response) => {
         if (!isActive) return;
 
         setSessionId(response.sessionId);
         setSessionToken(response.sessionToken);
         setStoreName(response.storeName ?? "");
+        setIsOnboardingSessionReady(true);
       })
       .catch((error) => {
         if (!isActive) return;
 
+        setIsOnboardingSessionReady(false);
         console.error("매장 진입(FR-000) 실패:", error);
         setOnboardingError(
           getOnboardingErrorMessage(
@@ -472,21 +551,29 @@ function App() {
             "매장 진입에 실패했습니다. 다시 시도해주세요.",
           ),
         );
+      })
+      .finally(() => {
+        if (createSessionRequestRef.current === sessionRequest) {
+          createSessionRequestRef.current = null;
+        }
       });
 
     return () => {
       isActive = false;
     };
-  }, []);
+  }, [location.pathname]);
 
   /**
    * [윤서][추가] "저장 없이 프라이빗하게 둘러보기" 클릭
    * FR-100(PRIVATE) → FR-002(필수 동의 자동 true) 순서로 호출합니다.
    */
   const handleSelectPrivate = async () => {
+    if (isOnboardingSubmittingRef.current) return;
+
     const sessionId = getSessionId();
     if (!sessionId) return;
 
+    isOnboardingSubmittingRef.current = true;
     setIsOnboardingSubmitting(true);
     setOnboardingError("");
 
@@ -508,6 +595,7 @@ function App() {
         ),
       );
     } finally {
+      isOnboardingSubmittingRef.current = false;
       setIsOnboardingSubmitting(false);
     }
   };
@@ -517,9 +605,12 @@ function App() {
    * FR-100(ACCOUNT) 호출 후 약관 동의 화면으로 이동합니다.
    */
   const handleSelectAccount = async () => {
+    if (isOnboardingSubmittingRef.current) return;
+
     const sessionId = getSessionId();
     if (!sessionId) return;
 
+    isOnboardingSubmittingRef.current = true;
     setIsOnboardingSubmitting(true);
     setOnboardingError("");
 
@@ -535,6 +626,7 @@ function App() {
         ),
       );
     } finally {
+      isOnboardingSubmittingRef.current = false;
       setIsOnboardingSubmitting(false);
     }
   };
@@ -544,16 +636,26 @@ function App() {
    * FR-002(동의값) → FR-100(카카오 로그인) 순서로 호출합니다.
    */
   const handleKakaoConsentSubmit = async (consents, kakaoAccessToken) => {
+    if (isOnboardingSubmittingRef.current) return;
+
     const sessionId = getSessionId();
     if (!sessionId) return;
 
+    isOnboardingSubmittingRef.current = true;
     setIsOnboardingSubmitting(true);
     setOnboardingError("");
 
     try {
       await updateConsents(sessionId, consents);
-      await loginWithKakao(sessionId, kakaoAccessToken);
-      handleLoginSuccess();
+      const loginResponse = await loginWithKakao(sessionId, kakaoAccessToken);
+
+      // [추가] 백엔드는 카카오 연결 실패도 200 + PRIVATE로 반환할 수 있습니다.
+      if (loginResponse?.storageScope === "ACCOUNT") {
+        handleLoginSuccess();
+      } else {
+        setIsLoggedIn(false);
+      }
+
       navigate("/onboarding/setup");
     } catch (error) {
       console.error("카카오 로그인/약관 동의 실패:", error);
@@ -564,6 +666,41 @@ function App() {
         ),
       );
     } finally {
+      isOnboardingSubmittingRef.current = false;
+      setIsOnboardingSubmitting(false);
+    }
+  };
+
+  /**
+   * [추가] 카카오 팝업 실패·취소 시 저장 범위를 PRIVATE로 되돌리고
+   * 로그인 없이 쇼핑 셋업을 계속합니다.
+   */
+  const handleKakaoLoginFailure = async (consents) => {
+    if (isOnboardingSubmittingRef.current) return;
+
+    const sessionId = getSessionId();
+    if (!sessionId) return;
+
+    isOnboardingSubmittingRef.current = true;
+    setIsOnboardingSubmitting(true);
+    setOnboardingError("");
+
+    try {
+      // [추가] 카카오 연결이 실패해도 사용자가 체크한 필수 약관 동의는 먼저 기록합니다.
+      await updateConsents(sessionId, consents);
+      await updateStorageScope(sessionId, "PRIVATE");
+      setIsLoggedIn(false);
+      navigate("/onboarding/setup");
+    } catch (error) {
+      console.error("카카오 로그인 실패 후 PRIVATE 전환 실패:", error);
+      setOnboardingError(
+        getOnboardingErrorMessage(
+          error,
+          "로그인 없이 계속하는 처리에 실패했습니다. 다시 시도해주세요.",
+        ),
+      );
+    } finally {
+      isOnboardingSubmittingRef.current = false;
       setIsOnboardingSubmitting(false);
     }
   };
@@ -577,9 +714,12 @@ function App() {
    * FR-103 응답에는 이미지가 없어서, 제품마다 FR-201(제품 상세)을 추가로 불러와 이미지를 채웁니다.
    */
   const handleOnboardingSetupSubmit = async (data) => {
+    if (isOnboardingSubmittingRef.current) return;
+
     const sessionId = getSessionId();
     if (!sessionId) return;
 
+    isOnboardingSubmittingRef.current = true;
     setIsOnboardingSubmitting(true);
     setOnboardingError("");
 
@@ -587,6 +727,8 @@ function App() {
       await updateNickname(sessionId, data.nickname);
       await updateLifestyleTags(sessionId, data.lifestyleTags);
       handleSetUserName(data.nickname);
+      // [추가] 도움 화면 등 다른 화면에서도 즉시 사용할 수 있도록 선택 태그를 저장합니다.
+      setLifestyleTags(data.lifestyleTags);
 
       // [윤서][추가] 추천 생성 실패는 온보딩 자체를 막지 않고, 완료 화면에 빈 카드로 넘어가게 처리
       try {
@@ -635,6 +777,7 @@ function App() {
         ),
       );
     } finally {
+      isOnboardingSubmittingRef.current = false;
       setIsOnboardingSubmitting(false);
     }
   };
@@ -944,7 +1087,11 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/onboarding" replace />} />
+      {/* [수정] 루트 QR로 진입해도 storeCode 쿼리 파라미터가 유지되도록 이동합니다. */}
+      <Route
+        path="/"
+        element={<Navigate to={`/onboarding${location.search}`} replace />}
+      />
 
       {/* [윤서][수정] 매장 진입(FR-000)에서 받아온 매장명 전달, 버튼은 API 호출 핸들러로 연결 */}
       <Route
@@ -954,6 +1101,7 @@ function App() {
             storeName={storeName}
             onSelectPrivate={handleSelectPrivate}
             onSelectAccount={handleSelectAccount}
+            isSessionReady={isOnboardingSessionReady}
             isSubmitting={isOnboardingSubmitting}
             errorMessage={onboardingError}
           />
@@ -967,6 +1115,7 @@ function App() {
           <Onboarding2
             onBack={() => navigate(-1)}
             onKakaoSubmit={handleKakaoConsentSubmit}
+            onKakaoFailure={handleKakaoLoginFailure}
             isSubmitting={isOnboardingSubmitting}
             errorMessage={onboardingError}
           />
