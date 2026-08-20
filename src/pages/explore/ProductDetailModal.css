@@ -181,23 +181,27 @@
   overflow: hidden;
 }
 
-/* [수정] 특징 이미지는 원본 크기를 유지하고 카드 하단에 배치 */
+/* [수정] 특징 이미지를 원본 비율 그대로 유지하면서 카드 너비에 맞춰 축소 */
 .product-detail-modal__feature-image {
   display: block;
 
-  /* [수정] 이미지 원본 크기 유지 */
-  width: auto;
+  /* [수정] 원본 비율 유지 */
+  width: 100%;
   height: auto;
-  max-width: none;
+
+  /* [수정] 카드 너비를 넘지 않도록 제한 */
+  max-width: 100%;
   max-height: none;
 
-  /* [수정] 남는 공간을 이미지 위쪽에 두어 카드 하단에 배치 */
+  /* [수정] 남는 공간을 위쪽에 두어 이미지가 카드 하단에 붙도록 설정 */
   margin-top: auto;
-
-  /* [수정] 카드 끝에 바로 붙도록 별도 여백 제거 */
   margin-left: 0;
   margin-right: 0;
   margin-bottom: 0;
+
+  /* [수정] 이미지 전체가 보이도록 비율 유지 */
+  object-fit: contain;
+  object-position: center bottom;
 }
 
 /* [추가] 특징 카드별 너비 */
