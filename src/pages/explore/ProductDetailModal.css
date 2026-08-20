@@ -194,13 +194,17 @@
   overflow: hidden;
 }
 
+/* [수정] object-fit: contain → cover로 변경, object-position으로 하단 기준 정렬
+   (기존엔 flex:1로 영역만 늘어나고 이미지 자체는 중앙에 작게 떠서 위아래 여백이 생겼음.
+   피그마는 이미지를 카드 하단에 꽉 채워 자르는 방식이라 cover + bottom 정렬로 맞춤) */
 .product-detail-modal__feature-image {
   display: block;
   flex: 1;
   min-height: 0;
   margin: 6px -8px -12px;
   width: calc(100% + 16px);
-  object-fit: contain;
+  object-fit: cover;
+  object-position: center bottom;
 }
 
 .product-detail-modal__feature-card--style {
