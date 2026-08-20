@@ -126,6 +126,7 @@
 
   /* [수정] 남은 공간을 제품 목록 위에 배치해 버튼 바로 위로 내립니다. */
   margin-top: auto;
+  transform: translateY(-32px);
 
   flex-shrink: 0;
 }
