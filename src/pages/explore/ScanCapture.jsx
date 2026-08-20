@@ -8,7 +8,13 @@ import grayCloseIcon from "../../assets/icons/gray-close.svg";
 import grayRefreshIcon from "../../assets/icons/gray-refresh.svg";
 import cameraIcon from "../../assets/icons/camera.svg";
 
-function ScanCapture({ onClose, onCapture, errorMessage = "" }) {
+function ScanCapture({
+  onClose,
+  onCapture,
+  onLookupProduct,
+  recognitionFailureCount = 0,
+  errorMessage = "",
+}) {
   const videoRef = useRef(null);
   // [윤서][추가] 캡처용 캔버스 (화면에는 안 보이고, 촬영 순간 사진을 그려서 파일로 뽑아내는 용도)
   const canvasRef = useRef(null);
@@ -18,6 +24,10 @@ function ScanCapture({ onClose, onCapture, errorMessage = "" }) {
   const [cameraError, setCameraError] = useState(null);
   // [윤서][추가] 촬영 버튼 중복 클릭 방지
   const [isCapturing, setIsCapturing] = useState(false);
+  // [추가] 카메라 사용이 어려울 때 직접 입력할 제품 코드와 조회 상태입니다.
+  const [productCode, setProductCode] = useState("");
+  const [isLookingUp, setIsLookingUp] = useState(false);
+  const [lookupError, setLookupError] = useState("");
 
   useEffect(() => {
     let stream;
@@ -83,6 +93,31 @@ function ScanCapture({ onClose, onCapture, errorMessage = "" }) {
     );
   };
 
+  /**
+   * [추가] 입력한 제품 코드로 제품을 조회합니다.
+   */
+  const handleLookupSubmit = async (event) => {
+    event.preventDefault();
+    const trimmedCode = productCode.trim();
+
+    if (!trimmedCode || isLookingUp) return;
+
+    setIsLookingUp(true);
+    setLookupError("");
+
+    try {
+      await onLookupProduct?.(trimmedCode);
+    } catch {
+      setLookupError("제품 번호를 다시 확인해주세요.");
+    } finally {
+      setIsLookingUp(false);
+    }
+  };
+
+  // [추가] 권한 거부 또는 세 번 이상 인식 실패 시 직접 입력 영역을 표시합니다.
+  const showProductLookup =
+    Boolean(cameraError) || recognitionFailureCount >= 3;
+
   return (
     <div className="scan-capture">
       <header className="scan-capture__header">
@@ -98,9 +133,7 @@ function ScanCapture({ onClose, onCapture, errorMessage = "" }) {
       </header>
 
       {/* [윤서][추가] 인식 API 실패 시 안내 문구 */}
-      {errorMessage && (
-        <p className="scan-capture__error">{errorMessage}</p>
-      )}
+      {errorMessage && <p className="scan-capture__error">{errorMessage}</p>}
 
       <div className="scan-capture__viewfinder">
         {!cameraError && (
@@ -114,7 +147,31 @@ function ScanCapture({ onClose, onCapture, errorMessage = "" }) {
         )}
 
         {cameraError && (
-          <p className="scan-capture__camera-error">{cameraError}</p>
+          <div className="scan-capture__camera-error">
+            <p>{cameraError}</p>
+          </div>
+        )}
+
+        {showProductLookup && (
+          <form className="scan-capture__lookup" onSubmit={handleLookupSubmit}>
+            <label htmlFor="scan-product-code">제품 번호로 찾기</label>
+            <div className="scan-capture__lookup-row">
+              <input
+                id="scan-product-code"
+                type="text"
+                value={productCode}
+                placeholder="제품 번호 입력"
+                onChange={(event) => setProductCode(event.target.value)}
+              />
+              <button
+                type="submit"
+                disabled={!productCode.trim() || isLookingUp}
+              >
+                {isLookingUp ? "조회 중" : "조회"}
+              </button>
+            </div>
+            {lookupError && <p role="alert">{lookupError}</p>}
+          </form>
         )}
 
         <div className="scan-capture__hint">

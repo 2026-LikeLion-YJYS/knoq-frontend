@@ -2,44 +2,21 @@
 
 import { createPortal } from "react-dom";
 import "./ProductDetailModal.css";
-import defaultBagImage from "../../assets/images/front-bag.png";
 import closeCircleIcon from "../../assets/icons/close-circle.svg";
 import orangeCheckIcon from "../../assets/icons/orange-check.svg";
-import bagStyleImage from "../../assets/images/bag-style.svg";
-import bagCompositionImage from "../../assets/images/bag-composition.svg";
 
-// 백엔드 연동 전 임시 더미 데이터 (Figma 값 그대로)
-// [윤서][수정] export 추가 - features(스타일/구성/활용) 3분류는 아직 백엔드 미확정이라,
-// ExploreHome에서 실데이터 조립 시 이 더미 features를 그대로 재사용하기 위해 내보냅니다.
-export const DEFAULT_PRODUCT = {
-  image: defaultBagImage,
-  category: "숄더백",
-  name: "Tracy 비세토스 호보",
-  material: "캔버스",
-  price: "₩1,490,000",
-  size: "Large",
-  sizeDetail: "(약 11 x 33 x 31)",
-  color: "Congnac",
-  features: {
-    style: {
-      image: bagStyleImage,
-      items: ["클래식", "럭셔리", "세련된"],
-    },
-    composition: {
-      image: bagCompositionImage,
-      items: ["내부 포켓", "가죽 패치 포켓"],
-    },
-    usage: [
-      "탈부착 가능한 가죽 스트랩",
-      "길이 조절 가능한 스트랩",
-      "토트백/숄더백 2way 활용",
-      "지퍼 클로저",
-    ],
-  },
-};
+function ProductDetailModal({ isOpen, onClose, product }) {
+  // [수정] 실제 제품 정보가 없으면 더미 모달을 표시하지 않습니다.
+  if (!isOpen || !product) return null;
 
-function ProductDetailModal({ isOpen, onClose, product = DEFAULT_PRODUCT }) {
-  if (!isOpen) return null;
+  // [추가] 누락된 특징 항목도 화면 오류 없이 표시하기 위한 빈 구조입니다.
+  const features = {
+    style: product.features?.style ?? [],
+    styleImageUrl: product.features?.styleImageUrl ?? null,
+    composition: product.features?.composition ?? [],
+    compositionImageUrl: product.features?.compositionImageUrl ?? null,
+    usage: product.features?.usage ?? [],
+  };
 
   return createPortal(
     <div className="product-detail-overlay" onClick={onClose}>
@@ -55,7 +32,11 @@ function ProductDetailModal({ isOpen, onClose, product = DEFAULT_PRODUCT }) {
           onClick={onClose}
           aria-label="닫기"
         >
-          <img src={closeCircleIcon} alt="" className="product-detail-modal__close-icon" />
+          <img
+            src={closeCircleIcon}
+            alt=""
+            className="product-detail-modal__close-icon"
+          />
         </button>
 
         {/* 상품 대표 이미지 */}
@@ -120,43 +101,59 @@ function ProductDetailModal({ isOpen, onClose, product = DEFAULT_PRODUCT }) {
             <div className="product-detail-modal__feature-card product-detail-modal__feature-card--style">
               <p className="product-detail-modal__feature-label">스타일</p>
               <ul className="product-detail-modal__feature-list">
-                {product.features.style.items.map((item) => (
+                {features.style.map((item) => (
                   <li key={item}>
-                    <img src={orangeCheckIcon} alt="" className="product-detail-modal__check-icon" />
+                    <img
+                      src={orangeCheckIcon}
+                      alt=""
+                      className="product-detail-modal__check-icon"
+                    />
                     <span>{item}</span>
                   </li>
                 ))}
               </ul>
-              <img
-                src={product.features.style.image}
-                alt=""
-                className="product-detail-modal__feature-image"
-              />
+              {features.styleImageUrl && (
+                <img
+                  src={features.styleImageUrl}
+                  alt=""
+                  className="product-detail-modal__feature-image"
+                />
+              )}
             </div>
 
             <div className="product-detail-modal__feature-card product-detail-modal__feature-card--composition">
               <p className="product-detail-modal__feature-label">구성</p>
               <ul className="product-detail-modal__feature-list">
-                {product.features.composition.items.map((item) => (
+                {features.composition.map((item) => (
                   <li key={item}>
-                    <img src={orangeCheckIcon} alt="" className="product-detail-modal__check-icon" />
+                    <img
+                      src={orangeCheckIcon}
+                      alt=""
+                      className="product-detail-modal__check-icon"
+                    />
                     <span>{item}</span>
                   </li>
                 ))}
               </ul>
-              <img
-                src={product.features.composition.image}
-                alt=""
-                className="product-detail-modal__feature-image"
-              />
+              {features.compositionImageUrl && (
+                <img
+                  src={features.compositionImageUrl}
+                  alt=""
+                  className="product-detail-modal__feature-image"
+                />
+              )}
             </div>
 
             <div className="product-detail-modal__feature-card product-detail-modal__feature-card--usage">
               <p className="product-detail-modal__feature-label">활용</p>
               <ul className="product-detail-modal__feature-list">
-                {product.features.usage.map((item) => (
+                {features.usage.map((item) => (
                   <li key={item}>
-                    <img src={orangeCheckIcon} alt="" className="product-detail-modal__check-icon" />
+                    <img
+                      src={orangeCheckIcon}
+                      alt=""
+                      className="product-detail-modal__check-icon"
+                    />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -166,7 +163,7 @@ function ProductDetailModal({ isOpen, onClose, product = DEFAULT_PRODUCT }) {
         </section>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 }
 

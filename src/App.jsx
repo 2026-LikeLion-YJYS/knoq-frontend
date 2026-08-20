@@ -38,10 +38,19 @@ import {
 import { getProductDetail, getProductFitAnalysis } from "./api/productsApi";
 
 // [윤서][추가] 제품 스캔(FR-200) 인식/확인 API
-import { recognizeProduct, confirmRecognition } from "./api/scanApi";
+import {
+  recognizeProduct,
+  confirmRecognition,
+  // [추가] 카메라 사용이 어려울 때 제품 코드로 직접 조회합니다.
+  lookupProductByCode,
+} from "./api/scanApi";
 
 // [윤서][추가] 탐색(FR-204) 저장목록 조회/삭제 API
-import { getSavedProducts, deleteSavedProduct } from "./api/savedProductsApi";
+import {
+  getSavedProducts,
+  addSavedProduct,
+  deleteSavedProduct,
+} from "./api/savedProductsApi";
 
 // [윤서][추가] 백엔드가 내려주는 상대 이미지 경로를 완전한 URL로 변환
 import { createApiAssetUrl } from "./api/apiClient";
@@ -335,6 +344,8 @@ function App() {
             size: [],
             color: [],
             images: [],
+            // [추가] 제품 상세 모달에서 실제 특징 정보를 표시합니다.
+            features: null,
           };
 
           // [추가] 제품 상세와 세션별 적합 분석을 병렬 조회해 고정 문구를 제거합니다.
@@ -374,7 +385,24 @@ function App() {
             price: detail?.price,
             size: detail?.size ?? [],
             color: detail?.color ?? [],
-            images: detail?.images ?? [],
+            // [수정] 백엔드가 반환하는 상대 이미지 URL을 화면에서 사용할 전체 URL로 변환합니다.
+            images: (detail?.images ?? [])
+              .map(createApiAssetUrl)
+              .filter(Boolean),
+            // [추가] 더미 대신 제품 상세 API의 특징 정보를 보관합니다.
+            features: detail?.features
+              ? {
+                  style: detail.features.style ?? [],
+                  styleImageUrl: createApiAssetUrl(
+                    detail.features.styleImageUrl,
+                  ),
+                  composition: detail.features.composition ?? [],
+                  compositionImageUrl: createApiAssetUrl(
+                    detail.features.compositionImageUrl,
+                  ),
+                  usage: detail.features.usage ?? [],
+                }
+              : null,
             // [수정] 적합 분석 실패 시 제품 상세의 AI 설명을 안전한 대체 문구로 사용합니다.
             fitAnalysis:
               fitAnalysis.length > 0
@@ -469,6 +497,9 @@ function App() {
   // [윤서][추가] 스캔 관련 API 실패 안내 메시지
   const [scanError, setScanError] = useState("");
 
+  // [추가] 인식 실패가 세 번 누적되면 제품 코드 직접 입력을 안내합니다.
+  const [scanFailureCount, setScanFailureCount] = useState(0);
+
   /**
    * [윤서][추가] 촬영 완료 시 호출됨 (ScanCapture의 onCapture)
    * FR-200 카메라 인식 요청 → 첫 번째 후보의 상세정보(이름/이미지) 조회 순서로 진행합니다.
@@ -497,6 +528,7 @@ function App() {
           "제품을 인식하지 못했어요. 다시 촬영해주세요.",
         ),
       );
+      setScanFailureCount((count) => count + 1);
       navigate("/explore/scan", { replace: true });
       return;
     }
@@ -505,6 +537,7 @@ function App() {
 
     if (!firstCandidate) {
       setScanError("인식된 제품이 없어요. 다시 촬영해주세요.");
+      setScanFailureCount((count) => count + 1);
       navigate("/explore/scan", { replace: true });
       return;
     }
@@ -521,6 +554,9 @@ function App() {
         },
       });
 
+      // [수정] 인식 성공 시 누적 실패 횟수를 초기화합니다.
+      setScanFailureCount(0);
+
       navigate("/explore/scan/confirm", { replace: true });
     } catch (error) {
       // [윤서][추가] 여기서 실패하는 경우 대부분 CORS(/products) 이슈입니다.
@@ -531,7 +567,42 @@ function App() {
           "제품 정보를 불러오지 못했어요. 잠시 후 다시 시도해주세요.",
         ),
       );
+      setScanFailureCount((count) => count + 1);
       navigate("/explore/scan", { replace: true });
+    }
+  };
+
+  /**
+   * [추가] 카메라 권한 거부 또는 반복 인식 실패 시 제품 코드를 직접 조회합니다.
+   * 직접 조회는 recognitionId가 없으므로 확인 완료 시 저장 API를 별도로 호출합니다.
+   */
+  const handleProductCodeLookup = async (productCode) => {
+    const sessionId = getSessionId();
+    if (!sessionId) return;
+
+    setScanError("");
+
+    try {
+      const lookupResult = await lookupProductByCode(sessionId, productCode);
+      const detail = await getProductDetail(lookupResult.productId);
+
+      setScanResult({
+        recognitionId: null,
+        product: {
+          productId: lookupResult.productId,
+          name: detail?.name ?? lookupResult.name ?? "",
+          image: createApiAssetUrl(detail?.thumbnailUrl),
+        },
+      });
+      setScanFailureCount(0);
+      navigate("/explore/scan/confirm", { replace: true });
+    } catch (error) {
+      const message = getOnboardingErrorMessage(
+        error,
+        "제품 번호를 확인하지 못했어요. 다시 입력해주세요.",
+      );
+      setScanError(message);
+      throw error;
     }
   };
 
@@ -543,18 +614,23 @@ function App() {
   const handleScanConfirm = async () => {
     const sessionId = getSessionId();
     const { recognitionId, product } = scanResult;
-    if (!sessionId || !recognitionId || !product) return;
+    if (!sessionId || !product) return;
 
     setIsScanSubmitting(true);
     setScanError("");
 
     try {
-      await confirmRecognition(
-        sessionId,
-        recognitionId,
-        product.productId,
-        true,
-      );
+      // [수정] 카메라 인식 결과는 confirm으로, 직접 조회 결과는 저장 API로 등록합니다.
+      if (recognitionId) {
+        await confirmRecognition(
+          sessionId,
+          recognitionId,
+          product.productId,
+          true,
+        );
+      } else {
+        await addSavedProduct(sessionId, product.productId);
+      }
       // [윤서][수정] 저장목록 실제 API로 재조회
       await loadSavedProducts();
       navigate("/explore/scan/complete", { replace: true });
@@ -1470,6 +1546,7 @@ function App() {
           element={
             <ExplorePastVisit
               userName={userName}
+              visits={visitArchive}
               isLoggedIn={isLoggedIn}
               onLogout={handleLogout}
             />
@@ -1484,6 +1561,8 @@ function App() {
             <ScanCapture
               onClose={() => navigate("/explore")}
               onCapture={handleScanCapture}
+              onLookupProduct={handleProductCodeLookup}
+              recognitionFailureCount={scanFailureCount}
               errorMessage={scanError}
             />
           }
@@ -1512,7 +1591,8 @@ function App() {
             <ScanComplete
               onBack={() => navigate("/explore")}
               onScanAgain={() => navigate("/explore/scan")}
-              onViewAnalysis={() => navigate("/explore")}
+              // [수정] 분석정보 보기 버튼을 분석 화면으로 연결합니다.
+              onViewAnalysis={() => navigate("/analysis")}
             />
           }
         />

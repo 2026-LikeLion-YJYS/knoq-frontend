@@ -1,13 +1,11 @@
 // 탐색 - 과거 방문 기록 스냅샷 (읽기 전용)
-// 탐색 아카이브에서 지난 방문 카드를 클릭했을 때 보여주는 화면입니다.
-// API 연동 전이라 방문별 실제 데이터 대신 더미 데이터를 표시합니다.
+// 탐색 아카이브에서 지난 방문 카드를 클릭했을 때 실제 저장 제품을 보여줍니다.
 
-import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { createApiAssetUrl } from "../../api/apiClient";
+import { getProductDetail } from "../../api/productsApi";
 import "./ExplorePastVisit.css";
-import frontBag from "../../assets/images/front-bag.png";
-import sideBag from "../../assets/images/side-bag.png";
-import topBag from "../../assets/images/top-bag.png";
 import cameraIcon from "../../assets/icons/camera.svg";
 import leftArrowIcon from "../../assets/icons/left-arrow.svg";
 import rightArrowIcon from "../../assets/icons/right-arrow.svg";
@@ -15,32 +13,137 @@ import MainHeader from "../../components/MainHeader/MainHeader";
 import BottomNav from "../../components/BottomNav/BottomNav";
 import ProductDetailModal from "./ProductDetailModal";
 
-const HERO_IMAGES = [frontBag, sideBag, topBag];
-
-// TODO: 방문별 실제 데이터 API 연동 시 visitId로 조회하도록 교체
-// [수정] 아직 제품별 실데이터 연동 전이라, 저장 제품 선택은 하이라이트(주황 테두리)만
-// 담당하고 위 카드의 이미지/이름은 바꾸지 않습니다.
-const PAST_VISIT_DUMMY = {
-  productName: "L Tracy 비세토스 호보",
-  insight: [
-    "평소 선호하는 미니멀 스타일과 잘 어울립니다.",
-    "노트북 수납이 가능한 사이즈입니다.",
-    "출퇴근용으로 적합합니다",
-  ],
-  savedItems: Array.from({ length: 3 }, (_, i) => ({ id: i, isRecommended: true })),
+/**
+ * [추가] 가격을 제품 상세 모달 표시 형식으로 변환합니다.
+ */
+const formatPrice = (price) => {
+  if (typeof price !== "number") return "정보 없음";
+  return `₩${price.toLocaleString("ko-KR")}`;
 };
 
-function ExplorePastVisit({ userName, isLoggedIn, onLogout }) {
-  const { visitId } = useParams();
-  const navigate = useNavigate();
-  const [angleIndex, setAngleIndex] = useState(0);
-  const [selectedId, setSelectedId] = useState(PAST_VISIT_DUMMY.savedItems[0].id);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
+/**
+ * [추가] 제품 상세 API 응답을 상세 모달 데이터로 변환합니다.
+ */
+const buildModalProduct = (detail) => {
+  if (!detail) return undefined;
 
-  const goPrev = () =>
-    setAngleIndex((prev) => (prev - 1 + HERO_IMAGES.length) % HERO_IMAGES.length);
-  const goNext = () =>
-    setAngleIndex((prev) => (prev + 1) % HERO_IMAGES.length);
+  return {
+    image: createApiAssetUrl(detail.thumbnailUrl),
+    // [유지] 현재 제품 상세 API에 카테고리가 없어 공통 분류로 표시합니다.
+    category: "가방",
+    name: detail.name ?? "정보 없음",
+    material: detail.material ?? "정보 없음",
+    price: formatPrice(detail.price),
+    size: detail.size?.[0] ?? "정보 없음",
+    sizeDetail: detail.size?.[1] ? `(${detail.size[1]})` : "",
+    color: detail.color?.join(" · ") || "정보 없음",
+    features: detail.features
+      ? {
+          style: detail.features.style ?? [],
+          styleImageUrl: createApiAssetUrl(detail.features.styleImageUrl),
+          composition: detail.features.composition ?? [],
+          compositionImageUrl: createApiAssetUrl(
+            detail.features.compositionImageUrl,
+          ),
+          usage: detail.features.usage ?? [],
+        }
+      : null,
+  };
+};
+
+function ExplorePastVisit({ userName, visits = [], isLoggedIn, onLogout }) {
+  const { visitId } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // [수정] 화면 이동 state를 우선 사용하고 새로고침 시 아카이브 목록에서 다시 찾습니다.
+  const visitFromState = location.state?.visit;
+  const visit =
+    visitFromState?.id === visitId
+      ? visitFromState
+      : visits.find((item) => item.id === visitId);
+  const products = visit?.products ?? [];
+
+  const [selectedId, setSelectedId] = useState(null);
+  const [selectedDetail, setSelectedDetail] = useState(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [angleIndex, setAngleIndex] = useState(0);
+  const [detailError, setDetailError] = useState("");
+
+  // [추가] 선택 제품이 없거나 목록에서 사라지면 첫 번째 제품을 사용합니다.
+  const effectiveSelectedId = products.some(
+    (product) => product.productId === selectedId,
+  )
+    ? selectedId
+    : (products[0]?.productId ?? null);
+  const selectedProduct = products.find(
+    (product) => product.productId === effectiveSelectedId,
+  );
+
+  /**
+   * [추가] 선택한 과거 저장 제품의 상세 정보와 각도별 이미지를 조회합니다.
+   */
+  useEffect(() => {
+    if (!effectiveSelectedId) {
+      return;
+    }
+
+    let isCancelled = false;
+
+    getProductDetail(effectiveSelectedId)
+      .then((detail) => {
+        if (!isCancelled) {
+          setSelectedDetail(detail);
+          setDetailError("");
+        }
+      })
+      .catch((error) => {
+        console.error("과거 저장 제품 상세 조회 실패:", error);
+        if (!isCancelled) {
+          setSelectedDetail(null);
+          setDetailError("제품 상세 정보를 불러오지 못했어요.");
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [effectiveSelectedId]);
+
+  // [수정] Base64 변환 없이 백엔드가 반환한 URL을 전체 URL로 변환합니다.
+  const detailImages = (selectedDetail?.images ?? [])
+    .map(createApiAssetUrl)
+    .filter(Boolean);
+  const fallbackImage = createApiAssetUrl(
+    selectedDetail?.thumbnailUrl ?? selectedProduct?.thumbnailUrl,
+  );
+  const heroImages =
+    detailImages.length > 0
+      ? detailImages
+      : fallbackImage
+        ? [fallbackImage]
+        : [];
+
+  const goPrev = () => {
+    if (heroImages.length < 2) return;
+    setAngleIndex(
+      (previousIndex) =>
+        (previousIndex - 1 + heroImages.length) % heroImages.length,
+    );
+  };
+
+  const goNext = () => {
+    if (heroImages.length < 2) return;
+    setAngleIndex((previousIndex) => (previousIndex + 1) % heroImages.length);
+  };
+
+  const handleSelectProduct = (productId) => {
+    setSelectedId(productId);
+    setSelectedDetail(null);
+    setDetailError("");
+    setAngleIndex(0);
+    setIsDetailOpen(false);
+  };
 
   const handleNavigate = (tabId) => {
     if (tabId === "explore") navigate("/explore");
@@ -65,78 +168,91 @@ function ExplorePastVisit({ userName, isLoggedIn, onLogout }) {
           {userName ? `${userName}님의 저장목록` : "저장목록"}
         </h1>
 
-        <section className="explore-past-visit__insight-card">
-          <p className="explore-past-visit__insight-label">라이프스타일 적합 분석</p>
-          <p className="explore-past-visit__insight-body">
-            {PAST_VISIT_DUMMY.insight.map((line) => (
-              <span key={line}>
-                {line}
-                <br />
-              </span>
-            ))}
-          </p>
-        </section>
-
+        {/* [수정] 고정 적합 분석 문구를 제거하고 실제 저장 제품만 표시합니다. */}
         <section className="explore-past-visit__hero-card">
           <div className="explore-past-visit__hero-header">
             <p className="explore-past-visit__hero-title">
-              {PAST_VISIT_DUMMY.productName}
+              {selectedDetail?.name ??
+                selectedProduct?.name ??
+                "저장한 제품이 없습니다"}
             </p>
             <button
               type="button"
               className="explore-past-visit__detail-badge"
               onClick={() => setIsDetailOpen(true)}
+              disabled={!selectedDetail}
             >
               상세 보기
             </button>
           </div>
 
           <div className="explore-past-visit__hero-image-wrap">
-            <button
-              type="button"
-              className="explore-past-visit__arrow explore-past-visit__arrow--left"
-              onClick={goPrev}
-              aria-label="이전 각도"
-            >
-              <img src={leftArrowIcon} alt="" />
-            </button>
+            {heroImages.length > 1 && (
+              <button
+                type="button"
+                className="explore-past-visit__arrow explore-past-visit__arrow--left"
+                onClick={goPrev}
+                aria-label="이전 각도"
+              >
+                <img src={leftArrowIcon} alt="" />
+              </button>
+            )}
 
-            <img
-              src={HERO_IMAGES[angleIndex]}
-              alt={PAST_VISIT_DUMMY.productName}
-              className="explore-past-visit__hero-image"
-            />
+            {heroImages[angleIndex] && (
+              <img
+                src={heroImages[angleIndex]}
+                alt={selectedDetail?.name ?? selectedProduct?.name ?? ""}
+                className="explore-past-visit__hero-image"
+              />
+            )}
 
-            <button
-              type="button"
-              className="explore-past-visit__arrow explore-past-visit__arrow--right"
-              onClick={goNext}
-              aria-label="다음 각도"
-            >
-              <img src={rightArrowIcon} alt="" />
-            </button>
+            {heroImages.length > 1 && (
+              <button
+                type="button"
+                className="explore-past-visit__arrow explore-past-visit__arrow--right"
+                onClick={goNext}
+                aria-label="다음 각도"
+              >
+                <img src={rightArrowIcon} alt="" />
+              </button>
+            )}
           </div>
+
+          {detailError && (
+            <p className="explore-past-visit__detail-error" role="alert">
+              {detailError}
+            </p>
+          )}
         </section>
       </div>
 
       <section className="explore-past-visit__saved">
         <p className="explore-past-visit__saved-title">저장한 제품</p>
         <div className="explore-past-visit__saved-grid">
-          {PAST_VISIT_DUMMY.savedItems.map((item) => (
+          {products.map((product) => (
             <button
-              key={item.id}
+              key={product.productId}
               type="button"
               className={
                 "explore-past-visit__saved-card" +
-                (selectedId === item.id
+                (effectiveSelectedId === product.productId
                   ? " explore-past-visit__saved-card--selected"
                   : "")
               }
-              onClick={() => setSelectedId(item.id)}
-              aria-label="저장 제품 선택"
+              onClick={() => handleSelectProduct(product.productId)}
+              aria-label={`${product.name ?? "저장 제품"} 선택`}
             >
-              {item.isRecommended && (
-                <span className="explore-past-visit__recommend-badge">추천</span>
+              {product.thumbnailUrl && (
+                <img
+                  src={createApiAssetUrl(product.thumbnailUrl)}
+                  alt={product.name ?? ""}
+                  className="explore-past-visit__saved-card-image"
+                />
+              )}
+              {product.source === "RECOMMEND" && (
+                <span className="explore-past-visit__recommend-badge">
+                  추천
+                </span>
               )}
             </button>
           ))}
@@ -157,6 +273,7 @@ function ExplorePastVisit({ userName, isLoggedIn, onLogout }) {
       <ProductDetailModal
         isOpen={isDetailOpen}
         onClose={() => setIsDetailOpen(false)}
+        product={buildModalProduct(selectedDetail)}
       />
     </div>
   );

@@ -5,23 +5,13 @@ import cameraIcon from "../../assets/icons/camera.svg";
 import leftArrowIcon from "../../assets/icons/left-arrow.svg";
 import rightArrowIcon from "../../assets/icons/right-arrow.svg";
 import closeIcon from "../../assets/icons/close.svg";
-import bgLogo from "../../assets/images/background-logo.png";
 import frontBag from "../../assets/images/front-bag.png";
 import MainHeader from "../../components/MainHeader/MainHeader";
 import BottomNav from "../../components/BottomNav/BottomNav";
-import ProductDetailModal, { DEFAULT_PRODUCT } from "./ProductDetailModal";
+import ProductDetailModal from "./ProductDetailModal";
 
 // [윤서][수정] 히어로 이미지가 없을 때만 쓰는 기본 이미지 (하드코딩 각도 이미지는 제거)
 const FALLBACK_HERO_IMAGE = frontBag;
-
-/**
- * [윤서][추가] FR-201 응답의 images(Base64 배열)를 <img src>에 바로 쓸 수 있는 data URL로 변환합니다.
- * (명세서에 정확한 인코딩 포맷 명시가 없어서 image/png로 가정 - 실제로 안 뜨면 이 부분만 조정하면 됩니다)
- */
-const toImageDataUrls = (images) => {
-  if (!Array.isArray(images) || images.length === 0) return [];
-  return images.map((base64) => `data:image/png;base64,${base64}`);
-};
 
 /**
  * [윤서][추가] 가격을 "₩1,690,000" 형태로 포맷합니다.
@@ -36,11 +26,9 @@ const formatPrice = (price) => {
  * App.jsx의 loadSavedProducts가 material/price/size/color/images를 이미 조회해서 넣어주기 때문에,
  * 여기서는 별도 API 호출 없이 그 값을 그대로 사용합니다.
  *
- * features(스타일/구성/활용 3분류)는 아직 백엔드 응답이 문장 하나(string)로만 와서
- * 3분류로 나눠줄 방법이 없습니다 - 백엔드 확정 답변 오면 이어서 연동 예정이라
- * 그 전까지는 ProductDetailModal의 기본 features(더미)를 그대로 사용합니다.
+ * [수정] 제품 상세 API의 URL 이미지와 구조화된 features를 그대로 사용합니다.
  */
-const buildModalProduct = (item, defaultFeatures) => {
+const buildModalProduct = (item) => {
   if (!item) return undefined;
 
   return {
@@ -52,8 +40,8 @@ const buildModalProduct = (item, defaultFeatures) => {
     size: item.size?.[0] ?? "",
     sizeDetail: item.size?.[1] ? `(${item.size[1]})` : "",
     color: Array.isArray(item.color) ? item.color.join(" · ") : "",
-    // [윤서][추가] features 3분류는 아직 미확정이라 기본 더미를 그대로 유지합니다.
-    features: defaultFeatures,
+    // [수정] 더미 특징 대신 제품 상세 API 응답을 표시합니다.
+    features: item.features,
   };
 };
 
@@ -88,7 +76,10 @@ function ExploreHome({
 
   // [윤서][추가] 선택한 제품의 이미지들(정면/측면/윗면). 없으면 대표이미지 1장, 그마저 없으면 기본 이미지.
   const heroImages = (() => {
-    const angleImages = toImageDataUrls(selectedItem?.images);
+    // [수정] 백엔드의 상대 URL은 App.jsx에서 전체 URL로 변환되어 전달됩니다.
+    const angleImages = Array.isArray(selectedItem?.images)
+      ? selectedItem.images
+      : [];
     if (angleImages.length > 0) return angleImages;
     if (selectedItem?.image) return [selectedItem.image];
     return [FALLBACK_HERO_IMAGE];
@@ -96,8 +87,7 @@ function ExploreHome({
 
   const goPrev = () =>
     setAngleIndex((prev) => (prev - 1 + heroImages.length) % heroImages.length);
-  const goNext = () =>
-    setAngleIndex((prev) => (prev + 1) % heroImages.length);
+  const goNext = () => setAngleIndex((prev) => (prev + 1) % heroImages.length);
 
   const handleNavigate = (tabId) => {
     if (tabId === "explore") navigate("/explore");
@@ -128,12 +118,12 @@ function ExploreHome({
         <div className="explore-home__glow" />
 
         <div className="explore-home__header-wrap">
-        <MainHeader
+          <MainHeader
             onNotificationClick={() => navigate("/notification")}
             isLoggedIn={isLoggedIn}
             onLogout={onLogout}
-        />
-    </div>
+          />
+        </div>
 
         <h1 className="explore-home__title">{title}</h1>
 
@@ -256,7 +246,7 @@ function ExploreHome({
       <ProductDetailModal
         isOpen={isDetailOpen}
         onClose={() => setIsDetailOpen(false)}
-        product={buildModalProduct(selectedItem, DEFAULT_PRODUCT.features)}
+        product={buildModalProduct(selectedItem)}
       />
     </div>
   );

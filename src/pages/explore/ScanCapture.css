@@ -73,6 +73,66 @@
   text-align: center;
 }
 
+.scan-capture__camera-error p {
+  margin: 0 0 120px;
+}
+
+/* [추가] 카메라 권한 거부·반복 인식 실패 시 제품 번호 직접 입력 */
+.scan-capture__lookup {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  bottom: 34px;
+  z-index: 3;
+  padding: 18px;
+  border-radius: 16px;
+  background: rgba(36, 34, 30, 0.92);
+  color: #ffffff;
+}
+
+.scan-capture__lookup label {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.scan-capture__lookup-row {
+  display: flex;
+  gap: 8px;
+}
+
+.scan-capture__lookup input {
+  min-width: 0;
+  flex: 1;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid #8d8d8d;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.scan-capture__lookup button {
+  width: 68px;
+  border: 0;
+  border-radius: 10px;
+  background: #fc7810;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.scan-capture__lookup button:disabled {
+  background: #8d8d8d;
+  cursor: default;
+}
+
+.scan-capture__lookup > p {
+  margin: 8px 0 0;
+  color: #ff8e8e;
+  font-size: 12px;
+}
+
 .scan-capture__hint {
   position: absolute;
   top: 22px;

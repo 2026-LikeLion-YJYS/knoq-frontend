@@ -24,12 +24,30 @@ export const recognizeProduct = (sessionId, imageBlob) => {
  * confirmed:true면 같은 트랜잭션 안에서 저장목록에 자동 저장됩니다(별도 저장 API 호출 불필요).
  * confirmed:false면 "다시 촬영할게요" 처리 - 클라이언트가 인식 API를 재호출합니다.
  */
-export const confirmRecognition = (sessionId, recognitionId, productId, confirmed) => {
+export const confirmRecognition = (
+  sessionId,
+  recognitionId,
+  productId,
+  confirmed,
+) => {
   return customerApiRequest(
     `/sessions/${encodeURIComponent(sessionId)}/recognitions/${encodeURIComponent(recognitionId)}/confirm`,
     {
       method: "POST",
       body: { productId, confirmed },
+    },
+  );
+};
+
+/**
+ * [추가] 카메라 권한 거부 또는 반복 인식 실패 시 제품 코드로 직접 조회합니다.
+ */
+export const lookupProductByCode = (sessionId, productCode) => {
+  return customerApiRequest(
+    `/sessions/${encodeURIComponent(sessionId)}/products/lookup`,
+    {
+      method: "POST",
+      body: { productCode },
     },
   );
 };

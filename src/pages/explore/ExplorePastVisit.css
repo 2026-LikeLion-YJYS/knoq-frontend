@@ -192,6 +192,14 @@
   background: rgba(104, 104, 104, 0.5);
   padding: 0;
   cursor: pointer;
+  overflow: hidden;
+}
+
+/* [추가] 과거 방문 저장 제품 이미지를 카드 안에 중앙 정렬합니다. */
+.explore-past-visit__saved-card-image {
+  width: 76%;
+  height: 70%;
+  object-fit: contain;
 }
 
 .explore-past-visit__saved-card--selected {
@@ -214,6 +222,14 @@
   font-weight: 400;
   font-size: 10px;
   letter-spacing: -0.2px;
+}
+
+/* [추가] 과거 제품 상세 조회 실패 안내 */
+.explore-past-visit__detail-error {
+  margin: 8px 0 0;
+  color: #ff8e8e;
+  font-size: 12px;
+  text-align: center;
 }
 
 .explore-past-visit__scan-fab {
