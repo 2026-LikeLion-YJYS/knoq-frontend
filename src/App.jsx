@@ -34,8 +34,11 @@ import {
   getVisitArchive,
 } from "./api/sessionApi";
 
-// [윤서][추가] 추천 제품 상세(이미지) 조회
-import { getProductDetail } from "./api/productsApi";
+// [수정] 추천 제품 상세와 라이프스타일 제품 적합 분석 조회
+import {
+  getProductDetail,
+  getProductFitAnalysis,
+} from "./api/productsApi";
 
 // [윤서][추가] 제품 스캔(FR-200) 인식/확인 API
 import { recognizeProduct, confirmRecognition } from "./api/scanApi";
@@ -224,6 +227,19 @@ const mapArchiveResponseToVisits = (response) => {
   });
 };
 
+/**
+ * [추가] 제품 적합 분석 응답을 탐색 카드에서 바로 출력할 문장 배열로 정리합니다.
+ */
+const mapFitAnalysisToLines = (analysis) => {
+  const lines = [
+    analysis?.summary,
+    ...(analysis?.reasons ?? []),
+    ...(analysis?.cautions ?? []),
+  ].filter((line) => typeof line === "string" && line.trim());
+
+  return [...new Set(lines)];
+};
+
 function App() {
   const navigate = useNavigate();
 
@@ -304,29 +320,55 @@ function App() {
 
       const items = await Promise.all(
         products.map(async (product) => {
-          // [윤서][추가] 상세 조회 실패 시 사용할 기본값 (이미지/이름 없이 카드만 표시)
+          // [수정] 상세·적합 분석 조회 실패 시에도 저장 카드 자체는 유지합니다.
           const base = {
             id: product.productId,
             savedProductId: product.savedProductId,
             image: null,
             name: "",
             isRecommended: product.source === "RECOMMEND",
+            fitAnalysis: [],
           };
 
-          try {
-            const detail = await getProductDetail(product.productId);
-            return {
-              ...base,
-              image: createApiAssetUrl(detail.thumbnailUrl),
-              name: detail.name,
-            };
-          } catch (detailError) {
+          // [추가] 제품 상세와 세션별 적합 분석을 병렬 조회해 고정 문구를 제거합니다.
+          const [detailResult, fitAnalysisResult] = await Promise.allSettled([
+            getProductDetail(product.productId),
+            getProductFitAnalysis(sessionId, product.productId),
+          ]);
+
+          const detail =
+            detailResult.status === "fulfilled" ? detailResult.value : null;
+          const fitAnalysis =
+            fitAnalysisResult.status === "fulfilled"
+              ? mapFitAnalysisToLines(fitAnalysisResult.value)
+              : [];
+
+          if (detailResult.status === "rejected") {
             console.error(
               `저장 제품 상세 조회 실패 (productId: ${product.productId}):`,
-              detailError,
+              detailResult.reason,
             );
-            return base;
           }
+
+          if (fitAnalysisResult.status === "rejected") {
+            console.error(
+              `제품 적합 분석 조회 실패 (productId: ${product.productId}):`,
+              fitAnalysisResult.reason,
+            );
+          }
+
+          return {
+            ...base,
+            image: createApiAssetUrl(detail?.thumbnailUrl),
+            name: detail?.name ?? "",
+            // [수정] 적합 분석 실패 시 제품 상세의 AI 설명을 안전한 대체 문구로 사용합니다.
+            fitAnalysis:
+              fitAnalysis.length > 0
+                ? fitAnalysis
+                : detail?.aiGenerated
+                  ? [detail.aiGenerated]
+                  : [],
+          };
         }),
       );
 
@@ -921,7 +963,12 @@ function App() {
         const productDetails = await Promise.all(
           products.map((product) =>
             getProductDetail(product.productId)
-              .then((detail) => ({ ...detail, productId: product.productId }))
+              // [수정] 추천 응답의 제품별 reason을 버리지 않고 탐색 화면까지 전달합니다.
+              .then((detail) => ({
+                ...detail,
+                productId: product.productId,
+                recommendationReason: product.reason,
+              }))
               .catch(() => null),
           ),
         );
@@ -944,6 +991,12 @@ function App() {
             image: createApiAssetUrl(detail.thumbnailUrl),
             name: detail.name,
             isRecommended: true,
+            // [추가] 최초 탐색 진입 전에도 추천 근거가 즉시 표시되도록 저장합니다.
+            fitAnalysis: detail.recommendationReason
+              ? [detail.recommendationReason]
+              : detail.aiGenerated
+                ? [detail.aiGenerated]
+                : [],
           })),
         );
       } catch (recommendationError) {
