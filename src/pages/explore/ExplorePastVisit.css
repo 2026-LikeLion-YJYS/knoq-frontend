@@ -24,7 +24,8 @@
 .explore-past-visit__glow {
   position: absolute;
   inset: 0;
-  background-image: url("../../assets/images/background-logo.png"),
+  background-image:
+    url("../../assets/images/background-logo.png"),
     linear-gradient(
       180deg,
       rgba(0, 0, 0, 0) 0%,
@@ -40,7 +41,8 @@
 .explore-past-visit__header-wrap {
   position: relative;
   z-index: 3;
-  margin-top: 62px;
+  /* [수정] 제거된 모바일 상태바의 빈 공간을 제외합니다. */
+  margin-top: var(--app-header-top-offset, 18px);
 }
 
 .explore-past-visit__title {

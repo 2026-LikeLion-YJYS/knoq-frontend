@@ -4,7 +4,8 @@
   min-height: 100dvh;
   height: 100dvh;
   overflow-y: auto;
-  background: radial-gradient(
+  background:
+    radial-gradient(
       ellipse 480px 480px at 100% 0%,
       rgba(218, 87, 0, 0.5) 0%,
       rgba(173, 74, 8, 0.5) 18%,
@@ -26,7 +27,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 62px;
+  /* [수정] 제거된 모바일 상태바의 빈 공간을 제외합니다. */
+  margin-top: var(--app-header-top-offset, 18px);
 }
 
 .onboarding-consent__back {

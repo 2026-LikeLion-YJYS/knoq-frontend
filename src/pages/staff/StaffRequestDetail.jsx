@@ -28,7 +28,7 @@ const LIFESTYLE_TAG_LABELS = {
   MINIMAL: "미니멀",
   CLASSIC: "클래식",
   CASUAL: "캐주얼",
-  STREET: "스트리트",
+  STREET: "스트릿",
   FORMAL: "포멀",
   TRENDY: "트렌디",
 };

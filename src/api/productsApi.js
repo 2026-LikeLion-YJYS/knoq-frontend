@@ -9,3 +9,12 @@ import { customerApiRequest } from "./apiClient";
 export const getProductDetail = (productId) => {
   return customerApiRequest(`/products/${encodeURIComponent(productId)}`);
 };
+
+/**
+ * [추가] 세션의 라이프스타일 태그와 선택 제품을 비교한 적합 분석을 조회합니다.
+ */
+export const getProductFitAnalysis = (sessionId, productId) => {
+  return customerApiRequest(
+    `/sessions/${encodeURIComponent(sessionId)}/products/${encodeURIComponent(productId)}/fit-analysis`,
+  );
+};
