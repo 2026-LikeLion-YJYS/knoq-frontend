@@ -127,3 +127,14 @@ export const getOnboardingRecommendations = (sessionId) => {
     },
   );
 };
+
+/**
+ * [윤서][추가] 탐색 아카이브 조회
+ * ACCOUNT 로그인 고객의 전체 방문 기록을 최근순으로 조회합니다.
+ * 현재 방문(isCurrent: true)을 포함하며, 방문별 저장 제품 목록도 함께 내려옵니다.
+ */
+export const getVisitArchive = (sessionId) => {
+  return customerApiRequest(
+    `/sessions/${encodeURIComponent(sessionId)}/archive`,
+  );
+};
