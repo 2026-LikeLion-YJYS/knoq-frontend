@@ -320,23 +320,27 @@
   letter-spacing: -0.4px;
 }
 
-/* 라이프스타일 태그 목록 */
+/* [수정] 라이프스타일 태그 목록 - 최대 3개까지 한 줄에 고정 배치되도록 wrap 제거
+   (기존엔 flex-wrap: wrap + 태그별 고정 min-width 때문에 태그가 2개 이상이면
+   폭이 부족한 화면(특히 iPad)에서 다음 줄로 밀려 카드 밖으로 넘치는 문제가 있었음) */
 .staff-request-detail__lifestyle-tags {
   min-width: 0;
+  flex: 1 1 auto;
 
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 
-  gap: clamp(6px, 1.2vw, 10px);
+  gap: clamp(4px, 1vw, 10px);
 }
 
-/* 라이프스타일 태그 */
+/* [수정] 라이프스타일 태그 - 고정 min-width 대신 내용에 맞게 유연하게 줄어들도록 변경 */
 .staff-request-detail__lifestyle-tag {
-  min-width: clamp(88px, 14vw, 105px);
+  flex-shrink: 1;
+  min-width: 0;
 
-  padding: clamp(8px, 1.1vh, 11px) clamp(13px, 2.4vw, 18px);
+  padding: clamp(7px, 1vh, 11px) clamp(10px, 1.8vw, 18px);
 
   color: #ffffff;
 
@@ -344,7 +348,7 @@
 
   background: rgba(73, 56, 43, 0.5);
 
-  font-size: 17px;
+  font-size: clamp(13px, 2vw, 17px);
   font-weight: 400;
   line-height: 150%;
   letter-spacing: -0.342px;
