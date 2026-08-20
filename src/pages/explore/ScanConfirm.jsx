@@ -1,17 +1,15 @@
 // 탐색 - 제품 스캔 : 촬영완료(확인) 화면
-// 인식된 제품이 맞는지 확인 (API 연동 전이라 더미 제품 데이터 사용)
+// [윤서][수정] 더미 기본값 제거. product는 이제 항상 App.jsx가 실제 인식 API 결과로 채워서 내려줍니다.
 
 import "./ScanConfirm.css";
 import backIcon from "../../assets/icons/backicon.svg";
-import dummyBagImage from "../../assets/images/front-bag.png";
 
-// 백엔드 연동 전 임시 더미 데이터
-const DUMMY_SCANNED_PRODUCT = {
-  image: dummyBagImage,
-  name: "L Tracy 비세토스 호보",
-};
+function ScanConfirm({ onRetake, onConfirm, product, isSubmitting = false, errorMessage = "" }) {
+  // [윤서][추가] 인식 결과가 아직 안 왔는데 이 화면에 들어온 경우(새로고침 등) 방어
+  if (!product) {
+    return null;
+  }
 
-function ScanConfirm({ onRetake, onConfirm, product = DUMMY_SCANNED_PRODUCT }) {
   return (
     <div className="scan-confirm">
       <header className="scan-confirm__header">
@@ -45,20 +43,27 @@ function ScanConfirm({ onRetake, onConfirm, product = DUMMY_SCANNED_PRODUCT }) {
         <p className="scan-confirm__product-name">{product.name}</p>
       </div>
 
+      {/* [윤서][추가] API 실패 시 안내 문구 */}
+      {errorMessage && (
+        <p className="scan-confirm__error">{errorMessage}</p>
+      )}
+
       <div className="scan-confirm__actions">
         <button
           type="button"
           className="scan-confirm__button scan-confirm__button--secondary"
           onClick={onRetake}
+          disabled={isSubmitting}
         >
           다시 촬영할게요
         </button>
         <button
           type="button"
           className="scan-confirm__button scan-confirm__button--primary"
-          onClick={() => onConfirm?.(product)}
+          onClick={onConfirm}
+          disabled={isSubmitting}
         >
-          맞아요
+          {isSubmitting ? "저장 중..." : "맞아요"}
         </button>
       </div>
     </div>

@@ -210,3 +210,10 @@
   width: 28px;
   height: 28px;
 }
+
+.scan-capture__error {
+  margin: 8px 24px 0;
+  color: #ff6b6b;
+  font-size: 13px;
+  text-align: center;
+}
