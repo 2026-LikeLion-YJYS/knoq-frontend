@@ -1,0 +1,291 @@
+/* [추가] 수정 모달 전체 요소 크기 계산 통일 */
+.analysis-edit-modal,
+.analysis-edit-modal * {
+  box-sizing: border-box;
+}
+
+/* [추가] 분석8 배경을 어둡게 하고 흐리게 표시하는 모달 영역 */
+.analysis-edit-modal {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+
+  display: flex;
+  align-items: flex-end;
+
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+
+  background: rgba(0, 0, 0, 0.48);
+
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+
+/* [추가] 화면 하단에서 표시되는 흰색 수정 모달 */
+.analysis-edit-modal__sheet {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-height: 414px;
+  padding: 10px 28px 38px;
+
+  color: #24221e;
+
+  border-radius: 18px 18px 0 0;
+  background: #ffffff;
+}
+
+/* [추가] 모달 상단 드래그 표시 */
+.analysis-edit-modal__handle {
+  width: 40px;
+  height: 4px;
+  margin: 0 auto;
+
+  border-radius: 10px;
+  background: #dedede;
+}
+
+/* [추가] 수정 모달 제목 */
+.analysis-edit-modal__title {
+  margin: 24px 0 0;
+
+  color: #24221e;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: -0.4px;
+}
+
+/* [추가] 모든 수정 선택 영역 */
+.analysis-edit-modal__options {
+  width: 100%;
+  margin-top: 24px;
+}
+
+/* [추가] 카테고리 선택 항목 배치 */
+.analysis-edit-modal__options--category {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 18px 8px;
+}
+
+/* [추가] 카테고리 선택 버튼 */
+.analysis-edit-modal__option--category {
+  min-height: 38px;
+  padding: 8px 16px;
+
+  color: #8d8d8d;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.26px;
+
+  border: 1px solid transparent;
+  border-radius: 30px;
+  background: #eeeeee;
+
+  cursor: pointer;
+}
+
+/* [추가] 소재 선택 항목 2열 배치 */
+.analysis-edit-modal__options--material {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+/* [추가] 소재 선택 버튼 */
+.analysis-edit-modal__option--material {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 92px;
+  padding: 0;
+
+  color: #8d8d8d;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 150%;
+
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: #eeeeee;
+
+  cursor: pointer;
+}
+
+/* [추가] 사이즈 선택 항목 3열 배치 */
+.analysis-edit-modal__options--size {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+/* [추가] 사이즈 선택 버튼 */
+.analysis-edit-modal__option--size {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+
+  width: 100%;
+  height: 94px;
+  padding: 8px 4px;
+
+  color: #8d8d8d;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 150%;
+
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: #eeeeee;
+
+  cursor: pointer;
+}
+
+/* [추가] 사이즈 가방 이미지 */
+.analysis-edit-modal__image--size {
+  display: block;
+
+  width: 54px;
+  height: 54px;
+
+  object-fit: contain;
+}
+
+/* [추가] 컬러 선택 항목 3열 배치 */
+.analysis-edit-modal__options--color {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px 10px;
+}
+
+/* [추가] 컬러 선택 버튼 */
+.analysis-edit-modal__option--color {
+  position: relative;
+
+  width: 100%;
+  height: 94px;
+  padding: 0;
+  overflow: hidden;
+
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: #eeeeee;
+
+  cursor: pointer;
+}
+
+/* [추가] 컬러 패턴 이미지 */
+.analysis-edit-modal__image--color {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+/* [추가] 컬러 이름 표시 */
+.analysis-edit-modal__option--color .analysis-edit-modal__option-label {
+  position: absolute;
+  top: 10px;
+  left: 8px;
+
+  padding: 3px 10px;
+
+  color: #8d8d8d;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 150%;
+
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* [수정] 다중 선택된 항목에 각각 선택 스타일 적용 */
+.analysis-edit-modal__option--selected {
+  color: #525252;
+  border-color: #fc7810;
+  background: #ffddc2;
+}
+
+/* [추가] 선택된 컬러 이름 강조 */
+.analysis-edit-modal__option--color.analysis-edit-modal__option--selected
+  .analysis-edit-modal__option-label {
+  color: #fc7810;
+}
+
+/* [추가] 선택 버튼 키보드 포커스 표시 */
+.analysis-edit-modal__option:focus-visible {
+  outline: 2px solid #fc7810;
+  outline-offset: 2px;
+}
+
+/* [수정] 선택 여부와 관계없이 항상 활성화되는 수정 완료 버튼 */
+.analysis-edit-modal__save-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: calc(100% - 40px);
+  height: 50px;
+  margin: auto auto 0;
+  padding: 0;
+
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 150%;
+  letter-spacing: -0.32px;
+
+  border: 0;
+  border-radius: 50px;
+  background: radial-gradient(
+    59.76% 166% at 51.59% 129%,
+    #f59e0b 0%,
+    #fc7810 100%
+  );
+
+  cursor: pointer;
+  transition: transform 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* [추가] 수정 완료 버튼 클릭 효과 */
+.analysis-edit-modal__save-button:active {
+  transform: scale(0.98);
+}
+
+/* [추가] 수정 완료 버튼 키보드 포커스 표시 */
+.analysis-edit-modal__save-button:focus-visible {
+  outline: 2px solid #24221e;
+  outline-offset: 3px;
+}
+
+/* [추가] 복수 선택 안내가 있는 제목의 하단 간격 */
+.analysis-edit-modal__title--with-guide {
+  margin-bottom: 4px;
+}
+
+/* [추가] 사이즈·컬러 최대 선택 개수 안내 */
+.analysis-edit-modal__selection-guide {
+  margin: 0 0 20px;
+  color: #999;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+/* [추가] 사이즈·컬러 선택 영역만 위로 이동 */
+.analysis-edit-modal__options--size,
+.analysis-edit-modal__options--color {
+  transform: translateY(-25px);
+}

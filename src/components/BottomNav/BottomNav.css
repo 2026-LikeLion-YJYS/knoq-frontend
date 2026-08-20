@@ -1,0 +1,38 @@
+/* [수정] 공통 하단 네비게이션 */
+.bottom-nav {
+  position: fixed;
+  left: 50%;
+  /* [수정] 스크롤 위치와 관계없이 실제 화면 하단의 안전 영역 위에 고정합니다. */
+  bottom: max(20px, env(safe-area-inset-bottom));
+  z-index: 50;
+  transform: translateX(-50%);
+
+  width: 241px;
+  height: 65px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+
+  background: rgba(46, 46, 46, 0.5);
+  border: 0.5px solid rgba(174, 174, 174, 0.3);
+  border-radius: 33px;
+}
+
+/* [추가] 각 메뉴 버튼 */
+.bottom-nav__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  border: none;
+  background: none;
+
+  cursor: pointer;
+}
+
+/* [추가] SVG 원본 크기 그대로 표시 */
+.bottom-nav__item img {
+  display: block;
+}

@@ -1,0 +1,130 @@
+/* [추가] 수정 완료 화면 전체 요소 크기 계산 통일 */
+.analysis-edit-complete-page,
+.analysis-edit-complete-page * {
+  box-sizing: border-box;
+}
+
+/* [추가] 수정 완료 전체 화면 */
+.analysis-edit-complete-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 50px 28px 48px;
+
+  color: #ffffff;
+
+  background:
+    radial-gradient(
+      149.83% 46.17% at 80.28% -15.61%,
+      rgba(218, 87, 0, 0.5) 0%,
+      rgba(36, 34, 30, 0.5) 100%
+    ),
+    #24221e;
+}
+
+/* [추가] 뒤로가기 버튼 없는 상단 제목 영역 */
+.analysis-edit-complete-header {
+  width: 100%;
+  text-align: center;
+}
+
+/* [추가] 상단 수정 완료 제목 */
+.analysis-edit-complete-header h1 {
+  margin: 0;
+
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 150%;
+  letter-spacing: -0.4px;
+}
+
+/* [추가] 체크 아이콘과 완료 문구 배치 */
+.analysis-edit-complete-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  margin-top: 180px;
+
+  text-align: center;
+}
+
+/* [추가] 수정 완료 체크 아이콘 */
+.analysis-edit-complete-icon {
+  display: block;
+
+  width: 116px;
+  height: 116px;
+
+  object-fit: contain;
+}
+
+/* [추가] 완료 안내 제목 */
+.analysis-edit-complete-title {
+  margin: 38px 0 0;
+
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: -0.56px;
+}
+
+/* [추가] 수정 완료 안내 문구 */
+.analysis-edit-complete-description {
+  margin: 16px 0 0;
+
+  color: #919191;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 160%;
+  letter-spacing: -0.28px;
+  text-align: center;
+}
+
+/* [추가] 이어서 분석하기 버튼 */
+.analysis-edit-result-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: calc(100% - 40px);
+  height: 50px;
+  margin: auto auto 0;
+  padding: 0;
+
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 150%;
+  letter-spacing: -0.32px;
+
+  border: 0;
+  border-radius: 50px;
+  background: radial-gradient(
+    59.76% 166% at 51.59% 129%,
+    #f59e0b 0%,
+    #fc7810 100%
+  );
+
+  cursor: pointer;
+  transition: transform 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* [추가] 이어서 분석하기 버튼 클릭 효과 */
+.analysis-edit-result-button:active {
+  transform: scale(0.98);
+}
+
+/* [추가] 키보드 접근 시 포커스 표시 */
+.analysis-edit-result-button:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+}

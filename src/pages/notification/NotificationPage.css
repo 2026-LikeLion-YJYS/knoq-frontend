@@ -1,0 +1,140 @@
+.notification-page {
+  width: 100%;
+  min-height: 100dvh;
+  background: #24221e;
+  display: flex;
+  flex-direction: column;
+}
+
+/* [헤더] 뒤로가기 + 타이틀 */
+.notification-page__header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 46px;
+  flex-shrink: 0;
+}
+
+.notification-page__back-button {
+  position: absolute;
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.notification-page__title {
+  margin: 0;
+  font-family: "Pretendard", sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  color: #ffffff;
+  letter-spacing: -0.4px;
+}
+
+/* [리스트] */
+.notification-page__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* [추가] 알림 조회·빈 목록·오류 상태 안내 */
+.notification-page__state {
+  padding: 48px 24px;
+  color: #8d8d8d;
+  font-family: "Pretendard", sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* [추가] 오류 문구의 기본 여백을 제거합니다. */
+.notification-page__state-message {
+  margin: 0;
+}
+
+/* [추가] 알림 조회 실패 시 사용하는 재시도 버튼 */
+.notification-page__retry-button {
+  margin-top: 16px;
+  padding: 8px 16px;
+  border: 1px solid #fd903b;
+  border-radius: 20px;
+  background: transparent;
+  color: #fd903b;
+  font-family: "Pretendard", sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.notification-item {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  height: 110px;
+  padding: 24px 24px 0 35px;
+  box-sizing: border-box;
+}
+
+.notification-item__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #fd903b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notification-item__icon img {
+  width: 25px;
+  height: 25px;
+}
+
+.notification-item__content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-item__title {
+  margin: 0;
+  font-family: "Pretendard", sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  color: #ffffff;
+  letter-spacing: -0.32px;
+  line-height: 1.5;
+}
+
+.notification-item__description {
+  margin: 0;
+  font-family: "Pretendard", sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  color: #8d8d8d;
+  letter-spacing: -0.24px;
+  line-height: 1.5;
+}
+
+.notification-item__time {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  font-family: "Pretendard", sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  color: #8d8d8d;
+  letter-spacing: -0.24px;
+  white-space: nowrap;
+}

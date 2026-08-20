@@ -1,0 +1,528 @@
+/* [추가] 분석 화면 전체 요소 크기 계산 통일 */
+.analysis-page,
+.analysis-page * {
+  box-sizing: border-box;
+}
+
+/* [추가] 전체 화면을 사용하는 분석 페이지 */
+.analysis-page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+
+  overflow-x: hidden;
+
+  color: #ffffff;
+
+  background: #24221e;
+}
+
+/* [추가] 피그마의 흐린 주황색 그라데이션 효과 */
+.analysis-page::before {
+  position: absolute;
+  top: 80px;
+  left: 40px;
+
+  width: 458.656px;
+  height: 290.267px;
+
+  border-radius: 458.656px;
+  background: linear-gradient(
+    91deg,
+    rgba(245, 158, 11, 0.02) 4.08%,
+    rgba(245, 158, 11, 0.1) 75.41%
+  );
+
+  content: "";
+  filter: blur(50px);
+  pointer-events: none;
+
+  transform: translateX(-50%) rotate(2.926deg);
+}
+
+/* [수정] 모바일 393px에서 실제 본문 너비가 337px이 되도록 설정 */
+.analysis-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+
+  width: 100%;
+  /* [수정] 고정 하단 네비게이션이 마지막 콘텐츠를 가리지 않도록 여백을 확보합니다. */
+  padding: 28px 28px 120px;
+}
+
+/* [추가] 분석 화면 제목 영역 */
+.analysis-intro {
+  width: 100%;
+}
+
+/* [추가] 분석 제목과 화면별 버튼 가로 배치 */
+.analysis-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  width: 100%;
+}
+
+/* [추가] 분석 화면 제목 */
+.analysis-title {
+  min-width: 0;
+  margin: 0;
+
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: -0.44px;
+}
+
+/* [수정] 피그마 기준 제목-설명 간격 8px (기존 4px) */
+.analysis-description {
+  margin: 8px 0 0;
+
+  color: #8d8d8d;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 140%;
+  letter-spacing: -0.2px;
+}
+
+/* [추가] 분석5 결과 요소를 하나의 영역으로 묶어 배치 */
+.analysis-result-area {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+}
+
+/* [수정] 피그마 기준 카드 간격 column-gap 17px (기존 9px) */
+.analysis-result-grid {
+  display: grid;
+  /* [수정] 393px 화면 안에 164px 카드 두 개를 피그마 간격으로 배치합니다. */
+  grid-template-columns: repeat(2, 164px);
+  column-gap: 17px;
+  row-gap: 12px;
+  justify-content: center;
+
+  width: 100%;
+  margin-top: 14px;
+}
+
+/* [수정] 피그마 기준 카드 배경색 rgba(104,104,104,0.5) (기존 rgba(70,69,67,0.55)) */
+.analysis-result-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  /* [수정] 피그마 기준 분석 결과 카드 크기 */
+  width: 164px;
+  min-width: 0;
+  height: 105px;
+  margin: 0;
+  padding: 8px;
+
+  text-align: center;
+
+  background: rgba(104, 104, 104, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* [추가] 분석8의 수정 버튼이 포함된 결과 카드 */
+.analysis-result-card--editable {
+  /* [수정] 수정 화면에서도 지정된 164×105px 카드 크기를 유지합니다. */
+  height: 105px;
+  padding: 2px 8px;
+}
+
+/* [수정] 피그마 기준 라벨 폰트 12px (기존 16px) */
+.analysis-result-label {
+  margin: 0;
+
+  color: #bbbbbb;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.24px;
+}
+
+/* [수정] 피그마 기준 143×52px 값 영역 안에서 텍스트를 가운데 정렬합니다. */
+.analysis-result-value {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 143px;
+  max-width: 100%;
+  height: 52px;
+  margin: 8px 0 0;
+  padding: 0 4px;
+  overflow: hidden;
+
+  box-sizing: border-box;
+  text-align: center;
+}
+
+/* [수정] 분석값은 14px로 최대 2줄까지만 표시하고 초과 내용은 말줄임합니다. */
+.analysis-result-value__text {
+  display: -webkit-box;
+  max-width: 100%;
+  overflow: hidden;
+
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.28px;
+  white-space: normal;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* [추가] 분석8 카드 내부 결과 값 간격 조정 */
+.analysis-result-card--editable .analysis-result-value {
+  margin-top: 0;
+}
+
+/* [추가] 분석8 카드별 수정 버튼 */
+.analysis-card-edit-button {
+  margin: 0;
+  padding: 0;
+
+  color: #ff8e43;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 150%;
+  letter-spacing: -0.28px;
+
+  border: 0;
+  background: transparent;
+
+  cursor: pointer;
+  transition: transform 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* [추가] 카드 수정 버튼 클릭 효과 */
+.analysis-card-edit-button:active {
+  transform: scale(0.95);
+}
+
+/* [추가] 카드 수정 버튼 키보드 포커스 표시 */
+.analysis-card-edit-button:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+}
+
+/* [수정] 피그마 기준 KNOQ 발견 영역 상단 여백 60px (기존 52px) */
+.analysis-discovery {
+  width: 100%;
+  margin-top: 60px;
+}
+
+/* [추가] KNOQ 발견 제목 */
+.analysis-discovery-title {
+  margin: 0;
+
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 150%;
+  letter-spacing: -0.36px;
+}
+
+/* [수정] 피그마 기준 제목-설명 간격 8px (기존 4px) */
+.analysis-discovery-description {
+  margin: 8px 0 0;
+
+  color: #8d8d8d;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.2px;
+}
+
+/* [추가] 분석 코멘트 박스 */
+.analysis-comment {
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  min-height: 92px;
+  margin-top: 14px;
+  padding: 20px;
+
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  background: rgba(46, 46, 46, 0.5);
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* [수정] 피그마 기준 letter-spacing -0.32px (기존 -0.3px) */
+.analysis-comment p {
+  margin: 0;
+
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.32px;
+  word-break: keep-all;
+}
+
+/* [추가] 니즈 분석 업데이트 버튼 */
+.analysis-update-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: calc(100% - 40px);
+  height: 50px;
+  margin: 24px auto 0;
+  padding: 0;
+
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 150%;
+  letter-spacing: -0.32px;
+
+  border: 0;
+  border-radius: 50px;
+  background: radial-gradient(
+    59.76% 166% at 51.59% 129%,
+    #f59e0b 0%,
+    #fc7810 100%
+  );
+
+  cursor: pointer;
+  transition: transform 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* [추가] 업데이트 버튼 클릭 효과 */
+.analysis-update-button:active {
+  transform: scale(0.98);
+}
+
+/* [추가] 키보드 접근 시 포커스 표시 */
+.analysis-update-button:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+}
+
+/* [추가] 저장 제품이 2개 미만일 때 업데이트 버튼 비활성화 */
+.analysis-update-button:disabled {
+  color: #525252;
+  background: #bbbbbb;
+  cursor: default;
+}
+
+/* [추가] 비활성화된 업데이트 버튼은 클릭 효과 제외 */
+.analysis-update-button:disabled:active {
+  transform: none;
+}
+
+/* [추가] 분석 결과가 없을 때 분석5 결과 영역 블러 처리 */
+.analysis-result-area--blurred {
+  filter: blur(9px);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* [추가] 분석1·2 버튼과 안내 문구를 표시하는 반투명 오버레이 */
+.analysis-entry-overlay {
+  position: absolute;
+  z-index: 2;
+  top: 103px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  padding: 270px 48px 0;
+
+  background: rgba(36, 34, 30, 0.18);
+
+  /* [추가] 오버레이가 하단 네비게이션 클릭을 막지 않도록 설정 */
+  pointer-events: none;
+}
+
+/* [추가] 최초 니즈 분석 시작 버튼 */
+.analysis-start-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 68px;
+  padding: 0;
+
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 150%;
+  letter-spacing: -0.36px;
+
+  border: 0;
+  border-radius: 18px;
+  background: radial-gradient(
+    59.76% 166% at 51.59% 129%,
+    #f59e0b 0%,
+    #fc7810 100%
+  );
+
+  cursor: pointer;
+  transition: transform 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+  pointer-events: auto;
+}
+
+/* [추가] 저장 제품이 2개 미만일 때 분석 버튼 비활성화 */
+.analysis-start-button:disabled {
+  color: #525252;
+  background: #bbbbbb;
+  cursor: default;
+}
+
+/* [추가] 활성화된 분석 버튼 클릭 효과 */
+.analysis-start-button:not(:disabled):active {
+  transform: scale(0.98);
+}
+
+/* [추가] 키보드 접근 시 분석 버튼 포커스 표시 */
+.analysis-start-button:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+}
+
+/* [추가] 분석 가능 여부 안내 문구 */
+.analysis-entry-message {
+  margin: 24px 0 0;
+
+  color: #bbbbbb;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.28px;
+  text-align: center;
+  word-break: keep-all;
+}
+
+/* [추가] 분석4 승인·수정 버튼 영역 */
+.analysis-review-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* [추가] 분석 결과 승인·수정 공통 버튼 */
+.analysis-review-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 21px;
+  padding: 3px 10px;
+
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 150%;
+  letter-spacing: -0.2px;
+
+  border: 0;
+  border-radius: 20px;
+  background: #fc7810;
+
+  cursor: pointer;
+  transition: transform 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* [추가] 승인·수정 버튼 클릭 효과 */
+.analysis-review-button:active {
+  transform: scale(0.96);
+}
+
+/* [추가] 승인·수정 버튼 키보드 포커스 표시 */
+.analysis-review-button:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+/* [추가] 분석8 상단 수정 완료하기 버튼 */
+.analysis-edit-complete-button {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+
+  height: 21px;
+  padding: 3px 10px;
+
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 150%;
+  letter-spacing: -0.22px;
+  white-space: nowrap;
+
+  border: 0;
+  border-radius: 20px;
+  background: #fc7810;
+
+  cursor: pointer;
+  transition: transform 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* [추가] 수정 완료하기 버튼 클릭 효과 */
+.analysis-edit-complete-button:active {
+  transform: scale(0.96);
+}
+
+/* [추가] 수정 완료하기 버튼 키보드 포커스 표시 */
+.analysis-edit-complete-button:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+/* [추가] 니즈 분석 업데이트 불가 안내 문구 */
+.analysis-update-message {
+  margin: 14px 0 0;
+
+  color: #bbbbbb;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.28px;
+  text-align: center;
+  word-break: keep-all;
+}

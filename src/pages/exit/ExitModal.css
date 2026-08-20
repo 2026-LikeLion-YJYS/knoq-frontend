@@ -1,0 +1,142 @@
+.exit-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 9999;
+}
+
+/* 모달 카드 */
+.exit-modal {
+  width: 345px;
+  max-width: calc(100% - 48px);
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 32px 10px 24px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 80px;
+}
+
+/* 안내 문구 */
+.exit-modal__text-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  max-width: 100%;
+}
+
+.exit-modal__title {
+  margin: 0;
+  font-family: "Pretendard", sans-serif;
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 1.5;
+  letter-spacing: -0.44px;
+  color: #111111;
+}
+
+.exit-modal__description {
+  margin: 0;
+  font-family: "Pretendard", sans-serif;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #8d8d8d;
+  white-space: nowrap;
+  font-size: 14px;
+  letter-spacing: -0.28px;
+}
+
+/* 비로그인 상태 설명 문구 */
+.exit-modal--guest .exit-modal__description {
+  font-size: 13px;
+  letter-spacing: -0.26px;
+}
+
+/* 버튼 */
+.exit-modal__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.exit-modal__button-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* 비로그인 상태 버튼 간격 */
+.exit-modal--guest .exit-modal__button-row {
+  gap: 8px;
+}
+
+.exit-modal__button {
+  height: 50px;
+  border: none;
+  border-radius: 100px;
+  cursor: pointer;
+
+  font-family: "Pretendard", sans-serif;
+  font-weight: 400;
+  line-height: 1.5;
+
+  width: 152px;
+  font-size: 16px;
+  letter-spacing: -0.32px;
+}
+
+/* 비로그인 상태 버튼 크기 */
+.exit-modal--guest .exit-modal__button {
+  width: 158px;
+  font-size: 15px;
+  letter-spacing: -0.3px;
+}
+
+.exit-modal__button--secondary {
+  background: #e0e0e0;
+  color: #525252;
+}
+
+.exit-modal__button--primary {
+  background: linear-gradient(0deg, #f59e0b 0%, #fc7810 100%);
+  color: #ffffff;
+}
+
+/* [추가] 종료 요청 중에는 모달 버튼의 중복 클릭을 막습니다. */
+.exit-modal__button:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* [추가] 종료·로그아웃 실패 시 재시도 안내 문구 */
+.exit-modal__error {
+  margin: 0;
+  padding: 0 12px;
+  font-family: "Pretendard", sans-serif;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #d94b45;
+  text-align: center;
+}
+
+.exit-modal__caption {
+  margin: 0;
+  font-family: "Pretendard", sans-serif;
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: -0.2px;
+  color: #bbbbbb;
+  text-align: center;
+}

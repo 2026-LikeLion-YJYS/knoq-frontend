@@ -1,0 +1,259 @@
+/* [추가] 오버레이 */
+.product-detail-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 17, 17, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* [추가] 모달 카드 */
+.product-detail-modal {
+  position: relative;
+  width: 345px;
+  max-width: calc(100% - 48px);
+  max-height: 85dvh;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px 16px 28px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  box-sizing: border-box;
+}
+
+.product-detail-modal::-webkit-scrollbar {
+  display: none;
+}
+
+/* [수정] close-circle 아이콘을 그대로 보여주는 닫기 버튼 */
+.product-detail-modal__close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.product-detail-modal__close-icon {
+  width: 100%;
+  height: 100%;
+}
+
+/* [추가] 상품 대표 이미지 */
+.product-detail-modal__image-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding-top: 16px;
+}
+
+.product-detail-modal__image {
+  width: 160px;
+  height: 124px;
+  object-fit: contain;
+}
+
+/* [추가] 카테고리 뱃지 + 상품명 */
+.product-detail-modal__heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.product-detail-modal__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: #fd9238;
+  font-family: "Pretendard", sans-serif;
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: -0.2px;
+  color: #ffffff;
+}
+
+.product-detail-modal__name {
+  margin: 0;
+  font-family: "Pretendard", sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: -0.36px;
+  color: #111111;
+}
+
+/* [추가] 섹션 공통 타이틀 */
+.product-detail-modal__section-title {
+  margin: 0 0 8px;
+  font-family: "Pretendard", sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: -0.24px;
+  color: #525252;
+}
+
+/* [추가] 제품 정보 섹션 */
+.product-detail-modal__info-section {
+  margin-top: 24px;
+}
+
+.product-detail-modal__info-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+}
+
+.product-detail-modal__info-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.product-detail-modal__info-label {
+  flex-shrink: 0;
+  font-family: "Pretendard", sans-serif;
+  font-weight: 400;
+  font-size: 10px;
+  letter-spacing: -0.2px;
+  color: #8d8d8d;
+}
+
+.product-detail-modal__info-value {
+  font-family: "Pretendard", sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: -0.24px;
+  color: #111111;
+  text-align: right;
+}
+
+.product-detail-modal__info-value--stacked {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.product-detail-modal__info-sub {
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: -0.2px;
+  color: #8d8d8d;
+}
+
+/* [추가] 특징 섹션 */
+.product-detail-modal__feature-section {
+  margin-top: 24px;
+}
+
+.product-detail-modal__feature-grid {
+  display: flex;
+  align-items: stretch;
+  gap: 9px;
+}
+
+/* [수정] 이미지가 카드 테두리 끝까지 닿도록 좌우/하단 padding 제거 */
+.product-detail-modal__feature-card {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 0 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* [수정] 특징 이미지를 원본 비율 그대로 유지하면서 카드 너비에 맞춰 축소 */
+.product-detail-modal__feature-image {
+  display: block;
+
+  /* [수정] 원본 비율 유지 */
+  width: 100%;
+  height: auto;
+
+  /* [수정] 카드 너비를 넘지 않도록 제한 */
+  max-width: 100%;
+  max-height: none;
+
+  /* [수정] 남는 공간을 위쪽에 두어 이미지가 카드 하단에 붙도록 설정 */
+  margin-top: auto;
+  margin-left: 0;
+  margin-right: 0;
+  margin-bottom: 0;
+
+  /* [수정] 이미지 전체가 보이도록 비율 유지 */
+  object-fit: contain;
+  object-position: center bottom;
+}
+
+/* [추가] 특징 카드별 너비 */
+.product-detail-modal__feature-card--style {
+  width: 75px;
+}
+
+.product-detail-modal__feature-card--composition {
+  width: 89px;
+}
+
+.product-detail-modal__feature-card--usage {
+  width: 130px;
+}
+
+/* [수정] 카드 padding 제거 후 라벨에 기존 좌우 여백 적용 */
+.product-detail-modal__feature-label {
+  margin: 0 8px 8px;
+  text-align: center;
+  font-family: "Pretendard", sans-serif;
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: -0.2px;
+  color: #8d8d8d;
+}
+
+/* [수정] 카드 padding 제거 후 특징 목록에 기존 좌우 여백 적용 */
+.product-detail-modal__feature-list {
+  margin: 0 8px;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.product-detail-modal__feature-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  font-family: "Pretendard", sans-serif;
+  font-weight: 500;
+  font-size: 10px;
+  line-height: 1.4;
+  letter-spacing: -0.2px;
+  color: #111111;
+  word-break: keep-all;
+}
+
+.product-detail-modal__check-icon {
+  width: 8px;
+  height: 8px;
+  margin-top: 3px;
+  flex-shrink: 0;
+}

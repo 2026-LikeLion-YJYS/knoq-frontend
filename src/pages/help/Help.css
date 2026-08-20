@@ -1,0 +1,485 @@
+/* [수정] 도움 화면 전체 요소 크기 계산 통일 */
+.help-page,
+.help-page * {
+  box-sizing: border-box;
+}
+
+/* [수정] 393px 고정 없이 전체 화면을 사용하는 도움 페이지 */
+.help-page {
+  position: relative;
+
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+
+  overflow-x: hidden;
+
+  color: #ffffff;
+  font-family: Pretendard, sans-serif;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.31) -33.49%,
+      rgba(255, 142, 67, 0.31) 99.99%
+    ),
+    #24221e;
+}
+
+/* [수정] 피그마 기준 상단 여백 10px (기존 8px), 모바일 393px에서 본문 너비 345px */
+.help-content {
+  width: 100%;
+  padding: 10px 24px 110px;
+}
+
+/* =========================
+   상단 안내 문구
+========================= */
+
+/* [수정] 상단 안내 영역 - 피그마 기준 다음 섹션까지 간격 40px (기존 24px) */
+.help-intro {
+  width: 100%;
+  margin-bottom: 40px;
+}
+
+/* [수정] 원하는 순간, 어드바이저와 연결하세요 */
+.help-intro h1 {
+  margin: 0 0 4px;
+
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 150%;
+  letter-spacing: -0.5px;
+}
+
+/* [수정] 자유롭게 탐색한 후 도움 안내 문구 */
+.help-intro p {
+  margin: 0;
+
+  color: #bbbbbb;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.3px;
+}
+
+/* =========================
+   도움 화면 공통 영역
+========================= */
+
+/* [수정] 각 도움 기능 영역 - 피그마 기준 섹션 간 간격 24px (기존 26px) */
+.help-section {
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+/* [수정] 도움 유형 선택, 제품 추가 등 영역 제목 - 피그마 기준 제목-콘텐츠 간격 12px (기존 14px) */
+.help-section h2 {
+  margin: 0 0 12px;
+
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.32px;
+}
+
+/* =========================
+   도움 유형 선택
+========================= */
+
+/* [수정] 도움 유형 2열 배치 - 피그마 기준 row-gap 4px, column-gap 13px (기존 6px 10px, 순서 반대였음) */
+.help-type-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 13px;
+
+  width: 100%;
+}
+
+/* [수정] 도움 유형 기본 버튼 - 피그마 기준 font-size 16px(기존14px), weight 500(기존400), 색상 고정값 #bbbbbb */
+.help-type-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-width: 0;
+  height: 50px;
+  padding: 15px 0 14px;
+
+  color: #bbbbbb;
+  font-family: Pretendard, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 150%;
+  letter-spacing: -0.32px;
+  white-space: nowrap;
+
+  background: rgba(46, 46, 46, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+
+  cursor: pointer;
+}
+
+/* [수정] 현재 선택된 도움 유형 */
+.help-type-button[aria-pressed="true"] {
+  color: #ffffff;
+
+  background: rgba(46, 46, 46, 0.2);
+  border-color: #ff8e43;
+
+  box-shadow: 0 2px 12px rgba(255, 142, 67, 0.2);
+}
+
+/* =========================
+   제품 추가
+========================= */
+
+/* [수정] 상담 제품 3칸 배치 - 피그마 기준 gap 15px (기존 10px) */
+.help-product-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 15px;
+
+  width: 100%;
+}
+
+/* [수정] 선택된 제품 카드 - 피그마 기준 높이 89px (기존 102px) */
+.help-product-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-width: 0;
+  height: 89px;
+  overflow: hidden;
+
+  background: rgba(46, 46, 46, 0.45);
+  border: 1px solid #ff8e43;
+  border-radius: 16px;
+
+  box-shadow: 0 2px 12px rgba(255, 142, 67, 0.2);
+}
+
+/* [수정] 선택된 제품 이미지 */
+.help-product-card img {
+  display: block;
+
+  width: 88%;
+  height: 88%;
+
+  object-fit: contain;
+  cursor: pointer;
+}
+
+/* [수정] 비어 있는 제품 추가 칸 - 피그마 기준 높이 89px (기존 102px) */
+.help-add-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  min-width: 0;
+  height: 89px;
+  padding: 0;
+
+  color: #bbbbbb;
+  font-family: Pretendard, sans-serif;
+  font-size: 44px;
+  font-weight: 300;
+  line-height: 1;
+
+  background: rgba(46, 46, 46, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+
+  cursor: pointer;
+}
+
+/* =========================
+   공유할 나의 정보
+========================= */
+
+/* [수정] 공유 정보 제목과 체크박스 배치 */
+.help-share-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  width: 100%;
+}
+
+/* [수정] 피그마 기준 제목-콘텐츠 간격 12px (기존 14px) */
+.help-share-title h2 {
+  margin-bottom: 12px;
+}
+
+/* 선택 전 정보공유 체크박스 */
+.help-checkbox {
+  position: relative;
+
+  flex-shrink: 0;
+
+  width: 23px;
+  height: 21px;
+  margin: 0 0 12px;
+  padding: 0;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  background: #919191;
+  border: 0;
+  border-radius: 3px;
+
+  cursor: pointer;
+}
+
+/* 기본 상태: 검정 체크 */
+.help-checkbox::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  color: #000000;
+  font-family: "SF Pro", Pretendard, sans-serif;
+  font-size: 15px;
+  font-weight: 590;
+  line-height: 150%;
+
+  content: "✓";
+
+  transform: translate(-50%, -52%);
+}
+
+/* 선택 상태: 주황색 박스 */
+.help-checkbox:checked {
+  background: #ff8e43;
+}
+
+/* 선택 상태: 흰색 체크 */
+.help-checkbox:checked::after {
+  color: #ffffff;
+}
+
+/* [수정] 라이프스타일과 니즈를 묶는 상자 */
+.help-info-card {
+  /* [수정] 피그마 기준 공유 정보 전체 카드 크기 */
+  width: 345px;
+  max-width: 100%;
+  height: 169px;
+  padding: 10px 13px;
+
+  background: radial-gradient(
+    59.76% 166% at 51.59% 129%,
+    rgba(245, 158, 11, 0.2) 0%,
+    rgba(248, 124, 42, 0.3) 100%
+  );
+  border-radius: 16px;
+}
+
+/* [수정] 라이프스타일 제목과 태그 배치 */
+.help-lifestyle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  width: 100%;
+  height: 34px;
+}
+
+/* [수정] 라이프스타일과 니즈 제목 */
+.help-lifestyle h3,
+.help-needs h3 {
+  margin: 0 0 0 5px;
+
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.28px;
+  white-space: nowrap;
+}
+
+/* [수정] 라이프스타일 태그 목록 */
+.help-tag-list {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* [수정] 모던, 미니멀 태그 */
+.help-tag-list span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 76px;
+  height: 34px;
+  padding: 0;
+
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.24px;
+
+  background: rgba(73, 56, 43, 0.5);
+  border-radius: 100px;
+}
+
+/* [수정] 나의 니즈 영역 */
+.help-needs {
+  width: 100%;
+  margin-top: 4px;
+}
+
+/* [수정] 나의 니즈를 묶는 상자 - 피그마 기준 4개 컬럼 동일 너비 60px, gap 12px (기존 60/46/83/80px 불균등 - 소재 컬럼이 너무 좁아 텍스트가 옆 컬럼과 겹치던 문제) */
+.help-needs-list {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  width: 319px;
+  max-width: 100%;
+  height: 81px;
+  margin-top: 4px;
+  padding: 7px 8px;
+
+  background: rgba(73, 56, 43, 0.5);
+  border-radius: 10px;
+}
+
+/* [수정] 니즈 개별 항목 - 피그마 기준 4개 항목 모두 고정 60px */
+.help-needs-list div {
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 60px;
+  min-width: 60px;
+}
+
+/* [수정] 카테고리, 소재, 사이즈, 컬러 - text-align: center 추가 (텍스트 자체가 박스 안에서 왼쪽 정렬되어 값이 짧을수록 왼쪽으로 쏠려 보이던 문제) */
+.help-needs-list span {
+  display: block;
+  margin-bottom: 6px;
+
+  color: #bbbbbb;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.2px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* [수정] 니즈 분석값 - text-align: center 추가 (핵심 수정: 이 속성이 없어서 값 텍스트가 박스 안에서 왼쪽 정렬되어 있었음) */
+.help-needs-list p {
+  /* [수정] 모든 니즈 값은 지정 영역 안에서 최대 3줄까지만 표시합니다. */
+  display: -webkit-box;
+
+  width: 60px;
+  max-width: 100%;
+  height: 36px;
+  margin: 0;
+  overflow: hidden;
+
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 12px;
+  letter-spacing: -0.22px;
+  text-align: center;
+  white-space: normal;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+/* =========================
+   도움 요청 버튼
+========================= */
+
+/* [수정] 비활성 상태의 도움 요청 버튼 - 피그마 기준 고정 너비 301px (기존 반응형 calc), 상단 여백 24px (기존 20px) */
+.help-request-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 301px;
+  max-width: 100%;
+  height: 50px;
+  margin: 24px auto 0;
+  padding: 13px 0;
+
+  color: #6f6f6f;
+  font-family: Pretendard, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.32px;
+  white-space: nowrap;
+
+  background: #c5c5c5;
+  border: 0;
+  border-radius: 50px;
+
+  cursor: default;
+}
+
+/* [추가] 운영시간 내에 도움 유형을 선택한 활성 버튼 */
+.help-request-button.is-active {
+  color: #ffffff;
+
+  background: radial-gradient(
+    59.76% 166% at 51.59% 129%,
+    #f59e0b 0%,
+    #fc7810 100%
+  );
+
+  cursor: pointer;
+}
+
+/* [추가] 비활성 버튼의 투명도 자동 적용 방지 */
+.help-request-button:disabled {
+  opacity: 1;
+}
+
+/* =========================
+   작은 모바일 화면 대응
+========================= */
+
+/* [추가] 360px 이하에서도 내용이 잘리지 않도록 조정 */
+@media (max-width: 360px) {
+  .help-content {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .help-type-button {
+    font-size: 14px;
+  }
+
+  .help-tag-list {
+    gap: 5px;
+  }
+
+  .help-tag-list span {
+    width: 66px;
+  }
+
+  .help-needs-list p {
+    font-size: 9px;
+  }
+}
