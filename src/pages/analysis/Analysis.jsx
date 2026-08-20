@@ -230,7 +230,12 @@ function Analysis({
               >
                 <p className="analysis-result-label">{item.label}</p>
 
-                <p className="analysis-result-value">{item.value}</p>
+                {/* [수정] 분석값을 최대 2줄로 제한하면서 값 영역 중앙에 배치합니다. */}
+                <p className="analysis-result-value">
+                  <span className="analysis-result-value__text">
+                    {item.value}
+                  </span>
+                </p>
 
                 {/* [추가] 분석8 카드별 수정 버튼 */}
                 {showEditControls && (

@@ -317,7 +317,10 @@ function StaffRequestDetail({ onEndConsultation, onSettings }) {
                       카테고리
                     </span>
                     <span className="staff-request-detail__needs-value">
-                      {requestDetail.needsAnalysis.productCategory || "-"}
+                      {/* [수정] 직원 니즈값을 최대 3줄로 제한하고 중앙 정렬합니다. */}
+                      <span className="staff-request-detail__needs-value-text">
+                        {requestDetail.needsAnalysis.productCategory || "-"}
+                      </span>
                     </span>
                   </div>
 
@@ -326,7 +329,10 @@ function StaffRequestDetail({ onEndConsultation, onSettings }) {
                       소재
                     </span>
                     <span className="staff-request-detail__needs-value">
-                      {requestDetail.needsAnalysis.preferredMaterial || "-"}
+                      {/* [수정] 직원 니즈값을 최대 3줄로 제한하고 중앙 정렬합니다. */}
+                      <span className="staff-request-detail__needs-value-text">
+                        {requestDetail.needsAnalysis.preferredMaterial || "-"}
+                      </span>
                     </span>
                   </div>
 
@@ -335,7 +341,10 @@ function StaffRequestDetail({ onEndConsultation, onSettings }) {
                       사이즈
                     </span>
                     <span className="staff-request-detail__needs-value">
-                      {requestDetail.needsAnalysis.preferredSize || "-"}
+                      {/* [수정] 직원 니즈값을 최대 3줄로 제한하고 중앙 정렬합니다. */}
+                      <span className="staff-request-detail__needs-value-text">
+                        {requestDetail.needsAnalysis.preferredSize || "-"}
+                      </span>
                     </span>
                   </div>
 
@@ -344,7 +353,10 @@ function StaffRequestDetail({ onEndConsultation, onSettings }) {
                       컬러
                     </span>
                     <span className="staff-request-detail__needs-value">
-                      {requestDetail.needsAnalysis.preferredColor || "-"}
+                      {/* [수정] 직원 니즈값을 최대 3줄로 제한하고 중앙 정렬합니다. */}
+                      <span className="staff-request-detail__needs-value-text">
+                        {requestDetail.needsAnalysis.preferredColor || "-"}
+                      </span>
                     </span>
                   </div>
                 </div>
