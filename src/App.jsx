@@ -86,6 +86,9 @@ import AnalysisEditComplete from "./pages/analysis/AnalysisEditComplete";
 
 import NotificationPage from "./pages/notification/NotificationPage";
 
+// [추가] 고객·직원 화면의 고정 해상도 프레임 스타일
+import "./App.css";
+
 // [추가] 탐색 아카이브 카드 썸네일 이미지
 // [윤서][수정] 실제 API 응답엔 카드 이미지가 없어서, 이 3개를 순서대로 돌려쓰는 고정 일러스트로 사용합니다.
 import reShoesImage from "./assets/images/re-shoes.svg";
@@ -226,6 +229,9 @@ function App() {
 
   // [추가] 분석 탭 진입 여부 확인에 사용하는 현재 경로
   const location = useLocation();
+
+  // [추가] 직원 화면은 744×1133, 고객 화면은 393×852 프레임을 사용합니다.
+  const isStaffRoute = location.pathname.startsWith("/staff");
 
   /**
    * [수정] POS 종료 성공 후 직원 토큰을 삭제하고 시작 화면으로 이동합니다.
@@ -1264,236 +1270,238 @@ function App() {
   };
 
   return (
-    <Routes>
-      {/* [수정] 루트 QR로 진입해도 storeCode 쿼리 파라미터가 유지되도록 이동합니다. */}
-      <Route
-        path="/"
-        element={<Navigate to={`/onboarding${location.search}`} replace />}
-      />
+    <div className={`app-frame${isStaffRoute ? " app-frame--staff" : ""}`}>
+      <Routes>
+        {/* [수정] 루트 QR로 진입해도 storeCode 쿼리 파라미터가 유지되도록 이동합니다. */}
+        <Route
+          path="/"
+          element={<Navigate to={`/onboarding${location.search}`} replace />}
+        />
 
-      {/* [윤서][수정] 매장 진입(FR-000)에서 받아온 매장명 전달, 버튼은 API 호출 핸들러로 연결 */}
-      <Route
-        path="/onboarding"
-        element={
-          <Onboarding1
-            storeName={storeName}
-            onSelectPrivate={handleSelectPrivate}
-            onSelectAccount={handleSelectAccount}
-            isSessionReady={isOnboardingSessionReady}
-            isSubmitting={isOnboardingSubmitting}
-            errorMessage={onboardingError}
-          />
-        }
-      />
+        {/* [윤서][수정] 매장 진입(FR-000)에서 받아온 매장명 전달, 버튼은 API 호출 핸들러로 연결 */}
+        <Route
+          path="/onboarding"
+          element={
+            <Onboarding1
+              storeName={storeName}
+              onSelectPrivate={handleSelectPrivate}
+              onSelectAccount={handleSelectAccount}
+              isSessionReady={isOnboardingSessionReady}
+              isSubmitting={isOnboardingSubmitting}
+              errorMessage={onboardingError}
+            />
+          }
+        />
 
-      {/* [윤서][수정] 카카오 로그인 성공 시 App.jsx가 동의값·토큰을 서버로 전송 */}
-      <Route
-        path="/onboarding/consent"
-        element={
-          <Onboarding2
-            onBack={() => navigate(-1)}
-            onKakaoSubmit={handleKakaoConsentSubmit}
-            onKakaoFailure={handleKakaoLoginFailure}
-            isSubmitting={isOnboardingSubmitting}
-            errorMessage={onboardingError}
-          />
-        }
-      />
+        {/* [윤서][수정] 카카오 로그인 성공 시 App.jsx가 동의값·토큰을 서버로 전송 */}
+        <Route
+          path="/onboarding/consent"
+          element={
+            <Onboarding2
+              onBack={() => navigate(-1)}
+              onKakaoSubmit={handleKakaoConsentSubmit}
+              onKakaoFailure={handleKakaoLoginFailure}
+              isSubmitting={isOnboardingSubmitting}
+              errorMessage={onboardingError}
+            />
+          }
+        />
 
-      {/* [윤서][수정] 닉네임/라이프스타일 저장 API 호출 후 완료 화면으로 이동 */}
-      <Route
-        path="/onboarding/setup"
-        element={
-          <OnboardingSetup
-            onBack={() => navigate(-1)}
-            onSubmit={handleOnboardingSetupSubmit}
-            isSubmitting={isOnboardingSubmitting}
-            errorMessage={onboardingError}
-          />
-        }
-      />
+        {/* [윤서][수정] 닉네임/라이프스타일 저장 API 호출 후 완료 화면으로 이동 */}
+        <Route
+          path="/onboarding/setup"
+          element={
+            <OnboardingSetup
+              onBack={() => navigate(-1)}
+              onSubmit={handleOnboardingSetupSubmit}
+              isSubmitting={isOnboardingSubmitting}
+              errorMessage={onboardingError}
+            />
+          }
+        />
 
-      {/* [윤서][수정] FR-103 추천 제품(이미지 포함)을 완료 화면에 전달 */}
-      <Route
-        path="/onboarding/complete"
-        element={
-          <OnboardingComplete
-            products={recommendedProducts}
-            onBack={() => navigate(-1)}
-            onStart={() => navigate("/explore")}
-          />
-        }
-      />
+        {/* [윤서][수정] FR-103 추천 제품(이미지 포함)을 완료 화면에 전달 */}
+        <Route
+          path="/onboarding/complete"
+          element={
+            <OnboardingComplete
+              products={recommendedProducts}
+              onBack={() => navigate(-1)}
+              onStart={() => navigate("/explore")}
+            />
+          }
+        />
 
-      {/* [수정] 탐색 기본 화면 - 로그인 상태(isLoggedIn)에 따라 분기
+        {/* [수정] 탐색 기본 화면 - 로그인 상태(isLoggedIn)에 따라 분기
           - true: 탐색 아카이브 (재방문) - 이제 실제 API(visitArchive)로 채워짐
           - false / null(확인 중): 기존 탐색 화면 그대로 */}
-      <Route
-        path="/explore"
-        element={
-          isLoggedIn === true ? (
-            <ExploreArchive
-              userName={userName}
-              visits={visitArchive}
-              isLoggedIn={isLoggedIn}
-              onLogout={handleLogout}
-              onScan={() => navigate("/explore/scan")}
-              onSelectVisit={(visit) => {
-                if (visit.isNew) {
-                  navigate("/explore/home");
-                } else {
-                  // [윤서][추가] 과거 방문의 저장 제품 목록을 이미 아카이브 응답에서 받아왔으므로,
-                  // 다시 API 호출하지 않고 state로 같이 넘겨줍니다.
-                  navigate(`/explore/visit/${visit.id}`, {
-                    state: { visit },
-                  });
-                }
-              }}
-            />
-          ) : (
+        <Route
+          path="/explore"
+          element={
+            isLoggedIn === true ? (
+              <ExploreArchive
+                userName={userName}
+                visits={visitArchive}
+                isLoggedIn={isLoggedIn}
+                onLogout={handleLogout}
+                onScan={() => navigate("/explore/scan")}
+                onSelectVisit={(visit) => {
+                  if (visit.isNew) {
+                    navigate("/explore/home");
+                  } else {
+                    // [윤서][추가] 과거 방문의 저장 제품 목록을 이미 아카이브 응답에서 받아왔으므로,
+                    // 다시 API 호출하지 않고 state로 같이 넘겨줍니다.
+                    navigate(`/explore/visit/${visit.id}`, {
+                      state: { visit },
+                    });
+                  }
+                }}
+              />
+            ) : (
+              <ExploreHome
+                savedItems={savedItems}
+                onDeleteSavedItem={handleDeleteSavedItem}
+                isLoggedIn={isLoggedIn}
+                onLogout={handleLogout}
+              />
+            )
+          }
+        />
+
+        {/* [추가] 탐색 아카이브에서 "New" 방문 클릭 시 이동하는 실시간 탐색 화면 */}
+        <Route
+          path="/explore/home"
+          element={
             <ExploreHome
               savedItems={savedItems}
               onDeleteSavedItem={handleDeleteSavedItem}
               isLoggedIn={isLoggedIn}
               onLogout={handleLogout}
             />
-          )
-        }
-      />
+          }
+        />
 
-      {/* [추가] 탐색 아카이브에서 "New" 방문 클릭 시 이동하는 실시간 탐색 화면 */}
-      <Route
-        path="/explore/home"
-        element={
-          <ExploreHome
-            savedItems={savedItems}
-            onDeleteSavedItem={handleDeleteSavedItem}
-            isLoggedIn={isLoggedIn}
-            onLogout={handleLogout}
-          />
-        }
-      />
+        {/* [추가] 탐색 아카이브에서 과거 방문 클릭 시 이동하는 읽기 전용 스냅샷 */}
+        <Route
+          path="/explore/visit/:visitId"
+          element={
+            <ExplorePastVisit
+              userName={userName}
+              isLoggedIn={isLoggedIn}
+              onLogout={handleLogout}
+            />
+          }
+        />
 
-      {/* [추가] 탐색 아카이브에서 과거 방문 클릭 시 이동하는 읽기 전용 스냅샷 */}
-      <Route
-        path="/explore/visit/:visitId"
-        element={
-          <ExplorePastVisit
-            userName={userName}
-            isLoggedIn={isLoggedIn}
-            onLogout={handleLogout}
-          />
-        }
-      />
-
-      {/* [윤서][수정] onCapture가 이제 실제 사진 Blob을 받아서 인식 API를 호출합니다.
+        {/* [윤서][수정] onCapture가 이제 실제 사진 Blob을 받아서 인식 API를 호출합니다.
           errorMessage도 전달해서, 인식/상세조회 실패로 이 화면에 되돌아왔을 때 이유가 보이게 함 */}
-      <Route
-        path="/explore/scan"
-        element={
-          <ScanCapture
-            onClose={() => navigate("/explore")}
-            onCapture={handleScanCapture}
-            errorMessage={scanError}
-          />
-        }
-      />
+        <Route
+          path="/explore/scan"
+          element={
+            <ScanCapture
+              onClose={() => navigate("/explore")}
+              onCapture={handleScanCapture}
+              errorMessage={scanError}
+            />
+          }
+        />
 
-      {/* [윤서][수정] 가짜 타이머 제거, App.jsx가 실제 API 응답 오면 알아서 다음 화면으로 이동시킴 */}
-      <Route path="/explore/scan/recognizing" element={<ScanRecognizing />} />
+        {/* [윤서][수정] 가짜 타이머 제거, App.jsx가 실제 API 응답 오면 알아서 다음 화면으로 이동시킴 */}
+        <Route path="/explore/scan/recognizing" element={<ScanRecognizing />} />
 
-      {/* [윤서][수정] 실제 인식된 제품 정보(scanResult.product) 전달 */}
-      <Route
-        path="/explore/scan/confirm"
-        element={
-          <ScanConfirm
-            product={scanResult.product}
-            onRetake={handleScanRetake}
-            onConfirm={handleScanConfirm}
-            isSubmitting={isScanSubmitting}
-            errorMessage={scanError}
-          />
-        }
-      />
+        {/* [윤서][수정] 실제 인식된 제품 정보(scanResult.product) 전달 */}
+        <Route
+          path="/explore/scan/confirm"
+          element={
+            <ScanConfirm
+              product={scanResult.product}
+              onRetake={handleScanRetake}
+              onConfirm={handleScanConfirm}
+              isSubmitting={isScanSubmitting}
+              errorMessage={scanError}
+            />
+          }
+        />
 
-      <Route
-        path="/explore/scan/complete"
-        element={
-          <ScanComplete
-            onBack={() => navigate("/explore")}
-            onScanAgain={() => navigate("/explore/scan")}
-            onViewAnalysis={() => navigate("/explore")}
-          />
-        }
-      />
+        <Route
+          path="/explore/scan/complete"
+          element={
+            <ScanComplete
+              onBack={() => navigate("/explore")}
+              onScanAgain={() => navigate("/explore/scan")}
+              onViewAnalysis={() => navigate("/explore")}
+            />
+          }
+        />
 
-      <Route path="/analysis/*" element={renderAnalysisScreen()} />
+        <Route path="/analysis/*" element={renderAnalysisScreen()} />
 
-      {/* [수정] 도움 화면 - 로그인 상태 전달 */}
-      <Route
-        path="/help"
-        element={<Help isLoggedIn={isLoggedIn} onLogout={handleLogout} />}
-      />
+        {/* [수정] 도움 화면 - 로그인 상태 전달 */}
+        <Route
+          path="/help"
+          element={<Help isLoggedIn={isLoggedIn} onLogout={handleLogout} />}
+        />
 
-      <Route
-        path="/staff"
-        element={<StaffIntro onLogin={() => navigate("/staff/login")} />}
-      />
+        <Route
+          path="/staff"
+          element={<StaffIntro onLogin={() => navigate("/staff/login")} />}
+        />
 
-      <Route
-        path="/staff/login"
-        element={
-          <StaffLogin
-            onBack={() => navigate("/staff")}
-            onLogin={() => navigate("/staff/requests")}
-          />
-        }
-      />
+        <Route
+          path="/staff/login"
+          element={
+            <StaffLogin
+              onBack={() => navigate("/staff")}
+              onLogin={() => navigate("/staff/requests")}
+            />
+          }
+        />
 
-      <Route
-        path="/staff/requests"
-        element={
-          <StaffRequests
-            onSelectRequest={(requestId) => {
-              navigate(`/staff/requests/${encodeURIComponent(requestId)}`);
-            }}
-            onExitPos={handleStaffExitSuccess}
-          />
-        }
-      />
+        <Route
+          path="/staff/requests"
+          element={
+            <StaffRequests
+              onSelectRequest={(requestId) => {
+                navigate(`/staff/requests/${encodeURIComponent(requestId)}`);
+              }}
+              onExitPos={handleStaffExitSuccess}
+            />
+          }
+        />
 
-      <Route
-        path="/staff/requests/:requestId"
-        element={
-          <StaffRequestDetail
-            onSettings={() => {
-              alert("상담을 종료한 후 POS를 종료해주세요.");
-            }}
-            onEndConsultation={(requestId) =>
-              navigate(`/staff/requests/${encodeURIComponent(requestId)}/end`)
-            }
-          />
-        }
-      />
+        <Route
+          path="/staff/requests/:requestId"
+          element={
+            <StaffRequestDetail
+              onSettings={() => {
+                alert("상담을 종료한 후 POS를 종료해주세요.");
+              }}
+              onEndConsultation={(requestId) =>
+                navigate(`/staff/requests/${encodeURIComponent(requestId)}/end`)
+              }
+            />
+          }
+        />
 
-      <Route
-        path="/staff/requests/:requestId/end"
-        element={
-          <StaffConsultationEnd
-            onContinue={(requestId) =>
-              navigate(`/staff/requests/${encodeURIComponent(requestId)}`)
-            }
-            onConfirmEnd={() => {
-              navigate("/staff/requests");
-            }}
-          />
-        }
-      />
+        <Route
+          path="/staff/requests/:requestId/end"
+          element={
+            <StaffConsultationEnd
+              onContinue={(requestId) =>
+                navigate(`/staff/requests/${encodeURIComponent(requestId)}`)
+              }
+              onConfirmEnd={() => {
+                navigate("/staff/requests");
+              }}
+            />
+          }
+        />
 
-      <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
 
-      <Route path="/notification" element={<NotificationPage />} />
-    </Routes>
+        <Route path="/notification" element={<NotificationPage />} />
+      </Routes>
+    </div>
   );
 }
 
