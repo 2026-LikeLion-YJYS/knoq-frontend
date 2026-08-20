@@ -13,7 +13,8 @@ import "./StaffRequestDetail.css";
 
 // [추가] 상단 아이콘
 import settingIcon from "../../assets/icons/setting.svg";
-import logoKnoq from "../../assets/icons/logo-knoq.svg";
+// [수정] 직원 상세 화면에도 신규 KNOQ 로고 에셋을 사용합니다.
+import logoKnoq from "../../assets/icons/knoq-newlogo.svg";
 
 // [추가] 화면에 표시할 도움 유형 목록
 const HELP_TYPES = [
@@ -28,7 +29,7 @@ const LIFESTYLE_TAG_LABELS = {
   MINIMAL: "미니멀",
   CLASSIC: "클래식",
   CASUAL: "캐주얼",
-  STREET: "스트릿",
+  STREET: "스트리트",
   FORMAL: "포멀",
   TRENDY: "트렌디",
 };

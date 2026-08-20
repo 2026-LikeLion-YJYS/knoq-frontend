@@ -7,7 +7,8 @@ import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./MainHeader.css";
 
-import logoKnoq from "../../assets/icons/logo-knoq.svg";
+// [수정] 기존 KNOQ 로고를 신규 로고 에셋으로 교체합니다.
+import logoKnoq from "../../assets/icons/knoq-newlogo.svg";
 import notificationIcon from "../../assets/icons/notification.svg";
 import settingIcon from "../../assets/icons/setting.svg";
 import ExitModal from "../../pages/exit/ExitModal";

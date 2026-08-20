@@ -16,7 +16,8 @@ import "./StaffRequests.css";
 
 // [추가] 아이콘
 import settingIcon from "../../assets/icons/setting.svg";
-import logoKnoq from "../../assets/icons/logo-knoq.svg";
+// [수정] 직원 화면에도 신규 KNOQ 로고 에셋을 사용합니다.
+import logoKnoq from "../../assets/icons/knoq-newlogo.svg";
 import requestLine from "../../assets/icons/request-line.svg";
 
 // [추가] API 도움 유형 enum을 화면 문구로 변환
@@ -32,7 +33,7 @@ const LIFESTYLE_TAG_LABELS = {
   MINIMAL: "미니멀",
   CLASSIC: "클래식",
   CASUAL: "캐주얼",
-  STREET: "스트릿",
+  STREET: "스트리트",
   FORMAL: "포멀",
   TRENDY: "트렌디",
 };

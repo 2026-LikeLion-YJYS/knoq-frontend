@@ -243,7 +243,8 @@
 .explore-home__scan-fab {
   position: fixed;
   bottom: 112px;
-  right: 24px;
+  /* [수정] PC에서도 393px 앱 프레임 오른쪽 안에 고정합니다. */
+  right: max(24px, calc(50vw - 172.5px));
   width: 62px;
   height: 62px;
   border-radius: 50%;
@@ -260,7 +261,10 @@
   gap: 2px;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  z-index: 2;
+  /* [수정] 상단 카드와 하단 네비게이션보다 위에서 항상 클릭되도록 합니다. */
+  z-index: 100;
+  pointer-events: auto;
+  touch-action: manipulation;
 }
 
 .explore-home__scan-fab img {
