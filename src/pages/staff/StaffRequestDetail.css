@@ -427,20 +427,33 @@
 
 /* 니즈 분석값 */
 .staff-request-detail__needs-value {
-  /* [수정] 상세 값은 96×73px 안에서 최대 3줄까지만 표시합니다. */
-  display: -webkit-box;
+  /* [수정] 96×73px 값 영역 안에서 한 줄부터 세 줄까지 수직·수평 가운데 정렬합니다. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   width: 96px;
   max-width: 100%;
   height: 73px;
+  padding: 0 4px;
+  overflow: hidden;
+
+  box-sizing: border-box;
+  text-align: center;
+}
+
+/* [수정] 직원 니즈값은 15px로 최대 3줄까지만 표시하고 초과 내용은 말줄임합니다. */
+.staff-request-detail__needs-value-text {
+  display: -webkit-box;
+  max-width: 100%;
   overflow: hidden;
 
   color: #ffffff;
 
   font-size: 15px;
   font-weight: 400;
-  line-height: 24px;
-  letter-spacing: -0.32px;
+  line-height: 1.35;
+  letter-spacing: -0.3px;
 
   white-space: normal;
   word-break: keep-all;
