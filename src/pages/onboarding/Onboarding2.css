@@ -153,3 +153,10 @@
 .onboarding-consent__section-title--select {
   margin-bottom: 16px;
 }
+
+.onboarding-consent__error {
+  color: #ff6b6b;
+  font-size: 13px;
+  text-align: center;
+  margin: 12px 24px 0;
+}

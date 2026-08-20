@@ -150,3 +150,16 @@
   );
   color: #fff;
 }
+
+.onboarding-setup__error {
+  color: #ff6b6b;
+  font-size: 13px;
+  text-align: center;
+  margin: 12px 24px 0;
+}
+
+.onboarding-setup__input-hint {
+  margin: 6px 0 0;
+  color: #8d8d8d;
+  font-size: 12px;
+}

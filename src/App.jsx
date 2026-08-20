@@ -19,12 +19,24 @@ import {
 } from "./api/analysisApi";
 
 // [추가] 새로고침·재진입 시 고객 저장 범위를 복원하는 세션 조회 API
-import { getCustomerSession } from "./api/sessionApi";
+// [윤서][수정] 온보딩 연동에 필요한 세션 관련 API 함수 추가
+import {
+  getCustomerSession,
+  createSession,
+  updateConsents,
+  updateStorageScope,
+  loginWithKakao,
+  updateNickname,
+  updateLifestyleTags,
+} from "./api/sessionApi";
 
-// [수정] 고객 세션·토큰 조회 및 직원 POS 종료 후 토큰 삭제
+// [수정] 고객 세션·토큰 조회/저장 및 직원 POS 종료 후 토큰 삭제
+// [윤서][수정] setSessionId, setSessionToken 추가
 import {
   getSessionId,
   getSessionToken,
+  setSessionId,
+  setSessionToken,
   removeStaffToken,
 } from "./utils/storage";
 
@@ -119,6 +131,19 @@ const getAnalysisErrorMessage = (error, fallbackMessage) => {
     error?.data?.error ??
     (error?.status ? error.message : fallbackMessage)
   );
+};
+
+/**
+ * [윤서][추가] 온보딩 API 오류에서 화면에 표시할 "문자열"만 안전하게 뽑아냅니다.
+ * 백엔드가 message 자리에 문자열이 아닌 객체(필드별 에러 등)를 내려주는 경우,
+ * 그 객체를 그대로 화면에 넣으면 "[object Object]"로 보이는 문제를 막기 위한 함수입니다.
+ */
+const getOnboardingErrorMessage = (error, fallbackMessage) => {
+  const candidate = error?.data?.message ?? error?.data?.error ?? error?.message;
+
+  return typeof candidate === "string" && candidate.trim().length > 0
+    ? candidate
+    : fallbackMessage;
 };
 
 /**
@@ -243,6 +268,11 @@ function App() {
 
         if (response?.storageScope === "ACCOUNT") {
           setIsLoggedIn(true);
+          // [윤서][추가] 백엔드 응답에 nickname이 새로 추가됨.
+          // 새로고침 시 "OO님의 저장목록" 문구가 사라지지 않도록 여기서도 복원합니다.
+          if (response?.nickname) {
+            setUserName(response.nickname);
+          }
           return;
         }
 
@@ -280,6 +310,176 @@ function App() {
   const handleLogout = () => {
     setIsLoggedIn(false);
   };
+
+  // ===== [윤서] 여기부터 온보딩 API 연동을 위해 추가한 부분 =====
+
+  // [윤서][추가] FR-000 매장 진입에서 받아온 매장명 (Onboarding1 화면 표시용)
+  const [storeName, setStoreName] = useState("");
+
+  // [윤서][추가] 온보딩 API 호출(저장 범위/동의/카카오/닉네임 등) 공통 진행 상태
+  const [isOnboardingSubmitting, setIsOnboardingSubmitting] = useState(false);
+
+  // [윤서][추가] 온보딩 API 호출 실패 안내 메시지
+  const [onboardingError, setOnboardingError] = useState("");
+
+  /**
+   * [윤서][추가] FR-000 매장 진입
+   * 이미 세션이 있으면(새로고침·재방문) 새로 만들지 않고, 없을 때만 QR 진입으로 간주해 세션을 생성합니다.
+   * TODO: 실제 QR 배포 전 쿼리 파라미터 이름(storeCode) 최종 확인 필요
+   */
+  useEffect(() => {
+    if (getSessionId() && getSessionToken()) {
+      return undefined;
+    }
+
+    let isActive = true;
+    const params = new URLSearchParams(window.location.search);
+    const storeCode = params.get("storeCode") || "TEST-001";
+
+    createSession(storeCode)
+      .then((response) => {
+        if (!isActive) return;
+
+        setSessionId(response.sessionId);
+        setSessionToken(response.sessionToken);
+        setStoreName(response.storeName ?? "");
+      })
+      .catch((error) => {
+        if (!isActive) return;
+
+        console.error("매장 진입(FR-000) 실패:", error);
+        setOnboardingError(
+          getOnboardingErrorMessage(
+            error,
+            "매장 진입에 실패했습니다. 다시 시도해주세요.",
+          ),
+        );
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
+  /**
+   * [윤서][추가] "저장 없이 프라이빗하게 둘러보기" 클릭
+   * FR-100(PRIVATE) → FR-002(필수 동의 자동 true) 순서로 호출합니다.
+   */
+  const handleSelectPrivate = async () => {
+    const sessionId = getSessionId();
+    if (!sessionId) return;
+
+    setIsOnboardingSubmitting(true);
+    setOnboardingError("");
+
+    try {
+      await updateStorageScope(sessionId, "PRIVATE");
+      await updateConsents(sessionId, {
+        termsOfService: true,
+        privacyPolicy: true,
+        over14: true,
+        marketingOptIn: false,
+      });
+      navigate("/onboarding/setup");
+    } catch (error) {
+      console.error("저장 범위 선택(PRIVATE) 실패:", error);
+      setOnboardingError(
+        getOnboardingErrorMessage(
+          error,
+          "처리에 실패했습니다. 다시 시도해주세요.",
+        ),
+      );
+    } finally {
+      setIsOnboardingSubmitting(false);
+    }
+  };
+
+  /**
+   * [윤서][추가] "내 정보 기억하고 이어서 탐색하기" 클릭
+   * FR-100(ACCOUNT) 호출 후 약관 동의 화면으로 이동합니다.
+   */
+  const handleSelectAccount = async () => {
+    const sessionId = getSessionId();
+    if (!sessionId) return;
+
+    setIsOnboardingSubmitting(true);
+    setOnboardingError("");
+
+    try {
+      await updateStorageScope(sessionId, "ACCOUNT");
+      navigate("/onboarding/consent");
+    } catch (error) {
+      console.error("저장 범위 선택(ACCOUNT) 실패:", error);
+      setOnboardingError(
+        getOnboardingErrorMessage(
+          error,
+          "처리에 실패했습니다. 다시 시도해주세요.",
+        ),
+      );
+    } finally {
+      setIsOnboardingSubmitting(false);
+    }
+  };
+
+  /**
+   * [윤서][추가] 약관 동의 화면에서 카카오 로그인 성공 후 호출
+   * FR-002(동의값) → FR-100(카카오 로그인) 순서로 호출합니다.
+   */
+  const handleKakaoConsentSubmit = async (consents, kakaoAccessToken) => {
+    const sessionId = getSessionId();
+    if (!sessionId) return;
+
+    setIsOnboardingSubmitting(true);
+    setOnboardingError("");
+
+    try {
+      await updateConsents(sessionId, consents);
+      await loginWithKakao(sessionId, kakaoAccessToken);
+      handleLoginSuccess();
+      navigate("/onboarding/setup");
+    } catch (error) {
+      console.error("카카오 로그인/약관 동의 실패:", error);
+      setOnboardingError(
+        getOnboardingErrorMessage(
+          error,
+          "로그인 처리에 실패했습니다. 다시 시도해주세요.",
+        ),
+      );
+    } finally {
+      setIsOnboardingSubmitting(false);
+    }
+  };
+
+  /**
+   * [윤서][추가] 쇼핑 셋업(닉네임/라이프스타일) 완료
+   * FR-101(닉네임) → FR-102(라이프스타일 태그) 순서로 호출합니다.
+   */
+  const handleOnboardingSetupSubmit = async (data) => {
+    const sessionId = getSessionId();
+    if (!sessionId) return;
+
+    setIsOnboardingSubmitting(true);
+    setOnboardingError("");
+
+    try {
+      await updateNickname(sessionId, data.nickname);
+      await updateLifestyleTags(sessionId, data.lifestyleTags);
+      handleSetUserName(data.nickname);
+      navigate("/onboarding/complete");
+    } catch (error) {
+      console.error("쇼핑 셋업 저장 실패:", error);
+      setOnboardingError(
+        getOnboardingErrorMessage(
+          error,
+          "저장에 실패했습니다. 다시 시도해주세요.",
+        ),
+      );
+    } finally {
+      setIsOnboardingSubmitting(false);
+    }
+  };
+
+  // ===== [윤서] 여기까지 온보딩 API 연동을 위해 추가한 부분 =====
 
   const isEditModalOpen = Boolean(analysisState.editModalType);
 
@@ -586,43 +786,42 @@ function App() {
     <Routes>
       <Route path="/" element={<Navigate to="/onboarding" replace />} />
 
-      {/* [수정] 프라이빗 둘러보기는 동의 화면 없이 바로 쇼핑 셋업으로 이동 */}
+      {/* [윤서][수정] 매장 진입(FR-000)에서 받아온 매장명 전달, 버튼은 API 호출 핸들러로 연결 */}
       <Route
         path="/onboarding"
         element={
           <Onboarding1
-            onSelectPrivate={() => navigate("/onboarding/setup")}
-            onSelectAccount={() => navigate("/onboarding/consent")}
+            storeName={storeName}
+            onSelectPrivate={handleSelectPrivate}
+            onSelectAccount={handleSelectAccount}
+            isSubmitting={isOnboardingSubmitting}
+            errorMessage={onboardingError}
           />
         }
       />
 
-      {/* [수정] 카카오 로그인 성공 시 App.jsx의 isLoggedIn을 true로 설정 */}
+      {/* [윤서][수정] 카카오 로그인 성공 시 App.jsx가 동의값·토큰을 서버로 전송 */}
       <Route
         path="/onboarding/consent"
         element={
           <Onboarding2
             onBack={() => navigate(-1)}
-            onLoginSuccess={handleLoginSuccess}
-            onSubmit={(consents) => {
-              console.log("제출된 동의값:", consents);
-              navigate("/onboarding/setup");
-            }}
+            onKakaoSubmit={handleKakaoConsentSubmit}
+            isSubmitting={isOnboardingSubmitting}
+            errorMessage={onboardingError}
           />
         }
       />
 
-      {/* [수정] 쇼핑 셋업 완료 시 닉네임을 App.jsx에 저장 */}
+      {/* [윤서][수정] 닉네임/라이프스타일 저장 API 호출 후 완료 화면으로 이동 */}
       <Route
         path="/onboarding/setup"
         element={
           <OnboardingSetup
             onBack={() => navigate(-1)}
-            onSubmit={(data) => {
-              console.log("닉네임/라이프스타일:", data);
-              handleSetUserName(data.nickname);
-              navigate("/onboarding/complete");
-            }}
+            onSubmit={handleOnboardingSetupSubmit}
+            isSubmitting={isOnboardingSubmitting}
+            errorMessage={onboardingError}
           />
         }
       />
