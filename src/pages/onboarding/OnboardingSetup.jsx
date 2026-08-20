@@ -1,7 +1,7 @@
 // 온보딩 - 닉네임 입력 + 라이프스타일 선택
 // 카카오 경로(온보딩_4/5), 비회원 경로(온보딩_2/3) 공통 사용 됨
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./OnboardingSetup.css";
 import backIcon from "../../assets/icons/backicon.svg";
 
@@ -19,12 +19,19 @@ const MAX_TAGS = 3;
 function OnboardingSetup({
   onBack,
   onSubmit,
+  initialNickname = "",
   // [윤서][추가] API 연동 - 로딩/에러 상태
   isSubmitting = false,
   errorMessage = "",
 }) {
-  const [nickname, setNickname] = useState("");
+  const [nickname, setNickname] = useState(initialNickname);
   const [selectedTags, setSelectedTags] = useState([]);
+
+  // 카카오 로그인 응답에서 불러온 이전 닉네임이 도착하면 입력창에 미리 채운다.
+  // 라이프스타일은 오늘 첫 로그인마다 새로 선택해야 하므로 복원하지 않는다.
+  useEffect(() => {
+    setNickname(initialNickname);
+  }, [initialNickname]);
 
   // [윤서][수정] API 스펙(FR-101)상 닉네임은 2~10자. 1글자면 어차피 400 나므로 프론트에서 미리 막음
   const isValid =

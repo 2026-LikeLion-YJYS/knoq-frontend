@@ -970,13 +970,33 @@ function App() {
 
       // [추가] 백엔드는 카카오 연결 실패도 200 + PRIVATE로 반환할 수 있습니다.
       if (loginResponse?.storageScope === "ACCOUNT") {
+        // TODO(임시 확인용): sessionId/sessionToken이 항상 오는지 아니면
+        // "같은 날 재로그인"일 때만 오는지 실제 응답으로 확인되면 이 로그는 지웁니다.
+        console.log("[kakao-login] sessionId/sessionToken 포함 여부:", {
+          hasSessionId: Boolean(loginResponse.sessionId),
+          hasSessionToken: Boolean(loginResponse.sessionToken),
+          onboardingCompleted: loginResponse.onboardingCompleted,
+        });
+
+        // 같은 날 재로그인하면 백엔드가 오늘 처음 만든 세션을 재사용해서 반환한다.
+        // 이후 모든 API가 삭제된 임시 세션이 아니라 반환된 일일 세션을 사용하도록 즉시 교체한다.
+        if (loginResponse.sessionId && loginResponse.sessionToken) {
+          setSessionId(loginResponse.sessionId);
+          setSessionToken(loginResponse.sessionToken);
+        }
+
+        // 오늘 첫 로그인에서는 이전 닉네임을 온보딩 입력창의 추천값으로 사용하고,
+        // 같은 날 재로그인에서는 오늘 확정된 닉네임/태그를 그대로 복원한다.
+        setUserName(loginResponse.nickname ?? "");
+        setLifestyleTags(loginResponse.lifestyleTags ?? []);
         handleLoginSuccess();
 
         // [수정] 이미 온보딩을 마친 재방문 계정이면 닉네임/라이프스타일 설정을
         // 다시 거치지 않고 바로 탐색 화면(아카이브)으로 보냅니다.
+        // [추가] navigate 전에 스왑된(또는 그대로인) 세션 기준으로 아카이브를 먼저
+        // 채워둬서, /explore 진입 직후 빈 목록이 잠깐 보이는 깜빡임을 없앱니다.
         if (loginResponse?.onboardingCompleted) {
-          setUserName(loginResponse.nickname ?? "");
-          setLifestyleTags(loginResponse.lifestyleTags ?? []);
+          await loadVisitArchive();
           navigate("/explore");
           return;
         }
@@ -1514,6 +1534,7 @@ function App() {
             <OnboardingSetup
               onBack={() => navigate(-1)}
               onSubmit={handleOnboardingSetupSubmit}
+              initialNickname={userName}
               isSubmitting={isOnboardingSubmitting}
               errorMessage={onboardingError}
             />
