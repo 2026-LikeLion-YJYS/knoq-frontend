@@ -21,7 +21,6 @@
   padding-bottom: 40px;
 }
 
-/* [수정] ExploreHome과 동일한 배경(MCM 패턴 + 그라디언트) 재사용 */
 .explore-archive__glow {
   position: absolute;
   inset: 0;
@@ -93,7 +92,6 @@
   box-sizing: border-box;
 }
 
-/* [수정] Figma 위치 기준: 설명글/버튼 옆(우측 하단)에 걸치는 위치 */
 .explore-archive__hero-image {
   position: absolute;
   z-index: 2;
@@ -129,13 +127,19 @@
 
 .explore-archive__card {
   position: relative;
-  aspect-ratio: 106 / 116;
+  aspect-ratio: 110 / 121;
   border: none;
-  border-radius: 9px;
+  border-radius: 16px;
   padding: 0;
   cursor: pointer;
-  overflow: hidden;
   background: rgba(104, 104, 104, 0.5);
+}
+
+.explore-archive__card-inner {
+  position: absolute;
+  inset: 4px;
+  border-radius: 13px;
+  overflow: hidden;
 }
 
 .explore-archive__card-image {
@@ -144,6 +148,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  opacity: 0.8;
 }
 
 .explore-archive__badge {
@@ -168,17 +173,16 @@
   left: 0;
   right: 0;
   bottom: 0;
+  height: 45%;
   z-index: 1;
 
-  padding: 8px;
-  background: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0) 0%,
-    rgba(0, 0, 0, 0.6) 100%
-  );
+  padding: 10px;
+  background: rgba(40, 38, 35, 0.5);
+  border-radius: 12px;
 
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
   align-items: flex-start;
   text-align: left;
 }
@@ -188,15 +192,16 @@
   color: #ffffff;
   font-family: "Pretendard", sans-serif;
   font-weight: 600;
-  font-size: 13px;
-  letter-spacing: -0.26px;
+  font-size: 14px;
+  letter-spacing: -0.28px;
+  white-space: nowrap;
 }
 
 .explore-archive__card-date {
-  margin: 2px 0 0;
+  margin: 4px 0 0;
   color: #bbbbbb;
   font-family: "Pretendard", sans-serif;
   font-weight: 400;
-  font-size: 9px;
-  letter-spacing: -0.18px;
+  font-size: 10px;
+  letter-spacing: -0.2px;
 }

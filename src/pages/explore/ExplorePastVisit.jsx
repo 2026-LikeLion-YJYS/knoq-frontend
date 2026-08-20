@@ -15,7 +15,6 @@ import MainHeader from "../../components/MainHeader/MainHeader";
 import BottomNav from "../../components/BottomNav/BottomNav";
 import ProductDetailModal from "./ProductDetailModal";
 
-// [수정] 각도 전환용 이미지 (화살표로만 바뀝니다, 제품 선택과는 무관)
 const HERO_IMAGES = [frontBag, sideBag, topBag];
 
 // TODO: 방문별 실제 데이터 API 연동 시 visitId로 조회하도록 교체
@@ -35,9 +34,7 @@ function ExplorePastVisit({ userName, isLoggedIn, onLogout }) {
   const { visitId } = useParams();
   const navigate = useNavigate();
   const [angleIndex, setAngleIndex] = useState(0);
-  // [추가] 저장 제품 선택 상태 (주황 테두리 하이라이트 전용)
   const [selectedId, setSelectedId] = useState(PAST_VISIT_DUMMY.savedItems[0].id);
-  // [추가] 상세 보기 모달 표시 여부
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   const goPrev = () =>
@@ -85,7 +82,6 @@ function ExplorePastVisit({ userName, isLoggedIn, onLogout }) {
             <p className="explore-past-visit__hero-title">
               {PAST_VISIT_DUMMY.productName}
             </p>
-            {/* [수정] 클릭 가능한 버튼으로 변경, 상세 모달 연결 */}
             <button
               type="button"
               className="explore-past-visit__detail-badge"
@@ -95,7 +91,6 @@ function ExplorePastVisit({ userName, isLoggedIn, onLogout }) {
             </button>
           </div>
 
-          {/* [추가] Figma에 있던 캐러셀 화살표 - 각도 전환 전용 */}
           <div className="explore-past-visit__hero-image-wrap">
             <button
               type="button"
@@ -148,7 +143,6 @@ function ExplorePastVisit({ userName, isLoggedIn, onLogout }) {
         </div>
       </section>
 
-      {/* [추가] Figma에 있던 스캔 FAB */}
       <button
         type="button"
         className="explore-past-visit__scan-fab"
@@ -160,7 +154,6 @@ function ExplorePastVisit({ userName, isLoggedIn, onLogout }) {
 
       <BottomNav activeTab="explore" onNavigate={handleNavigate} />
 
-      {/* [추가] 상세 보기 모달 */}
       <ProductDetailModal
         isOpen={isDetailOpen}
         onClose={() => setIsDetailOpen(false)}

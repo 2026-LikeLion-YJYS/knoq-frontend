@@ -52,6 +52,7 @@ import NotificationPage from "./pages/notification/NotificationPage";
 // [추가] 탐색 아카이브 카드 썸네일 이미지
 import reShoesImage from "./assets/images/re-shoes.svg";
 import reBagImage from "./assets/images/re-bag.svg";
+import reShirtImage from "./assets/images/re-shirt.svg";
 
 /**
  * [추가] 분석 화면 진행 단계
@@ -119,7 +120,10 @@ const getAnalysisErrorMessage = (error, fallbackMessage) => {
  * TODO: 방문 기록 API 나오면 이 더미 대신 실제 데이터로 교체
  */
 const VISIT_ARCHIVE = [
-  { id: "visit-2", label: "두번째 MCM", date: "2025.08.16", isNew: true, image: reShoesImage },
+  // TODO: Figma에 3번째 카드 라벨/날짜가 아직 확정 안 돼서(디자이너가 "첫 MCM" 그대로 복제해둠)
+  // 일단 이미지만 먼저 넣어둡니다. 확정되면 label/date 교체 필요.
+  { id: "visit-3", label: "세번째 MCM", date: "2025.08.16", isNew: true, image: reShirtImage },
+  { id: "visit-2", label: "두번째 MCM", date: "2025.08.16", isNew: false, image: reShoesImage },
   { id: "visit-1", label: "첫 MCM", date: "2025.08.16", isNew: false, image: reBagImage },
 ];
 
