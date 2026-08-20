@@ -1,18 +1,15 @@
-/* 직원 상담 요청 상세 화면 전체 영역 */
-.staff-request-detail {
-  position: relative;
-
+/* 직원 상담 요청 목록 화면 전체 영역 */
+.staff-requests {
   width: 100%;
   max-width: 744px;
   min-height: 100vh;
   min-height: 100dvh;
   margin: 0 auto;
-  padding: 30px 32px clamp(24px, 3.5vh, 40px);
-
+  padding: 48px 32px 32px;
   overflow-x: hidden;
+  overflow-y: auto;
 
   color: #ffffff;
-
   background:
     radial-gradient(
       149.83% 46.17% at 80.28% -15.61%,
@@ -22,19 +19,12 @@
     #24221e;
 
   box-sizing: border-box;
-
-  display: flex;
-  flex-direction: column;
 }
 
 /* 상단 KNOQ 로고와 설정 영역 */
-.staff-request-detail__header {
-  position: relative;
-  z-index: 1;
-
+.staff-requests__header {
   width: 100%;
-  height: clamp(46px, 4.8vh, 54px);
-  flex-shrink: 0;
+  height: 54px;
 
   display: flex;
   align-items: center;
@@ -42,19 +32,17 @@
 }
 
 /* KNOQ 로고 */
-.staff-request-detail__logo {
+.staff-requests__logo {
   display: block;
-
-  width: clamp(78px, 12vw, 90px);
+  width: 90px;
   height: auto;
-
   object-fit: contain;
 }
 
 /* 설정 버튼 */
-.staff-request-detail__setting-button {
-  width: clamp(46px, 7vw, 54px);
-  height: clamp(46px, 7vw, 54px);
+.staff-requests__setting-button {
+  width: 54px;
+  height: 54px;
   padding: 7px;
 
   display: flex;
@@ -69,500 +57,216 @@
 }
 
 /* 설정 아이콘 */
-.staff-request-detail__setting-icon {
+.staff-requests__setting-icon {
   display: block;
-
   width: 100%;
   height: 100%;
-
   object-fit: contain;
 }
 
-/* 상담 요청 제목 */
-.staff-request-detail__title {
-  position: relative;
-  z-index: 1;
+/* 요청 목록 제목 */
+.staff-requests__title {
+  margin: 64px 0 48px;
 
-  margin: clamp(22px, 3.2vh, 36px) 0 0;
-
-  color: #ffffff;
-
-  font-size: 34px;
+  font-size: 36px;
   font-weight: 500;
-  line-height: 150%;
-  letter-spacing: -0.68px;
+  line-height: 1.5;
+  letter-spacing: -0.03em;
 }
 
-/* 상세 콘텐츠 전체 영역 */
-.staff-request-detail__content {
-  position: relative;
-  z-index: 1;
-
-  width: min(528px, 100%);
-  margin: clamp(18px, 2.5vh, 28px) auto 0;
-}
-
-/* 상세 영역 공통 */
-.staff-request-detail__section {
+/* 요청 카드 목록 */
+.staff-requests__list {
   width: 100%;
-}
-
-/* 상세 영역 제목 */
-.staff-request-detail__section-title {
-  margin: 0;
-
-  color: #ffffff;
-
-  font-size: 22px;
-  font-weight: 500;
-  line-height: 150%;
-  letter-spacing: -0.44px;
-}
-
-/* 도움 유형 목록 */
-.staff-request-detail__help-types {
-  width: 100%;
-  margin-top: clamp(12px, 1.7vh, 20px);
-
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-
-  column-gap: 18px;
-  row-gap: clamp(6px, 0.8vh, 8px);
-}
-
-/* 도움 유형 */
-.staff-request-detail__help-type {
-  min-width: 0;
-  height: clamp(52px, 5.7vh, 64px);
-  padding: 0 12px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  color: #b7b7b7;
-
-  background: rgba(46, 46, 46, 0.6);
-
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 22px;
-
-  font-size: clamp(18px, 3vw, 23px);
-  font-weight: 400;
-  line-height: 150%;
-  letter-spacing: -0.46px;
-
-  box-sizing: border-box;
-}
-
-/* 고객이 실제로 선택한 도움 유형 */
-.staff-request-detail__help-type--selected {
-  color: #ffffff;
-
-  border: 1.423px solid #ff8e43;
-  background: rgba(82, 82, 82, 0.4);
-}
-
-/* 상담 제품 영역 */
-.staff-request-detail__product-section {
-  margin-top: clamp(18px, 2.4vh, 30px);
-}
-
-/* 상담 제품 목록 */
-.staff-request-detail__products {
-  width: 100%;
-  margin-top: clamp(12px, 1.7vh, 20px);
-
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-
-  gap: clamp(14px, 3vw, 22px);
-}
-
-/* 개별 상담 제품 */
-.staff-request-detail__product {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-
-  overflow: hidden;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: rgba(63, 62, 60, 0.65);
-
-  border: 1.423px solid #ff8e43;
-  border-radius: clamp(18px, 3vw, 22px);
-
-  box-sizing: border-box;
-}
-
-/* 상담 제품 이미지 */
-.staff-request-detail__product-image {
-  display: block;
-
-  width: 84%;
-  height: 84%;
-
-  object-fit: contain;
-}
-
-/* 제품이 없는 슬롯 */
-.staff-request-detail__product--empty {
-  border-color: transparent;
-  background: #2f2e2c;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-/* 빈 제품 슬롯 더하기 표시 */
-.staff-request-detail__plus {
-  position: relative;
-
-  width: clamp(32px, 5.6vw, 42px);
-  height: clamp(32px, 5.6vw, 42px);
-}
-
-/* 더하기 가로선 */
-.staff-request-detail__plus::before {
-  content: "";
-
-  position: absolute;
-  top: 50%;
-  left: 0;
-
-  width: 100%;
-  height: clamp(4px, 0.8vw, 6px);
-
-  background: #bcbcbc;
-  border-radius: 999px;
-
-  transform: translateY(-50%);
-}
-
-/* 더하기 세로선 */
-.staff-request-detail__plus::after {
-  content: "";
-
-  position: absolute;
-  top: 0;
-  left: 50%;
-
-  width: clamp(4px, 0.8vw, 6px);
-  height: 100%;
-
-  background: #bcbcbc;
-  border-radius: 999px;
-
-  transform: translateX(-50%);
-}
-
-/* 라이프스타일 및 니즈 영역 */
-.staff-request-detail__analysis-section {
-  margin-top: clamp(16px, 2.2vh, 28px);
-}
-
-/* 라이프스타일 및 니즈 제목 */
-.staff-request-detail__analysis-title {
-  margin: 0;
-
-  color: #ffffff;
-
-  font-size: clamp(19px, 3.2vw, 24px);
-  font-weight: 500;
-  line-height: 150%;
-  letter-spacing: -0.48px;
-}
-
-/* 니즈 분석 카드 */
-.staff-request-detail__analysis-card {
-  /* [수정] 피그마 기준 라이프스타일 및 니즈 전체 카드 크기 */
-  width: 491px;
-  max-width: 100%;
-  height: 260px;
-
-  margin: clamp(12px, 1.7vh, 20px) auto 0;
-
-  padding: 12px 18px;
-  overflow: hidden;
-  border-radius: 22.771px;
-  background: radial-gradient(
-    59.76% 166% at 51.59% 129%,
-    rgba(245, 158, 11, 0.2) 0%,
-    rgba(248, 124, 42, 0.3) 100%
-  );
-  box-sizing: border-box;
-}
-
-/* 라이프스타일 정보 */
-.staff-request-detail__lifestyle {
-  min-height: clamp(38px, 4.2vh, 48px);
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 18px;
-}
-
-/* 분석 영역 라벨 */
-.staff-request-detail__analysis-label {
-  flex-shrink: 0;
-
-  padding-left: 8px;
-
-  color: #ffffff;
-
-  font-size: clamp(16px, 2.7vw, 20px);
-  font-weight: 400;
-  line-height: 150%;
-  letter-spacing: -0.4px;
-}
-
-/* [수정] 라이프스타일 태그 3개가 항상 한 줄에 표시되도록 3열로 고정합니다. */
-.staff-request-detail__lifestyle-tags {
-  min-width: 0;
-  flex: 1 1 auto;
-
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  align-items: center;
-
-  gap: clamp(4px, 1vw, 10px);
-}
-
-/* [수정] 각 태그가 한 칸 안에서 줄바꿈 없이 표시되도록 제한합니다. */
-.staff-request-detail__lifestyle-tag {
-  display: block;
-  width: 100%;
-  min-width: 0;
-
-  padding: clamp(7px, 1vh, 11px) clamp(6px, 1vw, 12px);
-
-  color: #ffffff;
-
-  border-radius: 142.319px;
-
-  background: rgba(73, 56, 43, 0.5);
-
-  font-size: clamp(13px, 2vw, 17px);
-  font-weight: 400;
-  line-height: 150%;
-  letter-spacing: -0.342px;
-
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-
-  box-sizing: border-box;
-}
-
-/* 니즈 상세 영역 */
-.staff-request-detail__needs {
-  margin-top: clamp(5px, 0.7vh, 8px);
-}
-
-/* 니즈 제목 */
-.staff-request-detail__needs-title {
-  margin: 0 0 clamp(6px, 0.8vh, 9px);
-
-  padding-left: 8px;
-
-  color: #ffffff;
-
-  font-size: clamp(16px, 2.7vw, 20px);
-  font-weight: 400;
-  line-height: 150%;
-  letter-spacing: -0.4px;
-}
-
-/* 니즈 값 목록 */
-.staff-request-detail__needs-grid {
-  /* [수정] 피그마 기준 니즈 상세 박스 크기 */
-  width: 454px;
-  max-width: 100%;
-
-  height: 134px;
-  padding: 8px 12px;
-
-  display: grid;
-
-  /* 카테고리 / 소재 / 사이즈 / 컬러 */
-  grid-template-columns: repeat(4, 96px);
-  justify-content: space-between;
-
-  align-items: center;
-  border-radius: 14.232px;
-  background: rgba(73, 56, 43, 0.65);
-
-  box-sizing: border-box;
-}
-
-/* 개별 니즈 값 */
-.staff-request-detail__needs-item {
-  min-width: 0;
-  padding: 0 8px;
 
   display: flex;
   flex-direction: column;
-  align-items: center;
-
-  gap: clamp(5px, 0.8vh, 9px);
-
-  text-align: center;
+  gap: 16px;
 }
 
-/* 니즈 항목명 */
-.staff-request-detail__needs-label {
-  color: #bcbcbc;
+/* 개별 상담 요청 카드 */
+.staff-request-card {
+  width: 100%;
+  min-height: 153px;
+  padding: 26px 27px 26px 32px;
 
-  font-size: clamp(10px, 1.7vw, 13px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 145px;
+  align-items: center;
+  gap: 28px;
+  border-radius: 16px;
+  background: rgba(82, 82, 82, 0.4);
+  box-sizing: border-box;
+}
+
+/* 요청 정보 영역 */
+.staff-request-card__information {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* 도움 유형 */
+.staff-request-card__heading {
+  margin-bottom: 14px;
+}
+
+.staff-request-card__type {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 150%; /* 36px */
+  letter-spacing: -0.48px;
+}
+
+/* 요청 상세 정보 한 줄 */
+.staff-request-card__row {
+  min-height: 32px;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 요청 정보 라벨 */
+.staff-request-card__label {
+  width: 88px;
+  flex-shrink: 0;
+
+  color: #bbb;
+  font-size: 16px;
   font-weight: 400;
-  line-height: 1.2;
+  line-height: 150%;
+  letter-spacing: -0.32px;
+}
 
+/* SVG 점선 */
+.staff-request-card__line {
+  display: block;
+  width: 104px;
+  height: auto;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+/* 고객 닉네임 */
+.staff-request-card__nickname {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 150%; /* 24px */
+  letter-spacing: -0.32px;
   white-space: nowrap;
 }
 
-/* 니즈 분석값 */
-.staff-request-detail__needs-value {
-  /* [수정] 96×73px 값 영역 안에서 한 줄부터 세 줄까지 수직·수평 가운데 정렬합니다. */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 96px;
-  max-width: 100%;
-  height: 73px;
-  padding: 0 4px;
-  overflow: hidden;
-
-  box-sizing: border-box;
+/* 닉네임 뒤 '님' */
+.staff-request-card__nickname-suffix {
+  color: #bbb;
   text-align: center;
-}
-
-/* [수정] 직원 니즈값은 15px로 최대 3줄까지만 표시하고 초과 내용은 말줄임합니다. */
-.staff-request-detail__needs-value-text {
-  display: -webkit-box;
-  max-width: 100%;
-  overflow: hidden;
-
-  color: #ffffff;
-
-  font-size: 15px;
-  font-weight: 400;
-  line-height: 1.35;
-  letter-spacing: -0.3px;
-
-  white-space: normal;
-  word-break: keep-all;
-  overflow-wrap: anywhere;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-}
-
-/* 공유된 니즈 분석이 없을 때 */
-.staff-request-detail__needs-empty {
-  margin: clamp(8px, 1vh, 12px) 0 0;
-
-  padding: clamp(12px, 1.5vh, 18px);
-
-  color: #d2d2d2;
-
-  background: rgba(65, 53, 45, 0.76);
-
-  border-radius: 14px;
-
-  font-size: 15px;
-  line-height: 1.5;
-
-  text-align: center;
-}
-
-/* 제품 비교 정보 */
-.staff-request-detail__comparison {
-  width: 100%;
-
-  margin-top: clamp(16px, 2vh, 24px);
-
-  padding: clamp(14px, 1.8vh, 20px);
-
-  background: rgba(63, 62, 60, 0.65);
-
-  border-radius: 16px;
-
-  box-sizing: border-box;
-}
-
-/* 제품 비교 제목 */
-.staff-request-detail__comparison-title {
-  margin: 0;
-
-  font-size: 20px;
-  font-weight: 500;
-  line-height: 150%;
-}
-
-/* 제품 비교 내용 */
-.staff-request-detail__comparison-list {
-  margin: clamp(8px, 1vh, 12px) 0 0;
-  padding-left: 20px;
-
-  color: #d1d1d1;
-
-  font-size: 15px;
-  line-height: 1.5;
-}
-
-/* 상담 종료 버튼 */
-.staff-request-detail__end-button {
-  width: 100%;
-
-  min-height: clamp(64px, 7.8vh, 88px);
-
-  margin-top: clamp(18px, 2.4vh, 28px);
-
-  padding: 12px 24px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  color: #ffffff;
-
-  background: radial-gradient(
-    59.76% 166% at 51.59% 129%,
-    #f59e0b 0%,
-    #fc7810 100%
-  );
-
-  border: 0;
-  border-radius: 50px;
-
-  font-size: 30px;
+  font-size: 14px;
   font-style: normal;
-  font-weight: 500;
-  line-height: 150%;
-  letter-spacing: -0.64px;
+  font-weight: 400;
+  line-height: 150%; /* 21px */
+  letter-spacing: -0.28px;
+}
+
+/* 라이프스타일 태그 목록 */
+.staff-request-card__tags {
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* 라이프스타일 태그 */
+.staff-request-card__tag {
+  padding: 6px 13px;
+
+  color: #ffffff;
+  background: #62615f;
+  border-radius: 999px;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* 상담 시작 버튼 */
+.staff-request-card__start-button {
+  width: 146px;
+  height: 100px;
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #ffffff;
+  background: #fc7810;
+  border: 0;
+  border-radius: 10px;
+
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 150%; /* 24px */
+  letter-spacing: -0.32px;
 
   cursor: pointer;
-
-  transition: transform 0.1s ease;
+  transition:
+    background-color 0.15s ease,
+    transform 0.1s ease;
 
   -webkit-tap-highlight-color: transparent;
-
-  box-sizing: border-box;
 }
 
-/* 상담 종료 버튼 클릭 효과 */
-.staff-request-detail__end-button:active {
-  transform: scale(0.98);
+/* 상담 시작 버튼 클릭 효과 */
+.staff-request-card__start-button:active {
+  background: #e86200;
+  transform: scale(0.97);
+}
+
+/* 접수된 요청이 없을 때 */
+.staff-requests__empty {
+  width: 100%;
+  padding: 64px 20px;
+
+  color: #a8a8a8;
+  background: rgba(63, 62, 60, 0.55);
+  border-radius: 16px;
+
+  font-size: 18px;
+  text-align: center;
+  box-sizing: border-box;
 }
 
 /* 키보드 접근 시 포커스 표시 */
-.staff-request-detail__setting-button:focus-visible,
-.staff-request-detail__end-button:focus-visible {
+.staff-requests__setting-button:focus-visible,
+.staff-request-card__start-button:focus-visible {
   outline: 3px solid rgba(255, 255, 255, 0.9);
   outline-offset: 4px;
+}
+
+/* [추가] 상담이 완료된 요청 버튼 */
+.staff-request-card__start-button:disabled {
+  color: #595959;
+  background: #bbb;
+  font-size: 16px;
+  cursor: default;
+  transform: none;
+}
+
+/* [추가] 완료 버튼은 클릭 효과를 적용하지 않음 */
+.staff-request-card__start-button:disabled:active {
+  background: #bdbdbd;
+  transform: none;
 }
