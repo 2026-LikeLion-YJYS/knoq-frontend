@@ -145,3 +145,10 @@
   );
   color: #ffffff;
 }
+
+.scan-confirm__error {
+  margin: 16px 24px 0;
+  color: #ff6b6b;
+  font-size: 13px;
+  text-align: center;
+}

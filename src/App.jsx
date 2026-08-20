@@ -35,6 +35,9 @@ import {
 // [윤서][추가] 추천 제품 상세(이미지) 조회
 import { getProductDetail } from "./api/productsApi";
 
+// [윤서][추가] 제품 스캔(FR-200) 인식/확인 API
+import { recognizeProduct, confirmRecognition } from "./api/scanApi";
+
 // [윤서][추가] 백엔드가 내려주는 상대 이미지 경로를 완전한 URL로 변환
 import { createApiAssetUrl } from "./api/apiClient";
 
@@ -209,12 +212,8 @@ function App() {
   // [추가] 분석 경로의 이전 진입 상태를 저장해 중복 GET 요청을 방지합니다.
   const wasAnalysisRouteRef = useRef(false);
 
-  const [savedItems, setSavedItems] = useState(
-    Array.from({ length: 8 }, (_, i) => ({
-      id: i,
-      isRecommended: i === 4 || i === 5,
-    })),
-  );
+  // [윤서][수정] 더미 8개 대신 빈 배열로 시작 - 쇼핑 셋업 완료 시 실제 추천 제품 3개로 채워짐
+  const [savedItems, setSavedItems] = useState([]);
 
   const handleDeleteSavedItem = (id) => {
     setSavedItems((prev) => prev.filter((item) => item.id !== id));
@@ -231,6 +230,117 @@ function App() {
       },
     ]);
   };
+
+  // ===== [윤서] 여기부터 제품 스캔(FR-200) API 연동을 위해 추가한 부분 =====
+
+  // [윤서][추가] 인식 진행 중 상태 - recognitionId, 확인 대상 product를 같이 들고 있음
+  const [scanResult, setScanResult] = useState({
+    recognitionId: null,
+    product: null,
+  });
+
+  // [윤서][추가] "맞아요"/"다시 촬영" 처리 중 로딩 상태
+  const [isScanSubmitting, setIsScanSubmitting] = useState(false);
+
+  // [윤서][추가] 스캔 관련 API 실패 안내 메시지
+  const [scanError, setScanError] = useState("");
+
+  /**
+   * [윤서][추가] 촬영 완료 시 호출됨 (ScanCapture의 onCapture)
+   * FR-200 카메라 인식 요청 → 첫 번째 후보의 상세정보(이름/이미지) 조회 순서로 진행합니다.
+   * 후보가 여러 개(CANDIDATES) 와도, 별도 선택 화면 없이 첫 번째 후보만 사용하기로 함(팀 확인 완료).
+   */
+  const handleScanCapture = async (imageBlob) => {
+    const sessionId = getSessionId();
+    if (!sessionId) return;
+
+    setScanError("");
+    navigate("/explore/scan/recognizing");
+
+    try {
+      const recognition = await recognizeProduct(sessionId, imageBlob);
+      const firstCandidate = recognition?.candidates?.[0];
+
+      if (!firstCandidate) {
+        throw new Error("인식된 제품이 없어요.");
+      }
+
+      const detail = await getProductDetail(firstCandidate.productId);
+
+      setScanResult({
+        recognitionId: recognition.recognitionId,
+        product: {
+          productId: firstCandidate.productId,
+          name: detail.name,
+          image: createApiAssetUrl(detail.thumbnailUrl),
+        },
+      });
+
+      navigate("/explore/scan/confirm", { replace: true });
+    } catch (error) {
+      console.error("제품 인식(FR-200) 실패:", error);
+      setScanError(
+        getOnboardingErrorMessage(
+          error,
+          "제품을 인식하지 못했어요. 다시 촬영해주세요.",
+        ),
+      );
+      navigate("/explore/scan", { replace: true });
+    }
+  };
+
+  /**
+   * [윤서][추가] 확인 화면에서 "맞아요" 클릭
+   * confirmed:true로 confirm 호출 → 같은 트랜잭션 안에서 저장목록에 자동 저장됨(별도 저장 API 불필요).
+   */
+  const handleScanConfirm = async () => {
+    const sessionId = getSessionId();
+    const { recognitionId, product } = scanResult;
+    if (!sessionId || !recognitionId || !product) return;
+
+    setIsScanSubmitting(true);
+    setScanError("");
+
+    try {
+      await confirmRecognition(sessionId, recognitionId, product.productId, true);
+      // TODO: 저장목록을 실제 API(getSavedProducts)로 교체하면 이 줄은 지우고 재조회로 대체
+      handleAddScannedProduct(product);
+      navigate("/explore/scan/complete", { replace: true });
+    } catch (error) {
+      console.error("인식 결과 확인 실패:", error);
+      setScanError(
+        getOnboardingErrorMessage(
+          error,
+          "저장에 실패했어요. 다시 시도해주세요.",
+        ),
+      );
+    } finally {
+      setIsScanSubmitting(false);
+    }
+  };
+
+  /**
+   * [윤서][추가] 확인 화면에서 "다시 촬영할게요" 클릭
+   * confirmed:false로 confirm 호출 후 촬영 화면으로 돌아갑니다.
+   */
+  const handleScanRetake = async () => {
+    const sessionId = getSessionId();
+    const { recognitionId, product } = scanResult;
+
+    if (sessionId && recognitionId && product) {
+      try {
+        await confirmRecognition(sessionId, recognitionId, product.productId, false);
+      } catch (error) {
+        // [윤서][추가] 재촬영 자체는 막지 않고 콘솔에만 남김
+        console.error("재촬영 처리(confirmed:false) 실패:", error);
+      }
+    }
+
+    setScanResult({ recognitionId: null, product: null });
+    navigate("/explore/scan", { replace: true });
+  };
+
+  // ===== [윤서] 여기까지 제품 스캔(FR-200) API 연동을 위해 추가한 부분 =====
 
   // [수정] 저장된 고객 세션이 있으면 storageScope 복원 전까지 null로 두어 종료 API 오호출을 막습니다.
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
@@ -485,17 +595,30 @@ function App() {
 
         const productDetails = await Promise.all(
           products.map((product) =>
-            getProductDetail(product.productId).catch(() => null),
+            getProductDetail(product.productId)
+              .then((detail) => ({ ...detail, productId: product.productId }))
+              .catch(() => null),
           ),
         );
 
+        const validDetails = productDetails.filter(Boolean);
+
         setRecommendedProducts(
-          productDetails
-            .filter(Boolean)
-            .map((detail) => ({
-              image: createApiAssetUrl(detail.thumbnailUrl),
-              name: detail.name,
-            })),
+          validDetails.map((detail) => ({
+            image: createApiAssetUrl(detail.thumbnailUrl),
+            name: detail.name,
+          })),
+        );
+
+        // [윤서][추가] 탐색 화면 저장목록에도 같은 추천 제품 3개를 초기값으로 반영
+        // (나중에 실제 스캔해서 추가되는 제품은 handleAddScannedProduct가 계속 이어서 추가함)
+        setSavedItems(
+          validDetails.map((detail) => ({
+            id: detail.productId,
+            image: createApiAssetUrl(detail.thumbnailUrl),
+            name: detail.name,
+            isRecommended: true,
+          })),
         );
       } catch (recommendationError) {
         console.error("추천 제품 조회 실패:", recommendationError);
@@ -932,36 +1055,32 @@ function App() {
         }
       />
 
+      {/* [윤서][수정] onCapture가 이제 실제 사진 Blob을 받아서 인식 API를 호출합니다.
+          errorMessage도 전달해서, 인식 실패로 이 화면에 되돌아왔을 때 이유가 보이게 함 */}
       <Route
         path="/explore/scan"
         element={
           <ScanCapture
             onClose={() => navigate("/explore")}
-            onCapture={() => navigate("/explore/scan/recognizing")}
+            onCapture={handleScanCapture}
+            errorMessage={scanError}
           />
         }
       />
 
-      <Route
-        path="/explore/scan/recognizing"
-        element={
-          <ScanRecognizing
-            onComplete={() =>
-              navigate("/explore/scan/confirm", { replace: true })
-            }
-          />
-        }
-      />
+      {/* [윤서][수정] 가짜 타이머 제거, App.jsx가 실제 API 응답 오면 알아서 다음 화면으로 이동시킴 */}
+      <Route path="/explore/scan/recognizing" element={<ScanRecognizing />} />
 
+      {/* [윤서][수정] 실제 인식된 제품 정보(scanResult.product) 전달 */}
       <Route
         path="/explore/scan/confirm"
         element={
           <ScanConfirm
-            onRetake={() => navigate("/explore/scan", { replace: true })}
-            onConfirm={(product) => {
-              handleAddScannedProduct(product);
-              navigate("/explore/scan/complete", { replace: true });
-            }}
+            product={scanResult.product}
+            onRetake={handleScanRetake}
+            onConfirm={handleScanConfirm}
+            isSubmitting={isScanSubmitting}
+            errorMessage={scanError}
           />
         }
       />

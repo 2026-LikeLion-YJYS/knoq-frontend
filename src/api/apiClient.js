@@ -142,11 +142,16 @@ export const apiRequest = async (
     throw new ApiError("인증 정보를 확인할 수 없습니다.", 401, null);
   }
 
+  // [윤서][추가] 제품 인식(FR-200)처럼 이미지 파일을 보낼 땐 body가 FormData로 옵니다.
+  // FormData는 JSON.stringify하면 안 되고, Content-Type도 직접 지정하면 안 됩니다
+  // (브라우저가 boundary까지 포함해서 자동으로 넣어줘야 서버가 파싱할 수 있어요).
+  const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
+
   const requestHeaders = {
     ...headers,
   };
 
-  if (body !== undefined) {
+  if (body !== undefined && !isFormData) {
     requestHeaders["Content-Type"] = "application/json";
   }
 
@@ -157,7 +162,11 @@ export const apiRequest = async (
   const response = await fetch(createApiUrl(path), {
     method,
     headers: requestHeaders,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
+    body: isFormData
+      ? body
+      : body !== undefined
+        ? JSON.stringify(body)
+        : undefined,
   });
   const responseData = await parseResponse(response);
 
