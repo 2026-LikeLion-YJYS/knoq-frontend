@@ -3,26 +3,21 @@
   position: fixed;
   inset: 0;
   background: rgba(17, 17, 17, 0.5);
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   z-index: 9999;
 }
 
 /* [추가] 모달 카드 */
 .product-detail-modal {
   position: relative;
-
   width: 345px;
   max-width: calc(100% - 48px);
   max-height: 85dvh;
-
   background: #ffffff;
   border-radius: 16px;
   padding: 24px 16px 28px;
-
   overflow-y: auto;
   scrollbar-width: none;
   box-sizing: border-box;
@@ -37,17 +32,14 @@
   position: absolute;
   top: 16px;
   right: 16px;
-
   width: 28px;
   height: 28px;
   padding: 0;
   border: none;
   background: none;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   cursor: pointer;
 }
 
@@ -61,7 +53,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-
   width: 100%;
   padding-top: 16px;
 }
@@ -78,7 +69,6 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 6px;
-
   margin-top: 12px;
 }
 
@@ -86,11 +76,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   padding: 3px 10px;
   border-radius: 20px;
   background: #fd9238;
-
   font-family: "Pretendard", sans-serif;
   font-weight: 500;
   font-size: 10px;
@@ -126,7 +114,6 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-
   padding: 16px;
   border: 1px solid #e0e0e0;
   border-radius: 12px;
@@ -186,7 +173,6 @@
   flex: none;
   display: flex;
   flex-direction: column;
-
   padding: 12px 8px;
   border: 1px solid #e0e0e0;
   border-radius: 12px;
@@ -194,17 +180,23 @@
   overflow: hidden;
 }
 
-/* [수정] 디자인팀에서 카드 비율에 맞춰 제공한 특징 이미지를 영역 전체에 표시합니다. */
+/* [수정] 특징 이미지의 원본 비율을 유지하고 카드 하단에 배치 */
 .product-detail-modal__feature-image {
   display: block;
-  flex: 1;
-  min-height: 0;
 
+  /* [수정] 남은 공간을 강제로 채우지 않도록 설정 */
+  flex: none;
+
+  /* [수정] 카드 좌우 padding 영역까지 이미지 표시 */
   width: calc(100% + 16px);
-  margin: 6px -8px -12px;
+  height: auto;
 
+  /* [수정] 위쪽 남는 공간을 사용해 이미지를 카드 하단에 고정 */
+  margin: auto -8px -12px;
+
+  /* [수정] 원본 이미지 비율 유지 */
   object-fit: contain;
-  object-position: center;
+  object-position: center bottom;
 }
 
 .product-detail-modal__feature-card--style {
@@ -222,7 +214,6 @@
 .product-detail-modal__feature-label {
   margin: 0 0 8px;
   text-align: center;
-
   font-family: "Pretendard", sans-serif;
   font-weight: 500;
   font-size: 10px;
@@ -234,7 +225,6 @@
   margin: 0;
   padding: 0;
   list-style: none;
-
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -244,7 +234,6 @@
   display: flex;
   align-items: flex-start;
   gap: 4px;
-
   font-family: "Pretendard", sans-serif;
   font-weight: 500;
   font-size: 10px;
