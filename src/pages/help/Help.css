@@ -339,13 +339,12 @@
   margin-top: 4px;
 }
 
-/* [수정] 나의 니즈를 묶는 상자 */
+/* [수정] 나의 니즈를 묶는 상자 - 피그마 기준 4개 컬럼 동일 너비 60px, gap 12px (기존 60/46/83/80px 불균등 - 소재 컬럼이 너무 좁아 텍스트가 옆 컬럼과 겹치던 문제) */
 .help-needs-list {
-  display: grid;
-  /* [수정] 항목별 텍스트 영역의 지정 너비를 유지합니다. */
-  grid-template-columns: 60px 46px 83px 80px;
-  justify-content: space-between;
-  gap: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
 
   width: 319px;
   max-width: 100%;
@@ -357,14 +356,16 @@
   border-radius: 10px;
 }
 
-/* [수정] 니즈 개별 항목 */
+/* [수정] 니즈 개별 항목 - 피그마 기준 4개 항목 모두 고정 60px */
 .help-needs-list div {
   display: flex;
+  flex-shrink: 0;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 
-  min-width: 0;
+  width: 60px;
+  min-width: 60px;
 }
 
 /* [수정] 카테고리, 소재, 사이즈, 컬러 */
@@ -380,12 +381,14 @@
   white-space: nowrap;
 }
 
-/* [수정] 니즈 분석값 */
+/* [수정] 니즈 분석값 - 피그마 기준 모든 항목 너비 60px로 통일 (기존 46/83/80px 불균등이 겹침 원인) */
 .help-needs-list p {
   /* [수정] 모든 니즈 값은 지정 영역 안에서 최대 3줄까지만 표시합니다. */
   display: -webkit-box;
 
+  width: 60px;
   max-width: 100%;
+  height: 36px;
   margin: 0;
   overflow: hidden;
 
@@ -399,27 +402,6 @@
   overflow-wrap: anywhere;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
-}
-
-/* [수정] 도움 화면 니즈 항목별 텍스트 박스 크기 */
-.help-needs-list div:nth-child(1) p {
-  width: 60px;
-  height: 34px;
-}
-
-.help-needs-list div:nth-child(2) p {
-  width: 46px;
-  height: 36px;
-}
-
-.help-needs-list div:nth-child(3) p {
-  width: 83px;
-  height: 36px;
-}
-
-.help-needs-list div:nth-child(4) p {
-  width: 80px;
-  height: 36px;
 }
 
 /* =========================

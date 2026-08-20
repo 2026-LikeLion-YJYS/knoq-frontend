@@ -12,15 +12,18 @@
 /* 배경 이미지 */
 .onboarding-start__bg {
   position: absolute;
-  left: 0;
+  /* [수정] 피그마 기준 이미지가 왼쪽으로 살짝 넘치게 배치됩니다 (left: -113px, 원본 393px 프레임 기준). */
+  left: -28.75%; /* -113px / 393px */
   top: 111px;
 
-  width: 100%;
+  /* [수정] 피그마 원본 비율(620:775)을 유지한 채, 프레임 대비 158%로 확대 배치됩니다. */
+  width: 157.76%; /* 620px / 393px */
   height: calc(100% - 111px);
 
-  /* [수정] 이미지가 잘리지 않도록 원본 비율을 유지합니다. */
-  object-fit: contain;
-  object-position: center bottom;
+  /* [수정] 이 화면은 피그마상 이미지가 영역을 꽉 채우고 일부가 잘리는 게 원래 의도된 디자인입니다.
+     (contain으로 바꾸면 이미지가 작아지면서 위아래에 빈 여백이 생겨 오히려 의도와 달라집니다) */
+  object-fit: cover;
+  object-position: center top;
 
   display: block;
 }
