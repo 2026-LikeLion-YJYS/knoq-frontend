@@ -26,20 +26,20 @@
     #24221e;
 }
 
-/* [수정] 모바일 393px에서 실제 본문 너비가 345px이 되도록 설정 */
+/* [수정] 피그마 기준 상단 여백 10px (기존 8px), 모바일 393px에서 본문 너비 345px */
 .help-content {
   width: 100%;
-  padding: 8px 24px 110px;
+  padding: 10px 24px 110px;
 }
 
 /* =========================
    상단 안내 문구
 ========================= */
 
-/* [수정] 상단 안내 영역 */
+/* [수정] 상단 안내 영역 - 피그마 기준 다음 섹션까지 간격 40px (기존 24px) */
 .help-intro {
   width: 100%;
-  margin-bottom: 24px;
+  margin-bottom: 40px;
 }
 
 /* [수정] 원하는 순간, 어드바이저와 연결하세요 */
@@ -68,15 +68,15 @@
    도움 화면 공통 영역
 ========================= */
 
-/* [수정] 각 도움 기능 영역 */
+/* [수정] 각 도움 기능 영역 - 피그마 기준 섹션 간 간격 24px (기존 26px) */
 .help-section {
   width: 100%;
-  margin-bottom: 26px;
+  margin-bottom: 24px;
 }
 
-/* [수정] 도움 유형 선택, 제품 추가 등 영역 제목 */
+/* [수정] 도움 유형 선택, 제품 추가 등 영역 제목 - 피그마 기준 제목-콘텐츠 간격 12px (기존 14px) */
 .help-section h2 {
-  margin: 0 0 14px;
+  margin: 0 0 12px;
 
   color: rgba(255, 255, 255, 0.9);
   font-size: 16px;
@@ -89,16 +89,16 @@
    도움 유형 선택
 ========================= */
 
-/* [수정] 도움 유형 2열 배치 */
+/* [수정] 도움 유형 2열 배치 - 피그마 기준 row-gap 4px, column-gap 13px (기존 6px 10px, 순서 반대였음) */
 .help-type-list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 6px 10px;
+  gap: 4px 13px;
 
   width: 100%;
 }
 
-/* [수정] 도움 유형 기본 버튼 */
+/* [수정] 도움 유형 기본 버튼 - 피그마 기준 font-size 16px(기존14px), weight 500(기존400), 색상 고정값 #bbbbbb */
 .help-type-button {
   display: flex;
   align-items: center;
@@ -107,14 +107,14 @@
   width: 100%;
   min-width: 0;
   height: 50px;
-  padding: 14px 0;
+  padding: 15px 0 14px;
 
-  color: rgba(255, 255, 255, 0.7);
+  color: #bbbbbb;
   font-family: Pretendard, sans-serif;
-  font-size: 14px;
-  font-weight: 400;
+  font-size: 16px;
+  font-weight: 500;
   line-height: 150%;
-  letter-spacing: -0.28px;
+  letter-spacing: -0.32px;
   white-space: nowrap;
 
   background: rgba(46, 46, 46, 0.6);
@@ -138,16 +138,16 @@
    제품 추가
 ========================= */
 
-/* [수정] 상담 제품 3칸 배치 */
+/* [수정] 상담 제품 3칸 배치 - 피그마 기준 gap 15px (기존 10px) */
 .help-product-list {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  gap: 15px;
 
   width: 100%;
 }
 
-/* [수정] 선택된 제품 카드 */
+/* [수정] 선택된 제품 카드 - 피그마 기준 높이 89px (기존 102px) */
 .help-product-card {
   display: flex;
   align-items: center;
@@ -155,7 +155,7 @@
 
   width: 100%;
   min-width: 0;
-  height: 102px;
+  height: 89px;
   overflow: hidden;
 
   background: rgba(46, 46, 46, 0.45);
@@ -176,7 +176,7 @@
   cursor: pointer;
 }
 
-/* [수정] 비어 있는 제품 추가 칸 */
+/* [수정] 비어 있는 제품 추가 칸 - 피그마 기준 높이 89px (기존 102px) */
 .help-add-card {
   display: flex;
   align-items: center;
@@ -184,7 +184,7 @@
 
   width: 100%;
   min-width: 0;
-  height: 102px;
+  height: 89px;
   padding: 0;
 
   color: #bbbbbb;
@@ -214,9 +214,9 @@
   width: 100%;
 }
 
-/* [수정] 제목 아래 간격 유지 */
+/* [수정] 피그마 기준 제목-콘텐츠 간격 12px (기존 14px) */
 .help-share-title h2 {
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 /* 선택 전 정보공유 체크박스 */
@@ -227,7 +227,7 @@
 
   width: 23px;
   height: 21px;
-  margin: 0 0 14px;
+  margin: 0 0 12px;
   padding: 0;
 
   appearance: none;
@@ -426,15 +426,16 @@
    도움 요청 버튼
 ========================= */
 
-/* [수정] 비활성 상태의 도움 요청 버튼 */
+/* [수정] 비활성 상태의 도움 요청 버튼 - 피그마 기준 고정 너비 301px (기존 반응형 calc), 상단 여백 24px (기존 20px) */
 .help-request-button {
   display: flex;
   align-items: center;
   justify-content: center;
 
-  width: calc(100% - 44px);
+  width: 301px;
+  max-width: 100%;
   height: 50px;
-  margin: 20px auto 0;
+  margin: 24px auto 0;
   padding: 13px 0;
 
   color: #6f6f6f;
@@ -482,7 +483,7 @@
   }
 
   .help-type-button {
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .help-tag-list {
