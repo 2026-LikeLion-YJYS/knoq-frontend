@@ -3,6 +3,27 @@
 import "./Onboarding1.css";
 import heroImage from "../../assets/images/onboarding-hero.png";
 
+/**
+ * [추가] API 매장명(MCM 청담 HAUS)을 피그마 안내 문구로 변환한다.
+ */
+function formatStoreName(storeName) {
+  if (!storeName) {
+    return "매장 확인 중...";
+  }
+
+  const storeNameMatch = storeName.trim().match(/^MCM\s+(.+?)\s+HAUS$/i);
+
+  // [추가] 예상 형식이 아니면 API에서 받은 매장명을 그대로 표시한다.
+  if (!storeNameMatch) {
+    return `${storeName.trim()}입니다.`;
+  }
+
+  // [추가] 정규식으로 추출한 지점명에 이해하기 쉬운 변수명을 사용한다.
+  const [, branchName] = storeNameMatch;
+
+  return `MCM 하우스 [ ${branchName} ]점 입니다.`;
+}
+
 function Onboarding1({
   storeName,
   onSelectPrivate,
@@ -20,11 +41,12 @@ function Onboarding1({
         <h1 className="onboarding-start__title">
           50년의 탁월함을 넘어 당신에게로,
         </h1>
+
         <p className="onboarding-start__subtitle">
           현재 접속하신 매장은
           <br />
-          {/* [수정] FR-000 응답의 매장명을 중복 문구 없이 그대로 표시 */}
-          {storeName || "매장 확인 중..."}입니다.
+          {/* [수정] FR-000 응답의 매장명을 피그마 문구 형식으로 표시 */}
+          {formatStoreName(storeName)}
         </p>
       </div>
 
@@ -43,6 +65,7 @@ function Onboarding1({
           <span className="onboarding-start__btn-label">
             저장 없이 프라이빗하게 둘러보기
           </span>
+
           <span className="onboarding-start__btn-caption">
             필수 서비스 이용약관 및 만 14세 이상 이용에 동의한 것으로
             간주됩니다.
@@ -58,6 +81,7 @@ function Onboarding1({
           <span className="onboarding-start__btn-label">
             내 정보 기억하고 이어서 탐색하기
           </span>
+
           <span className="onboarding-start__btn-caption">
             카카오 계정으로 간편하게 시작합니다
           </span>
