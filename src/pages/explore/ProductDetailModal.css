@@ -203,7 +203,7 @@
   width: calc(100% + 16px);
   margin: 6px -8px -12px;
 
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
 }
 
