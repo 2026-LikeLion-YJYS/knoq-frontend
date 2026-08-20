@@ -9,7 +9,9 @@ import bagStyleImage from "../../assets/images/bag-style.svg";
 import bagCompositionImage from "../../assets/images/bag-composition.svg";
 
 // 백엔드 연동 전 임시 더미 데이터 (Figma 값 그대로)
-const DEFAULT_PRODUCT = {
+// [윤서][수정] export 추가 - features(스타일/구성/활용) 3분류는 아직 백엔드 미확정이라,
+// ExploreHome에서 실데이터 조립 시 이 더미 features를 그대로 재사용하기 위해 내보냅니다.
+export const DEFAULT_PRODUCT = {
   image: defaultBagImage,
   category: "숄더백",
   name: "Tracy 비세토스 호보",
