@@ -18,8 +18,15 @@ import {
   updateNeedsAnalysis,
 } from "./api/analysisApi";
 
-// [수정] 고객 세션 ID 조회 및 직원 POS 종료 후 토큰 삭제
-import { getSessionId, removeStaffToken } from "./utils/storage";
+// [추가] 새로고침·재진입 시 고객 저장 범위를 복원하는 세션 조회 API
+import { getCustomerSession } from "./api/sessionApi";
+
+// [수정] 고객 세션·토큰 조회 및 직원 POS 종료 후 토큰 삭제
+import {
+  getSessionId,
+  getSessionToken,
+  removeStaffToken,
+} from "./utils/storage";
 
 import Help from "./pages/help/Help";
 
@@ -29,7 +36,7 @@ import OnboardingSetup from "./pages/onboarding/OnboardingSetup";
 import OnboardingComplete from "./pages/onboarding/OnboardingComplete";
 
 import ExploreHome from "./pages/explore/ExploreHome";
-// [추가] 로그인 재방문 시 탐색 아카이브 / 과거 방문 스냅샷
+// [추가] 로그인 재방문 시 탐색 아카이브 / 과거 방문 스냅샷 (병합 과정에서 빠졌던 부분 복구)
 import ExploreArchive from "./pages/explore/ExploreArchive";
 import ExplorePastVisit from "./pages/explore/ExplorePastVisit";
 import ScanCapture from "./pages/explore/ScanCapture";
@@ -192,8 +199,77 @@ function App() {
     ]);
   };
 
-  // [추가] 로그인 상태 (내 정보 기억하고 이어서 탐색하기 → 카카오 로그인 완료 시 true)
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // [수정] 저장된 고객 세션이 있으면 storageScope 복원 전까지 null로 두어 종료 API 오호출을 막습니다.
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return getSessionId() && getSessionToken() ? null : false;
+  });
+
+  // [추가] 쇼핑 셋업에서 입력한 최신 닉네임 (탐색 아카이브 등 개인화 표시용)
+  const [userName, setUserName] = useState("");
+
+  // [추가] 쇼핑 셋업 완료 시 닉네임 저장
+  const handleSetUserName = (name) => {
+    setUserName(name);
+  };
+
+  // [추가] StrictMode에서도 동일한 세션 복원 GET 요청이 중복되지 않도록 Promise를 보관합니다.
+  const customerSessionRequestRef = useRef(null);
+
+  /**
+   * [추가] 새로고침·재진입 시 서버의 storageScope로 ACCOUNT 로그인 상태를 복원합니다.
+   * 이 조회 API는 서버의 세션 만료 시각을 연장하지 않습니다.
+   */
+  useEffect(() => {
+    const sessionId = getSessionId();
+    const sessionToken = getSessionToken();
+
+    if (!sessionId || !sessionToken) {
+      return undefined;
+    }
+
+    let isActive = true;
+
+    if (!customerSessionRequestRef.current) {
+      customerSessionRequestRef.current = getCustomerSession(sessionId);
+    }
+
+    const sessionRequest = customerSessionRequestRef.current;
+
+    sessionRequest
+      .then((response) => {
+        if (!isActive) {
+          return;
+        }
+
+        if (response?.storageScope === "ACCOUNT") {
+          setIsLoggedIn(true);
+          return;
+        }
+
+        if (response?.storageScope === "PRIVATE") {
+          setIsLoggedIn(false);
+          return;
+        }
+
+        // [추가] 필드가 아직 배포되지 않았거나 예상하지 못한 상태이면 종료 API를 선택하지 않습니다.
+        setIsLoggedIn(null);
+      })
+      .catch(() => {
+        if (isActive) {
+          // [추가] 조회 실패를 PRIVATE로 오판하지 않고 새로고침 후 다시 복원할 수 있게 유지합니다.
+          setIsLoggedIn(null);
+        }
+      })
+      .finally(() => {
+        if (customerSessionRequestRef.current === sessionRequest) {
+          customerSessionRequestRef.current = null;
+        }
+      });
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
 
   // [추가] 카카오 로그인 성공 시 호출
   const handleLoginSuccess = () => {
@@ -203,14 +279,6 @@ function App() {
   // [추가] 종료 모달에서 로그아웃 시 호출
   const handleLogout = () => {
     setIsLoggedIn(false);
-  };
-
-  // [추가] 쇼핑 셋업에서 입력한 최신 닉네임 (탐색 아카이브 등 개인화 표시용)
-  const [userName, setUserName] = useState("");
-
-  // [추가] 쇼핑 셋업 완료 시 닉네임 저장
-  const handleSetUserName = (name) => {
-    setUserName(name);
   };
 
   const isEditModalOpen = Boolean(analysisState.editModalType);
@@ -569,11 +637,13 @@ function App() {
         }
       />
 
-      {/* [수정] 탐색 기본 화면 - 로그인 상태면 탐색 아카이브, 아니면 기존 화면 */}
+      {/* [수정] 탐색 기본 화면 - 로그인 상태(isLoggedIn)에 따라 분기
+          - true: 탐색 아카이브 (재방문)
+          - false / null(확인 중): 기존 탐색 화면 그대로 */}
       <Route
         path="/explore"
         element={
-          isLoggedIn ? (
+          isLoggedIn === true ? (
             <ExploreArchive
               userName={userName}
               visits={VISIT_ARCHIVE}
@@ -599,8 +669,7 @@ function App() {
         }
       />
 
-      {/* [수정] 탐색 아카이브에서 "New" 방문 클릭 시 이동하는 실시간 탐색 화면
-          - 사용자 확인: 개인화 없이 기존 탐색 화면 그대로(X 버튼, 기본 제목) */}
+      {/* [추가] 탐색 아카이브에서 "New" 방문 클릭 시 이동하는 실시간 탐색 화면 */}
       <Route
         path="/explore/home"
         element={
