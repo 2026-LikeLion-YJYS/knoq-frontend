@@ -1653,8 +1653,8 @@ function App() {
             <ScanComplete
               onBack={() => navigate("/explore")}
               onScanAgain={() => navigate("/explore/scan")}
-              // [수정] 분석정보 보기 버튼을 분석 화면으로 연결합니다.
-              onViewAnalysis={() => navigate("/analysis")}
+              // [수정] 분석정보 보기 버튼을 탐색 화면으로 연결합니다.
+              onViewAnalysis={() => navigate("/explore")}
             />
           }
         />
