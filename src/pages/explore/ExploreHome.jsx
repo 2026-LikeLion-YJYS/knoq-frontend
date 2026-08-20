@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+// [추가] 백엔드 상대 이미지 URL을 전체 API URL로 변환합니다.
+import { createApiAssetUrl } from "../../api/apiClient";
 import "./ExploreHome.css";
 import cameraIcon from "../../assets/icons/camera.svg";
 import leftArrowIcon from "../../assets/icons/left-arrow.svg";
@@ -78,7 +80,7 @@ function ExploreHome({
   const heroImages = (() => {
     // [수정] 백엔드의 상대 URL은 App.jsx에서 전체 URL로 변환되어 전달됩니다.
     const angleImages = Array.isArray(selectedItem?.images)
-      ? selectedItem.images
+      ? selectedItem.images.map(createApiAssetUrl).filter(Boolean)
       : [];
     if (angleImages.length > 0) return angleImages;
     if (selectedItem?.image) return [selectedItem.image];
