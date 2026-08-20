@@ -67,13 +67,12 @@ const LIFESTYLE_TAG_LABELS = {
 };
 
 /**
- * [수정] 개발 환경에서는 환경변수로 매장 운영시간을 강제 활성화할 수 있습니다.
- * 실제 운영 환경에서는 11:00 이상, 22:00 미만일 때만 활성화됩니다.
+ * [수정] 환경변수로 매장 운영시간을 강제 활성화할 수 있습니다.
+ * VITE_FORCE_STORE_OPEN=true이면 배포 환경에서도 운영시간과 관계없이 활성화됩니다.
  */
 const checkStoreOpen = () => {
-  // [추가] 로컬 개발 환경의 운영시간 테스트 설정
-  const isForcedOpen =
-    import.meta.env.DEV && import.meta.env.VITE_FORCE_STORE_OPEN === "true";
+  // [수정] DEV 조건을 제거해 Vercel에서도 테스트 가능하도록 변경
+  const isForcedOpen = import.meta.env.VITE_FORCE_STORE_OPEN === "true";
 
   if (isForcedOpen) {
     return true;
