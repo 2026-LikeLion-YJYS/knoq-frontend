@@ -791,8 +791,15 @@ function App() {
   };
 
   // [추가] 종료 모달에서 로그아웃 시 호출
+  // [수정] 닉네임 등은 sessionStorage가 아니라 이 컴포넌트의 state로만 들고 있어서
+  // clearCustomerStorage()로는 지워지지 않습니다. 다음 고객(비로그인 포함)에게
+  // 이전 고객의 정보가 남아 보이지 않도록 여기서 함께 초기화합니다.
   const handleLogout = () => {
     setIsLoggedIn(false);
+    setUserName("");
+    setStoreName("");
+    setSavedItems([]);
+    setVisitArchive([]);
   };
 
   // ===== 온보딩 API 연동 =====
@@ -904,6 +911,10 @@ function App() {
         over14: true,
         marketingOptIn: false,
       });
+      // [수정] 닉네임 프리필(initialNickname)은 "같은 날 카카오 재로그인"에서만
+      // 이전 닉네임을 보여주기 위한 기능입니다. PRIVATE를 선택하면 그 이전 값이
+      // 온보딩 닉네임 입력창에 새어 들어가지 않도록 여기서 비웁니다.
+      setUserName("");
       navigate("/onboarding/setup");
     } catch (error) {
       console.error("저장 범위 선택(PRIVATE) 실패:", error);
