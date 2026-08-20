@@ -1238,19 +1238,35 @@ function App() {
 
     try {
       const response = await createNeedsAnalysis(sessionId);
-      const nextAnalysisData = {
-        ...EMPTY_ANALYSIS_DATA,
-        ...response,
-      };
 
-      setAnalysisState((previousState) => ({
-        ...previousState,
-        hasAnalysis: true,
-        analysisData: nextAnalysisData,
-        editedAnalysis: { ...nextAnalysisData },
-        analysisStep: ANALYSIS_STEP.REVIEW,
-        editModalType: null,
-      }));
+      // [추가] 최초 분석과 기존 분석 업데이트 요청을 구분합니다.
+      const isUpdateRequest = loadingStep === ANALYSIS_STEP.UPDATE_LOADING;
+
+      setAnalysisState((previousState) => {
+        /**
+         * [수정] 니즈 분석 업데이트에서는 사용자가 확정하거나 수정한
+         * 카테고리·컬러·소재·사이즈를 유지하고 KNOQ'S 발견 문구만 교체합니다.
+         * 최초 분석에서는 API가 생성한 전체 분석 결과를 그대로 반영합니다.
+         */
+        const nextAnalysisData = isUpdateRequest
+          ? {
+              ...previousState.analysisData,
+              comment: response?.comment ?? previousState.analysisData.comment,
+            }
+          : {
+              ...EMPTY_ANALYSIS_DATA,
+              ...response,
+            };
+
+        return {
+          ...previousState,
+          hasAnalysis: true,
+          analysisData: nextAnalysisData,
+          editedAnalysis: { ...nextAnalysisData },
+          analysisStep: ANALYSIS_STEP.REVIEW,
+          editModalType: null,
+        };
+      });
     } catch (error) {
       setAnalysisState((previousState) => ({
         ...previousState,

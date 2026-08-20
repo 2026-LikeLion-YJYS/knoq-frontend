@@ -304,6 +304,7 @@
   font-weight: 400;
   line-height: 150%;
   letter-spacing: -0.28px;
+  white-space: nowrap;
 }
 
 /* [수정] 라이프스타일 태그 목록 */
