@@ -35,7 +35,6 @@ function ExploreArchive({ userName, visits, isLoggedIn, onLogout, onScan, onSele
             <br />
             직접 스캔해보세요.
           </h1>
-          {/* [수정] Figma 원본은 3줄로 나뉘어 있음 */}
           <p className="explore-archive__description">
             매장에서 제품을 스캔하면
             <br />
@@ -53,7 +52,6 @@ function ExploreArchive({ userName, visits, isLoggedIn, onLogout, onScan, onSele
           </button>
         </div>
 
-        {/* [수정] 삭제됐던 대표 가방 이미지 복구 */}
         <img
           src={mainBagImage}
           alt=""
@@ -72,19 +70,21 @@ function ExploreArchive({ userName, visits, isLoggedIn, onLogout, onScan, onSele
               className="explore-archive__card"
               onClick={() => onSelectVisit?.(visit)}
             >
-              {/* [수정] 방문별 이미지 적용 */}
-              <img
-                src={visit.image}
-                alt=""
-                className="explore-archive__card-image"
-              />
+              <div className="explore-archive__card-inner">
+                <img
+                  src={visit.image}
+                  alt=""
+                  className="explore-archive__card-image"
+                />
+                <div className="explore-archive__card-overlay">
+                  <p className="explore-archive__card-label">{visit.label}</p>
+                  <p className="explore-archive__card-date">{visit.date}</p>
+                </div>
+              </div>
+
               {visit.isNew && (
                 <span className="explore-archive__badge">New</span>
               )}
-              <div className="explore-archive__card-overlay">
-                <p className="explore-archive__card-label">{visit.label}</p>
-                <p className="explore-archive__card-date">{visit.date}</p>
-              </div>
             </button>
           ))}
         </div>

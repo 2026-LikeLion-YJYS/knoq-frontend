@@ -194,8 +194,6 @@
   overflow: hidden;
 }
 
-/* [수정] 카드 높이가 이제 서로 같아지므로(align-items: stretch), 이미지는
-   남는 세로 공간을 flex로 채우되 비율은 유지(contain)합니다. */
 .product-detail-modal__feature-image {
   display: block;
   flex: 1;
@@ -205,7 +203,6 @@
   object-fit: contain;
 }
 
-/* [추가] Figma 실측 값: 스타일 75px / 구성 89px / 활용 130px */
 .product-detail-modal__feature-card--style {
   width: 75px;
 }
@@ -253,7 +250,6 @@
   word-break: keep-all;
 }
 
-/* [수정] 텍스트 체크 표시 대신 orange-check 아이콘 사용 */
 .product-detail-modal__check-icon {
   width: 8px;
   height: 8px;
