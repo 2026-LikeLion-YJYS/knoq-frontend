@@ -9,6 +9,51 @@ import AnalysisEditModal from "./AnalysisEditModal";
 import "./Analysis.css";
 
 /**
+ * [추가] 백엔드 소재 설명을 화면에서 사용하는 네 가지 소재 카테고리로 변환합니다.
+ * 여러 소재가 포함된 경우 Visetos → Leather → Canvas → Nylon 순서로 분류합니다.
+ */
+const normalizePreferredMaterial = (material) => {
+  const materialText = Array.isArray(material)
+    ? material.join(" ")
+    : String(material ?? "");
+
+  const normalizedMaterial = materialText.toLowerCase();
+
+  if (
+    normalizedMaterial.includes("visetos") ||
+    normalizedMaterial.includes("비세토스") ||
+    normalizedMaterial.includes("모노그램")
+  ) {
+    return "Visetos";
+  }
+
+  if (
+    normalizedMaterial.includes("leather") ||
+    normalizedMaterial.includes("레더") ||
+    normalizedMaterial.includes("가죽")
+  ) {
+    return "Leather";
+  }
+
+  if (
+    normalizedMaterial.includes("canvas") ||
+    normalizedMaterial.includes("캔버스")
+  ) {
+    return "Canvas";
+  }
+
+  if (
+    normalizedMaterial.includes("nylon") ||
+    normalizedMaterial.includes("나일론")
+  ) {
+    return "Nylon";
+  }
+
+  // [추가] 소재 정보가 없거나 네 가지 카테고리에 해당하지 않으면 빈 값으로 표시합니다.
+  return "-";
+};
+
+/**
  * [수정] 니즈 분석 화면
  * App.jsx에서 관리하는 API 상태와 분석 단계를 전달받아 표시합니다.
  */
@@ -59,7 +104,12 @@ function Analysis({
   // [수정] 분석8에서는 수정 중인 결과를 표시하고 나머지는 확정 결과 표시
   const displayedAnalysis = showEditControls ? editedAnalysis : analysisData;
 
-  // [추가] 현재 화면에 표시할 니즈 분석 카드
+  // [추가] 긴 소재 설명을 네 가지 소재 카테고리 중 하나로 변환합니다.
+  const displayedPreferredMaterial = normalizePreferredMaterial(
+    displayedAnalysis.preferredMaterial,
+  );
+
+  // [수정] 현재 화면에 표시할 니즈 분석 카드
   const analysisItems = [
     {
       type: "category",
@@ -74,7 +124,7 @@ function Analysis({
     {
       type: "material",
       label: "선호 소재",
-      value: displayedAnalysis.preferredMaterial,
+      value: displayedPreferredMaterial,
     },
     {
       type: "size",
@@ -91,9 +141,13 @@ function Analysis({
     size: "preferredSize",
   };
 
-  // [추가] 현재 수정 모달에 전달할 값
+  // [수정] 소재 수정 모달에는 네 가지 소재 카테고리로 변환한 값을 전달합니다.
   const editingValue = editModalType
-    ? editedAnalysis[analysisFieldMap[editModalType]]
+    ? editModalType === "material"
+      ? normalizePreferredMaterial(
+          editedAnalysis[analysisFieldMap[editModalType]],
+        )
+      : editedAnalysis[analysisFieldMap[editModalType]]
     : "";
 
   return (
