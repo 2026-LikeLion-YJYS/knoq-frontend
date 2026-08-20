@@ -30,6 +30,8 @@ import {
   updateLifestyleTags,
   // [윤서][추가] FR-103 온보딩 추천 생성
   getOnboardingRecommendations,
+  // [윤서][추가] 탐색 아카이브(재방문 목록) 조회
+  getVisitArchive,
 } from "./api/sessionApi";
 
 // [윤서][추가] 추천 제품 상세(이미지) 조회
@@ -37,6 +39,9 @@ import { getProductDetail } from "./api/productsApi";
 
 // [윤서][추가] 제품 스캔(FR-200) 인식/확인 API
 import { recognizeProduct, confirmRecognition } from "./api/scanApi";
+
+// [윤서][추가] 탐색(FR-204) 저장목록 조회/삭제 API
+import { getSavedProducts, deleteSavedProduct } from "./api/savedProductsApi";
 
 // [윤서][추가] 백엔드가 내려주는 상대 이미지 경로를 완전한 URL로 변환
 import { createApiAssetUrl } from "./api/apiClient";
@@ -82,6 +87,7 @@ import AnalysisEditComplete from "./pages/analysis/AnalysisEditComplete";
 import NotificationPage from "./pages/notification/NotificationPage";
 
 // [추가] 탐색 아카이브 카드 썸네일 이미지
+// [윤서][수정] 실제 API 응답엔 카드 이미지가 없어서, 이 3개를 순서대로 돌려쓰는 고정 일러스트로 사용합니다.
 import reShoesImage from "./assets/images/re-shoes.svg";
 import reBagImage from "./assets/images/re-bag.svg";
 import reShirtImage from "./assets/images/re-shirt.svg";
@@ -161,35 +167,59 @@ const getOnboardingErrorMessage = (error, fallbackMessage) => {
 };
 
 /**
- * [추가] 탐색 아카이브 더미 데이터 (API 연동 전)
- * isNew: true인 항목만 "지금 이 로그인 세션의 실시간 탐색 화면"으로 연결됩니다.
- * TODO: 방문 기록 API 나오면 이 더미 대신 실제 데이터로 교체
+ * [윤서][추가] 탐색 아카이브 카드에 순서대로 돌려쓸 고정 일러스트
+ * (실제 API 응답엔 카드 이미지가 없어서, 방문 개수만큼 이 3개를 순환시켜 사용합니다)
  */
-const VISIT_ARCHIVE = [
-  // TODO: Figma에 3번째 카드 라벨/날짜가 아직 확정 안 돼서(디자이너가 "첫 MCM" 그대로 복제해둠)
-  // 일단 이미지만 먼저 넣어둡니다. 확정되면 label/date 교체 필요.
-  {
-    id: "visit-3",
-    label: "세번째 MCM",
-    date: "2025.08.16",
-    isNew: true,
-    image: reShirtImage,
-  },
-  {
-    id: "visit-2",
-    label: "두번째 MCM",
-    date: "2025.08.16",
-    isNew: false,
-    image: reShoesImage,
-  },
-  {
-    id: "visit-1",
-    label: "첫 MCM",
-    date: "2025.08.16",
-    isNew: false,
-    image: reBagImage,
-  },
-];
+const VISIT_ARCHIVE_IMAGES = [reShirtImage, reShoesImage, reBagImage];
+
+/**
+ * [윤서][추가] ISO 날짜 문자열("2025-08-16T16:30:00")을 "2025.08.16" 형태로 변환합니다.
+ */
+const formatVisitDate = (isoString) => {
+  if (!isoString) return "";
+  const datePart = isoString.slice(0, 10); // "2025-08-16"
+  return datePart.replaceAll("-", ".");
+};
+
+/**
+ * [윤서][추가] 방문 순서(ordinal)를 Figma 원래 문구 형식("첫 MCM", "두번째 MCM"...)으로 변환합니다.
+ * 4번째부터는 "n번째 MCM" 형식으로 자동 생성합니다.
+ */
+const ORDINAL_LABELS = ["", "첫", "두번째", "세번째"];
+const formatOrdinalLabel = (ordinal) => {
+  const prefix = ORDINAL_LABELS[ordinal] ?? `${ordinal}번째`;
+  return `${prefix} MCM`;
+};
+
+/**
+ * [윤서][추가] GET /sessions/{sessionId}/archive 응답을
+ * ExploreArchive가 쓰는 카드 형태로 변환합니다.
+ *
+ * - id: 방문(세션) 식별자. 과거 방문 상세 화면 이동 시 사용.
+ * - label: "첫 MCM" / "두번째 MCM" 형태 (Figma 원래 문구 형식). API가 최신순으로 내려주므로,
+ *   전체 개수(count)에서 배열 순서(index)를 빼서 오래된 방문일수록 작은 번호가 붙게 계산합니다.
+ * - date: "2025.08.16" 형태. label과 별도로 전달 - ExploreArchive가 카드 아래쪽 작은 글씨로 따로 렌더링합니다.
+ * - isNew: 지금 이 세션인지 여부 (isCurrent 그대로 사용)
+ * - image: 순서대로 돌려쓰는 고정 일러스트
+ * - products: 그 방문에서 저장했던 제품 목록 (추후 과거 방문 상세 화면에서 활용 가능)
+ */
+const mapArchiveResponseToVisits = (response) => {
+  const visits = response?.visits ?? [];
+  const total = response?.count ?? visits.length;
+
+  return visits.map((visit, index) => {
+    const ordinal = total - index;
+
+    return {
+      id: visit.sessionId,
+      label: formatOrdinalLabel(ordinal),
+      date: formatVisitDate(visit.visitedAt),
+      isNew: Boolean(visit.isCurrent),
+      image: VISIT_ARCHIVE_IMAGES[index % VISIT_ARCHIVE_IMAGES.length],
+      products: visit.products ?? [],
+    };
+  });
+};
 
 function App() {
   const navigate = useNavigate();
@@ -233,24 +263,135 @@ function App() {
   // [추가] 분석 경로의 이전 진입 상태를 저장해 중복 GET 요청을 방지합니다.
   const wasAnalysisRouteRef = useRef(false);
 
-  // [윤서][수정] 더미 8개 대신 빈 배열로 시작 - 쇼핑 셋업 완료 시 실제 추천 제품 3개로 채워짐
+  // [윤서][수정] 저장목록(FR-204) - 이제 더미/낙관적 로컬 상태가 아니라
+  // getSavedProducts로 실제 조회한 값을 담습니다. 초기값은 빈 배열.
   const [savedItems, setSavedItems] = useState([]);
 
-  const handleDeleteSavedItem = (id) => {
-    setSavedItems((prev) => prev.filter((item) => item.id !== id));
+  // [윤서][추가] 저장목록 조회 진행 여부 (화면에 로딩 문구 표시하고 싶을 때 사용)
+  const [isSavedItemsLoading, setIsSavedItemsLoading] = useState(false);
+
+  // [윤서][추가] 저장목록 GET 중복 요청 즉시 차단용 ref
+  const isSavedItemsFetchingRef = useRef(false);
+
+  /**
+   * [윤서][추가] FR-204 저장목록 조회
+   * getSavedProducts는 productId/source/savedAt만 주기 때문에,
+   * 이름·이미지가 필요한 화면 표시용으로 제품마다 FR-201(제품 상세)을 추가 조회해서 채웁니다.
+   * (온보딩 완료 화면에서 추천 이미지 채울 때 썼던 것과 같은 패턴)
+   *
+   * 주의: /products/{productId} CORS가 아직 안 풀린 상태라, 상세 조회 하나가 실패해도
+   * 저장목록 자체(개수, 선택/삭제 기능)는 깨지지 않도록 제품별로 따로 catch 합니다.
+   * CORS가 풀리면 별도 코드 수정 없이 이미지/이름이 자동으로 채워집니다.
+   */
+  const loadSavedProducts = useCallback(async () => {
+    if (isSavedItemsFetchingRef.current) return;
+
+    const sessionId = getSessionId();
+    if (!sessionId) return;
+
+    isSavedItemsFetchingRef.current = true;
+    setIsSavedItemsLoading(true);
+
+    try {
+      const response = await getSavedProducts(sessionId);
+      const products = response?.products ?? [];
+
+      const items = await Promise.all(
+        products.map(async (product) => {
+          // [윤서][추가] 상세 조회 실패 시 사용할 기본값 (이미지/이름 없이 카드만 표시)
+          const base = {
+            id: product.productId,
+            savedProductId: product.savedProductId,
+            image: null,
+            name: "",
+            isRecommended: product.source === "RECOMMEND",
+          };
+
+          try {
+            const detail = await getProductDetail(product.productId);
+            return {
+              ...base,
+              image: createApiAssetUrl(detail.thumbnailUrl),
+              name: detail.name,
+            };
+          } catch (detailError) {
+            console.error(
+              `저장 제품 상세 조회 실패 (productId: ${product.productId}):`,
+              detailError,
+            );
+            return base;
+          }
+        }),
+      );
+
+      setSavedItems(items);
+    } catch (error) {
+      console.error("저장목록 조회(FR-204) 실패:", error);
+    } finally {
+      isSavedItemsFetchingRef.current = false;
+      setIsSavedItemsLoading(false);
+    }
+  }, []);
+
+  /**
+   * [윤서][추가] 저장목록 삭제 (FR-204)
+   * 먼저 화면에서 즉시 제거(낙관적 업데이트)하고, API 실패 시에만 되돌립니다.
+   */
+  const handleDeleteSavedItem = async (productId) => {
+    const sessionId = getSessionId();
+    if (!sessionId) return;
+
+    const previousItems = savedItems;
+    setSavedItems((prev) => prev.filter((item) => item.id !== productId));
+
+    try {
+      await deleteSavedProduct(sessionId, productId);
+    } catch (error) {
+      console.error("저장목록 삭제(FR-204) 실패:", error);
+      // [윤서][추가] 삭제 실패 시 화면을 원래 상태로 되돌립니다.
+      setSavedItems(previousItems);
+    }
   };
 
-  const handleAddScannedProduct = (product) => {
-    setSavedItems((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        image: product.image,
-        name: product.name,
-        isRecommended: false,
-      },
-    ]);
-  };
+  // ===== [윤서] 여기부터 탐색 아카이브(재방문 목록) API 연동을 위해 추가한 부분 =====
+
+  // [윤서][추가] 탐색 아카이브(재방문 목록) - 더미 VISIT_ARCHIVE 대신 실제 조회한 값을 담습니다.
+  const [visitArchive, setVisitArchive] = useState([]);
+
+  // [윤서][추가] 아카이브 조회 진행 여부
+  const [isVisitArchiveLoading, setIsVisitArchiveLoading] = useState(false);
+
+  // [윤서][추가] 아카이브 GET 중복 요청 즉시 차단용 ref
+  const isVisitArchiveFetchingRef = useRef(false);
+
+  /**
+   * [윤서][추가] 탐색 아카이브 조회
+   * ACCOUNT 로그인 상태(isLoggedIn === true)일 때만 의미가 있는 화면이라,
+   * 로그인 상태가 true로 확정될 때 호출합니다.
+   */
+  const loadVisitArchive = useCallback(async () => {
+    if (isVisitArchiveFetchingRef.current) return;
+
+    const sessionId = getSessionId();
+    if (!sessionId) return;
+
+    isVisitArchiveFetchingRef.current = true;
+    setIsVisitArchiveLoading(true);
+
+    try {
+      const response = await getVisitArchive(sessionId);
+      setVisitArchive(mapArchiveResponseToVisits(response));
+    } catch (error) {
+      console.error("탐색 아카이브 조회 실패:", error);
+      // [윤서][추가] 실패해도 빈 배열로 두어 화면이 깨지지 않게 합니다.
+      setVisitArchive([]);
+    } finally {
+      isVisitArchiveFetchingRef.current = false;
+      setIsVisitArchiveLoading(false);
+    }
+  }, []);
+
+  // ===== [윤서] 여기까지 탐색 아카이브(재방문 목록) API 연동을 위해 추가한 부분 =====
 
   // ===== [윤서] 여기부터 제품 스캔(FR-200) API 연동을 위해 추가한 부분 =====
 
@@ -270,6 +411,11 @@ function App() {
    * [윤서][추가] 촬영 완료 시 호출됨 (ScanCapture의 onCapture)
    * FR-200 카메라 인식 요청 → 첫 번째 후보의 상세정보(이름/이미지) 조회 순서로 진행합니다.
    * 후보가 여러 개(CANDIDATES) 와도, 별도 선택 화면 없이 첫 번째 후보만 사용하기로 함(팀 확인 완료).
+   *
+   * [윤서][추가] /products/{productId} CORS 이슈로 상세조회가 실패하면
+   * 예전엔 조용히 촬영 화면으로 돌아가서 "셔터가 안 눌리는 것처럼" 보였습니다.
+   * 지금은 인식 자체(recognizeProduct)와 상세조회(getProductDetail)를 구분해서
+   * 에러 메시지를 다르게 보여줍니다.
    */
   const handleScanCapture = async (imageBlob) => {
     const sessionId = getSessionId();
@@ -278,14 +424,30 @@ function App() {
     setScanError("");
     navigate("/explore/scan/recognizing");
 
+    let recognition;
     try {
-      const recognition = await recognizeProduct(sessionId, imageBlob);
-      const firstCandidate = recognition?.candidates?.[0];
+      recognition = await recognizeProduct(sessionId, imageBlob);
+    } catch (error) {
+      console.error("제품 인식(FR-200) 실패:", error);
+      setScanError(
+        getOnboardingErrorMessage(
+          error,
+          "제품을 인식하지 못했어요. 다시 촬영해주세요.",
+        ),
+      );
+      navigate("/explore/scan", { replace: true });
+      return;
+    }
 
-      if (!firstCandidate) {
-        throw new Error("인식된 제품이 없어요.");
-      }
+    const firstCandidate = recognition?.candidates?.[0];
 
+    if (!firstCandidate) {
+      setScanError("인식된 제품이 없어요. 다시 촬영해주세요.");
+      navigate("/explore/scan", { replace: true });
+      return;
+    }
+
+    try {
       const detail = await getProductDetail(firstCandidate.productId);
 
       setScanResult({
@@ -299,11 +461,12 @@ function App() {
 
       navigate("/explore/scan/confirm", { replace: true });
     } catch (error) {
-      console.error("제품 인식(FR-200) 실패:", error);
+      // [윤서][추가] 여기서 실패하는 경우 대부분 CORS(/products) 이슈입니다.
+      console.error("제품 상세 조회(FR-201) 실패:", error);
       setScanError(
         getOnboardingErrorMessage(
           error,
-          "제품을 인식하지 못했어요. 다시 촬영해주세요.",
+          "제품 정보를 불러오지 못했어요. 잠시 후 다시 시도해주세요.",
         ),
       );
       navigate("/explore/scan", { replace: true });
@@ -311,8 +474,9 @@ function App() {
   };
 
   /**
-   * [윤서][추가] 확인 화면에서 "맞아요" 클릭
+   * [윤서][수정] 확인 화면에서 "맞아요" 클릭
    * confirmed:true로 confirm 호출 → 같은 트랜잭션 안에서 저장목록에 자동 저장됨(별도 저장 API 불필요).
+   * 로컬에 낙관적으로 항목을 추가하던 방식 대신, 저장목록을 실제 API로 재조회해서 반영합니다.
    */
   const handleScanConfirm = async () => {
     const sessionId = getSessionId();
@@ -329,8 +493,8 @@ function App() {
         product.productId,
         true,
       );
-      // TODO: 저장목록을 실제 API(getSavedProducts)로 교체하면 이 줄은 지우고 재조회로 대체
-      handleAddScannedProduct(product);
+      // [윤서][수정] 저장목록 실제 API로 재조회
+      await loadSavedProducts();
       navigate("/explore/scan/complete", { replace: true });
     } catch (error) {
       console.error("인식 결과 확인 실패:", error);
@@ -373,10 +537,16 @@ function App() {
 
   // ===== [윤서] 여기까지 제품 스캔(FR-200) API 연동을 위해 추가한 부분 =====
 
-  // [수정] 저장된 고객 세션이 있으면 storageScope 복원 전까지 null로 두어 종료 API 오호출을 막습니다.
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     return getSessionId() && getSessionToken() ? null : false;
   });
+
+  // [윤서][추가] 로그인 상태가 true로 확정되면(재방문 상태) 아카이브를 조회합니다.
+  // (isLoggedIn을 참조하므로 반드시 위 state 선언 뒤에 있어야 합니다 - TDZ 에러 방지)
+  useEffect(() => {
+    if (isLoggedIn !== true) return;
+    loadVisitArchive();
+  }, [isLoggedIn, loadVisitArchive]);
 
   // [추가] 쇼핑 셋업에서 입력한 최신 닉네임 (탐색 아카이브 등 개인화 표시용)
   const [userName, setUserName] = useState("");
@@ -400,6 +570,13 @@ function App() {
   const handleSetUserName = (name) => {
     setUserName(name);
   };
+
+  // [윤서][추가] 세션이 준비되면(새로고침 복원 포함) 저장목록을 한 번 조회합니다.
+  // 이후에는 스캔 확인/삭제 시점마다 필요한 곳에서 다시 조회합니다.
+  useEffect(() => {
+    if (!isOnboardingSessionReady) return;
+    loadSavedProducts();
+  }, [isOnboardingSessionReady, loadSavedProducts]);
 
   // [추가] StrictMode에서도 동일한 세션 복원 GET 요청이 중복되지 않도록 Promise를 보관합니다.
   const customerSessionRequestRef = useRef(null);
@@ -752,8 +929,9 @@ function App() {
           })),
         );
 
-        // [윤서][추가] 탐색 화면 저장목록에도 같은 추천 제품 3개를 초기값으로 반영
-        // (나중에 실제 스캔해서 추가되는 제품은 handleAddScannedProduct가 계속 이어서 추가함)
+        // [윤서][수정] FR-103 추천 생성 시 서버가 자동 저장하므로(source: RECOMMEND),
+        // 여기서도 화면에 바로 반영되도록 같은 데이터로 savedItems를 채워둡니다.
+        // (다음에 /explore 진입 시 loadSavedProducts가 실제 저장목록으로 다시 덮어씁니다)
         setSavedItems(
           validDetails.map((detail) => ({
             id: detail.productId,
@@ -1148,7 +1326,7 @@ function App() {
       />
 
       {/* [수정] 탐색 기본 화면 - 로그인 상태(isLoggedIn)에 따라 분기
-          - true: 탐색 아카이브 (재방문)
+          - true: 탐색 아카이브 (재방문) - 이제 실제 API(visitArchive)로 채워짐
           - false / null(확인 중): 기존 탐색 화면 그대로 */}
       <Route
         path="/explore"
@@ -1156,7 +1334,7 @@ function App() {
           isLoggedIn === true ? (
             <ExploreArchive
               userName={userName}
-              visits={VISIT_ARCHIVE}
+              visits={visitArchive}
               isLoggedIn={isLoggedIn}
               onLogout={handleLogout}
               onScan={() => navigate("/explore/scan")}
@@ -1164,7 +1342,11 @@ function App() {
                 if (visit.isNew) {
                   navigate("/explore/home");
                 } else {
-                  navigate(`/explore/visit/${visit.id}`);
+                  // [윤서][추가] 과거 방문의 저장 제품 목록을 이미 아카이브 응답에서 받아왔으므로,
+                  // 다시 API 호출하지 않고 state로 같이 넘겨줍니다.
+                  navigate(`/explore/visit/${visit.id}`, {
+                    state: { visit },
+                  });
                 }
               }}
             />
@@ -1205,7 +1387,7 @@ function App() {
       />
 
       {/* [윤서][수정] onCapture가 이제 실제 사진 Blob을 받아서 인식 API를 호출합니다.
-          errorMessage도 전달해서, 인식 실패로 이 화면에 되돌아왔을 때 이유가 보이게 함 */}
+          errorMessage도 전달해서, 인식/상세조회 실패로 이 화면에 되돌아왔을 때 이유가 보이게 함 */}
       <Route
         path="/explore/scan"
         element={
