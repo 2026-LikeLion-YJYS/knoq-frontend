@@ -28,7 +28,15 @@ import {
   loginWithKakao,
   updateNickname,
   updateLifestyleTags,
+  // [윤서][추가] FR-103 온보딩 추천 생성
+  getOnboardingRecommendations,
 } from "./api/sessionApi";
+
+// [윤서][추가] 추천 제품 상세(이미지) 조회
+import { getProductDetail } from "./api/productsApi";
+
+// [윤서][추가] 백엔드가 내려주는 상대 이미지 경로를 완전한 URL로 변환
+import { createApiAssetUrl } from "./api/apiClient";
 
 // [수정] 고객 세션·토큰 조회/저장 및 직원 POS 종료 후 토큰 삭제
 // [윤서][수정] setSessionId, setSessionToken 추가
@@ -450,9 +458,13 @@ function App() {
     }
   };
 
+  // [윤서][추가] 쇼핑 셋업 완료 화면에 표시할 추천 제품 (이미지 포함)
+  const [recommendedProducts, setRecommendedProducts] = useState([]);
+
   /**
    * [윤서][추가] 쇼핑 셋업(닉네임/라이프스타일) 완료
-   * FR-101(닉네임) → FR-102(라이프스타일 태그) 순서로 호출합니다.
+   * FR-101(닉네임) → FR-102(라이프스타일 태그) → FR-103(추천 생성) 순서로 호출합니다.
+   * FR-103 응답에는 이미지가 없어서, 제품마다 FR-201(제품 상세)을 추가로 불러와 이미지를 채웁니다.
    */
   const handleOnboardingSetupSubmit = async (data) => {
     const sessionId = getSessionId();
@@ -465,6 +477,31 @@ function App() {
       await updateNickname(sessionId, data.nickname);
       await updateLifestyleTags(sessionId, data.lifestyleTags);
       handleSetUserName(data.nickname);
+
+      // [윤서][추가] 추천 생성 실패는 온보딩 자체를 막지 않고, 완료 화면에 빈 카드로 넘어가게 처리
+      try {
+        const recommendation = await getOnboardingRecommendations(sessionId);
+        const products = recommendation?.products ?? [];
+
+        const productDetails = await Promise.all(
+          products.map((product) =>
+            getProductDetail(product.productId).catch(() => null),
+          ),
+        );
+
+        setRecommendedProducts(
+          productDetails
+            .filter(Boolean)
+            .map((detail) => ({
+              image: createApiAssetUrl(detail.thumbnailUrl),
+              name: detail.name,
+            })),
+        );
+      } catch (recommendationError) {
+        console.error("추천 제품 조회 실패:", recommendationError);
+        setRecommendedProducts([]);
+      }
+
       navigate("/onboarding/complete");
     } catch (error) {
       console.error("쇼핑 셋업 저장 실패:", error);
@@ -826,10 +863,12 @@ function App() {
         }
       />
 
+      {/* [윤서][수정] FR-103 추천 제품(이미지 포함)을 완료 화면에 전달 */}
       <Route
         path="/onboarding/complete"
         element={
           <OnboardingComplete
+            products={recommendedProducts}
             onBack={() => navigate(-1)}
             onStart={() => navigate("/explore")}
           />

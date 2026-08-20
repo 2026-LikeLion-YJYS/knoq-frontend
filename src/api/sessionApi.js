@@ -112,3 +112,18 @@ export const updateLifestyleTags = (sessionId, tags) => {
     },
   );
 };
+
+/**
+ * [윤서][추가] FR-103 온보딩 추천 생성.
+ * 세션의 라이프스타일 태그 기준으로 제품을 최대 3개 추천하고 저장목록에 자동 저장됩니다.
+ * Swagger상 request body가 필수로 표시되어 있어 빈 객체를 명시적으로 보냅니다.
+ */
+export const getOnboardingRecommendations = (sessionId) => {
+  return customerApiRequest(
+    `/sessions/${encodeURIComponent(sessionId)}/recommendations`,
+    {
+      method: "POST",
+      body: {},
+    },
+  );
+};
