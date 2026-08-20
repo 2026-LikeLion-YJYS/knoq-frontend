@@ -27,14 +27,33 @@ function ExploreHome({
   showDelete = true,
 }) {
   const [angleIndex, setAngleIndex] = useState(0);
-  const [selectedId, setSelectedId] = useState(4); // [임시] 기본 선택값
+  // [수정] 서버 저장목록의 첫 제품을 기본 선택하므로 임시 id 고정값을 제거합니다.
+  const [selectedId, setSelectedId] = useState(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const navigate = useNavigate();
 
+  // [추가] 비동기 목록 갱신·삭제 시 별도 렌더링 없이 첫 제품을 기본 선택합니다.
+  const effectiveSelectedId = savedItems.some((item) => item.id === selectedId)
+    ? selectedId
+    : (savedItems[0]?.id ?? null);
+
+  // [추가] 실제 선택 제품에 연결된 서버 적합 분석과 화면 표시값을 계산합니다.
+  const selectedItem = savedItems.find(
+    (item) => item.id === effectiveSelectedId,
+  );
+  const selectedAnalysis =
+    selectedItem?.fitAnalysis?.length > 0
+      ? selectedItem.fitAnalysis
+      : ["선택한 제품의 라이프스타일 적합 분석을 준비하고 있어요."];
+  const heroName = selectedItem?.name || "제품 정보를 불러오는 중입니다.";
+  const heroImage = selectedItem?.image || HERO_IMAGES[angleIndex];
+  const hasSelectedImage = Boolean(selectedItem?.image);
+
   const goPrev = () =>
-    setAngleIndex((prev) => (prev - 1 + HERO_IMAGES.length) % HERO_IMAGES.length);
-  const goNext = () =>
-    setAngleIndex((prev) => (prev + 1) % HERO_IMAGES.length);
+    setAngleIndex(
+      (prev) => (prev - 1 + HERO_IMAGES.length) % HERO_IMAGES.length,
+    );
+  const goNext = () => setAngleIndex((prev) => (prev + 1) % HERO_IMAGES.length);
 
   const handleNavigate = (tabId) => {
     if (tabId === "explore") navigate("/explore");
@@ -44,13 +63,14 @@ function ExploreHome({
 
   const handleSelect = (id) => {
     setSelectedId(id);
-    // TODO: 선택한 상품에 맞는 분석 텍스트로 교체 (API 연동 시)
+    // [수정] 선택 제품이 바뀌면 대체 이미지 각도를 첫 화면으로 초기화합니다.
+    setAngleIndex(0);
   };
 
   const handleDelete = (id, e) => {
     e.stopPropagation();
     onDeleteSavedItem?.(id);
-    if (selectedId === id) setSelectedId(null);
+    if (effectiveSelectedId === id) setSelectedId(null);
   };
 
   return (
@@ -59,29 +79,31 @@ function ExploreHome({
         <div className="explore-home__glow" />
 
         <div className="explore-home__header-wrap">
-        <MainHeader
+          <MainHeader
             onNotificationClick={() => navigate("/notification")}
             isLoggedIn={isLoggedIn}
             onLogout={onLogout}
-        />
-    </div>
+          />
+        </div>
 
         <h1 className="explore-home__title">{title}</h1>
 
         <section className="explore-home__insight-card">
           <p className="explore-home__insight-label">라이프스타일 적합 분석</p>
           <p className="explore-home__insight-body">
-            평소 선호하는 미니멀 스타일과 잘 어울립니다.
-            <br />
-            노트북 수납이 가능한 사이즈입니다.
-            <br />
-            출퇴근용으로 적합합니다.
+            {/* [수정] 선택 제품의 fit-analysis API 결과를 문장별로 표시합니다. */}
+            {selectedAnalysis.map((line) => (
+              <span key={line} className="explore-home__insight-line">
+                {line}
+              </span>
+            ))}
           </p>
         </section>
 
         <section className="explore-home__hero-card">
           <div className="explore-home__hero-header">
-            <p className="explore-home__hero-title">L Tracy 비세토스 호보</p>
+            {/* [수정] 고정 제품명이 아니라 선택한 저장 제품명을 표시합니다. */}
+            <p className="explore-home__hero-title">{heroName}</p>
             <button
               type="button"
               className="explore-home__detail-badge"
@@ -92,29 +114,34 @@ function ExploreHome({
           </div>
 
           <div className="explore-home__hero-image-wrap">
-            <button
-              type="button"
-              className="explore-home__arrow explore-home__arrow--left"
-              onClick={goPrev}
-              aria-label="이전 각도"
-            >
-              <img src={leftArrowIcon} alt="" />
-            </button>
+            {/* [수정] 서버 썸네일만 있는 제품에서는 임시 각도 전환 버튼을 숨깁니다. */}
+            {!hasSelectedImage && (
+              <button
+                type="button"
+                className="explore-home__arrow explore-home__arrow--left"
+                onClick={goPrev}
+                aria-label="이전 각도"
+              >
+                <img src={leftArrowIcon} alt="" />
+              </button>
+            )}
 
             <img
-              src={HERO_IMAGES[angleIndex]}
-              alt="L Tracy 비세토스 호보"
+              src={heroImage}
+              alt={heroName}
               className="explore-home__hero-image"
             />
 
-            <button
-              type="button"
-              className="explore-home__arrow explore-home__arrow--right"
-              onClick={goNext}
-              aria-label="다음 각도"
-            >
-              <img src={rightArrowIcon} alt="" />
-            </button>
+            {!hasSelectedImage && (
+              <button
+                type="button"
+                className="explore-home__arrow explore-home__arrow--right"
+                onClick={goNext}
+                aria-label="다음 각도"
+              >
+                <img src={rightArrowIcon} alt="" />
+              </button>
+            )}
           </div>
         </section>
       </div>
@@ -127,7 +154,9 @@ function ExploreHome({
               key={item.id}
               className={
                 "explore-home__saved-card" +
-                (selectedId === item.id ? " explore-home__saved-card--selected" : "")
+                (effectiveSelectedId === item.id
+                  ? " explore-home__saved-card--selected"
+                  : "")
               }
             >
               <button

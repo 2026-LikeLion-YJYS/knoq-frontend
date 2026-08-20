@@ -1,22 +1,15 @@
-/* [수정] 고객 화면은 피그마 기준 너비를 유지하고 높이는 실제 기기에 맞춥니다. */
+/* [수정] 고객 화면은 피그마 기준 너비를 유지하고 콘텐츠 높이만큼 자연스럽게 확장합니다. */
 .app-frame {
   position: relative;
   width: 393px;
   max-width: 100%;
-  height: 100dvh;
+  min-height: 100dvh;
   margin: 0 auto;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow-x: clip;
   background: #24221e;
-  scrollbar-width: none;
 
-  /* [추가] 하단 네비게이션 등 fixed 요소가 프레임을 기준으로 배치되도록 합니다. */
-  transform: translateZ(0);
-}
-
-/* [추가] 고정 프레임의 스크롤바만 숨기고 세로 스크롤 기능은 유지합니다. */
-.app-frame::-webkit-scrollbar {
-  display: none;
+  /* [추가] 상태바가 제거된 화면의 공통 상단 헤더 간격입니다. */
+  --app-header-top-offset: 18px;
 }
 
 /* [수정] 직원 화면은 피그마 기준 너비만 744px로 변경합니다. */
@@ -24,9 +17,9 @@
   width: 744px;
 }
 
-/* [수정] 각 화면은 프레임 너비와 최소 높이만 사용하고 콘텐츠 높이는 제한하지 않습니다. */
+/* [수정] 각 화면은 프레임 너비와 뷰포트 최소 높이만 사용하고 콘텐츠 높이는 제한하지 않습니다. */
 .app-frame > * {
   width: 100% !important;
   max-width: 100% !important;
-  min-height: 100% !important;
+  min-height: 100dvh !important;
 }

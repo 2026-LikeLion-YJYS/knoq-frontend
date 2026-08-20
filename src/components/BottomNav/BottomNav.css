@@ -2,8 +2,9 @@
 .bottom-nav {
   position: fixed;
   left: 50%;
-  bottom: 32px;
-  z-index: 20;
+  /* [수정] 스크롤 위치와 관계없이 실제 화면 하단의 안전 영역 위에 고정합니다. */
+  bottom: max(20px, env(safe-area-inset-bottom));
+  z-index: 50;
   transform: translateX(-50%);
 
   width: 241px;
